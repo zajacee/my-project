@@ -3,13 +3,17 @@ let allNotifications = [];
 let currentlyVisible = 5;
 const BATCH_SIZE = 5;
 
-// ===== API BASE (lokál vs produkcia) =====
-const API_BASE =
+// Použi globálne hodnoty z index.html, alebo fallback ak by neboli
+const API_BASE = window.API_BASE || (
   (location.hostname === "localhost" || location.hostname === "127.0.0.1")
     ? "http://localhost:3000"
-    : "https://api.dajtovon.sk";
+    : "https://api.dajtovon.sk"
+);
 
-const api = (path) => `${API_BASE}${path}`;
+const api = window.api || ((path) => `${API_BASE}${path}`);
+
+window.API_BASE = window.API_BASE || API_BASE;
+window.api = window.api || api;
 
 function timeAgo(timestamp) {
   const now = new Date();
@@ -115,7 +119,7 @@ function checkUnreadDot() {
   document.getElementById("bell-dot").style.display = hasUnread ? "block" : "none";
 }
 
-function initializeNotifications() {
+window.initializeNotifications = function initializeNotifications() {
   // ✅ Socket.IO na správnu URL (https -> wss automaticky)
   const socket = io(API_BASE, {
     withCredentials: true,
