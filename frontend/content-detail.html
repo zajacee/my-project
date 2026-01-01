@@ -644,12 +644,20 @@ header h1 {
                 <a href="privacy.pdf" target="_blank" class="footer-link">Ochrana osobných údajov</a>
             </div>
             <div class="copyright">
-                <p>&copy; 2025 DajToVon</p>
+                <p>&copy; 2026 DajToVon</p>
             </div>
         </div>
     </footer>
 
     <script>
+
+      // ===== API BASE (lokál vs produkcia) =====
+const API_BASE =
+  (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+    ? "http://localhost:3000"
+    : "https://api.dajtovon.sk";
+
+const api = (path) => `${API_BASE}${path}`;
 
             const categoryMapping = {
             vedomosti: "Vedomosti",
@@ -700,7 +708,7 @@ function getTokenFromCookie() {
 let currentUser = null;
 
     // --- Check if logged in ---
-    fetch('http://localhost:3000/api/me', {
+    fetch(api('/api/me'), {
         method: 'GET',
         credentials: 'include'
     })
@@ -742,7 +750,7 @@ let currentUser = null;
 
     // --- Logout ---
     logoutOption.addEventListener("click", () => {
-        fetch("http://localhost:3000/logout", {
+        fetch(api('/logout'), {
             method: "POST",
             credentials: "include"
         })
@@ -843,7 +851,7 @@ let currentUser = null;
         }
     });
 
-    fetch('http://localhost:3000/all-content')
+    fetch(api('/all-content'))
   .then(res => res.json())
   .then(data => {
     const allContent = data.allContent || [];
@@ -856,7 +864,7 @@ let currentUser = null;
     const item = entry.content; // ✅ consistent with the rest of your app
 
 // Register the view
-fetch(`http://localhost:3000/view/${contentId}`, {
+fetch(api(`/view/${contentId}`), {
   method: 'POST'
 });
 
@@ -879,7 +887,7 @@ const commentsPerPage = 5;
 let userReactions = {};
 
 function fetchStats() {
-  fetch(`http://localhost:3000/stats/${contentId}`, {
+  fetch(api(`/stats/${contentId}`), {
     method: 'GET',
     credentials: 'include' // ✅ This sends the cookie with the request
   })
@@ -998,7 +1006,7 @@ function attachCommentHandlers() {
       if (currentReaction === 'like') {
         btn.classList.remove('liked');
         delete userReactions[commentId];
-        fetch(`http://localhost:3000/comment-neutral/${contentId}/${safeId}`, {
+        fetch(api(`/comment-neutral/${contentId}/${safeId}`), {
           method: 'POST',
           credentials: 'include'
         }).then(fetchStats);
@@ -1006,7 +1014,7 @@ function attachCommentHandlers() {
         btn.classList.add('liked');
         btn.parentElement.querySelector('.comment-dislike')?.classList.remove('disliked');
         delete userReactions[commentId];
-        fetch(`http://localhost:3000/comment-like/${contentId}/${safeId}`, {
+        fetch(api(`/comment-like/${contentId}/${safeId}`), {
           method: 'POST',
           credentials: 'include'
         }).then(fetchStats);
@@ -1028,7 +1036,7 @@ function attachCommentHandlers() {
       if (currentReaction === 'dislike') {
         btn.classList.remove('disliked');
         delete userReactions[commentId];
-        fetch(`http://localhost:3000/comment-neutral/${contentId}/${safeId}`, {
+        fetch(api(`/comment-neutral/${contentId}/${safeId}`), {
           method: 'POST',
           credentials: 'include'
         }).then(fetchStats);
@@ -1036,7 +1044,7 @@ function attachCommentHandlers() {
         btn.classList.add('disliked');
         btn.parentElement.querySelector('.comment-like')?.classList.remove('liked');
         delete userReactions[commentId];
-        fetch(`http://localhost:3000/comment-dislike/${contentId}/${safeId}`, {
+        fetch(api(`/comment-dislike/${contentId}/${safeId}`), {
           method: 'POST',
           credentials: 'include'
         }).then(fetchStats);
@@ -1050,7 +1058,7 @@ function attachCommentHandlers() {
       const safeId = encodeURIComponent(commentId);
 
       showAlert("Naozaj chcete vymazať tento komentár?", () => {
-        fetch(`http://localhost:3000/comment/${contentId}/${safeId}`, {
+        fetch(api(`/comment/${contentId}/${safeId}`), {
           method: 'DELETE',
           credentials: 'include'
         }).then(() => fetchStats());
@@ -1108,7 +1116,7 @@ function attachCommentHandlers() {
         if (!newText) return showAlert("Text komentára nemôže byť prázdny");
 
         const safeId = encodeURIComponent(commentId);
-        fetch(`http://localhost:3000/comment/${contentId}/${safeId}`, {
+        fetch(api(`/comment/${contentId}/${safeId}`), {
           method: 'PUT',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
@@ -1281,7 +1289,7 @@ if (contactSection && contactBtn && contactInput) {
         return;
       }
 
-      fetch(`http://localhost:3000/contact-author/${contentId}`, {
+      fetch(api(`/contact-author/${contentId}`), {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -1325,7 +1333,7 @@ document.getElementById('post-comment-btn').addEventListener('click', () => {
   return;
 }
 
-fetch(`http://localhost:3000/comment/${contentId}`, {
+fetch(api(`/comment/${contentId}`), {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -1357,14 +1365,14 @@ document.getElementById('like-btn').addEventListener('click', () => {
 
   if (isLiked) {
     likeBtn.classList.remove('liked');
-    fetch(`http://localhost:3000/neutral/${contentId}`, {
+    fetch(api(`/neutral/${contentId}`), {
       method: 'POST',
       credentials: 'include'
     }).then(() => fetchStats());
   } else {
     likeBtn.classList.add('liked');
     dislikeBtn.classList.remove('disliked');
-    fetch(`http://localhost:3000/like/${contentId}`, {
+    fetch(api(`/like/${contentId}`), {
       method: 'POST',
       credentials: 'include'
     }).then(() => fetchStats());
@@ -1383,14 +1391,14 @@ document.getElementById('dislike-btn').addEventListener('click', () => {
 
   if (isDisliked) {
     dislikeBtn.classList.remove('disliked');
-    fetch(`http://localhost:3000/neutral/${contentId}`, {
+    fetch(api(`/neutral/${contentId}`), {
       method: 'POST',
       credentials: 'include'
     }).then(() => fetchStats());
   } else {
     dislikeBtn.classList.add('disliked');
     likeBtn.classList.remove('liked');
-    fetch(`http://localhost:3000/dislike/${contentId}`, {
+    fetch(api(`/dislike/${contentId}`), {
       method: 'POST',
       credentials: 'include'
     }).then(() => fetchStats());

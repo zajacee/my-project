@@ -3,6 +3,14 @@ let allNotifications = [];
 let currentlyVisible = 5;
 const BATCH_SIZE = 5;
 
+// ===== API BASE (lokál vs produkcia) =====
+const API_BASE =
+  (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+    ? "http://localhost:3000"
+    : "https://api.dajtovon.sk";
+
+const api = (path) => `${API_BASE}${path}`;
+
 function timeAgo(timestamp) {
   const now = new Date();
   const diff = Math.floor((Date.now() - new Date(timestamp)) / 1000);
@@ -29,39 +37,41 @@ function renderNotification(notification) {
   const title = `<strong>„${notification.contentTitle}“</strong>`;
   let text = "";
 
-  if (notification.type === 'like') {
-    text = notification.targetType === 'comment'
+  if (notification.type === "like") {
+    text = notification.targetType === "comment"
       ? `👍 ${username} reagoval na váš komentár k príspevku ${title}`
       : `👍 ${username} reagoval na váš príspevok ${title}`;
-  } else if (notification.type === 'dislike') {
-    text = notification.targetType === 'comment'
+  } else if (notification.type === "dislike") {
+    text = notification.targetType === "comment"
       ? `👎 ${username} reagoval na váš komentár k príspevku ${title}`
       : `👎 ${username} reagoval na váš príspevok ${title}`;
-  } else if (notification.type === 'comment') {
+  } else if (notification.type === "comment") {
     text = `💬 ${username} komentoval váš príspevok ${title}`;
   }
 
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = `content-detail.html?contentId=${notification.contentId}`;
   a.innerHTML = `${text}<br><small style="color:#888;">${timeAgo(notification.timestamp)}</small>`;
-  a.style.textDecoration = 'none';
-  a.style.color = '#333';
-  a.style.display = 'block';
+  a.style.textDecoration = "none";
+  a.style.color = "#333";
+  a.style.display = "block";
 
-  a.addEventListener('click', e => {
+  a.addEventListener("click", (e) => {
     e.preventDefault();
-    fetch(`http://localhost:3000/api/notifications/read/${notification._id}`, {
-      method: 'POST',
-      credentials: 'include'
-    }).then(() => {
-      notification.read = true;
-      li.style.backgroundColor = "";
-      li.dataset.read = "true";
-      checkUnreadDot();
-      window.location.href = a.href;
-    }).catch(() => {
-      window.location.href = a.href;
-    });
+    fetch(api(`/api/notifications/read/${notification._id}`), {
+      method: "POST",
+      credentials: "include",
+    })
+      .then(() => {
+        notification.read = true;
+        li.style.backgroundColor = "";
+        li.dataset.read = "true";
+        checkUnreadDot();
+        window.location.href = a.href;
+      })
+      .catch(() => {
+        window.location.href = a.href;
+      });
   });
 
   li.appendChild(a);
@@ -82,8 +92,8 @@ function renderNotificationList() {
     moreLi.style.cursor = "pointer";
     moreLi.style.padding = "8px 0";
     moreLi.style.color = "#3498db";
-    moreLi.addEventListener('click', (e) => {
-      e.stopPropagation();  // prevent popup from closing
+    moreLi.addEventListener("click", (e) => {
+      e.stopPropagation(); // prevent popup from closing
       currentlyVisible += BATCH_SIZE;
       renderNotificationList();
     });
@@ -92,10 +102,10 @@ function renderNotificationList() {
 }
 
 function checkUnreadDot() {
-  const items = document.querySelectorAll('#notification-list li');
+  const items = document.querySelectorAll("#notification-list li");
   let hasUnread = false;
 
-  items.forEach(item => {
+  items.forEach((item) => {
     const isNotification = item.dataset.read !== undefined;
     if (isNotification && item.dataset.read === "false") {
       hasUnread = true;
@@ -106,7 +116,11 @@ function checkUnreadDot() {
 }
 
 function initializeNotifications() {
-  const socket = io("http://localhost:3000", { withCredentials: true });
+  // ✅ Socket.IO na správnu URL (https -> wss automaticky)
+  const socket = io(API_BASE, {
+    withCredentials: true,
+    transports: ["websocket", "polling"],
+  });
 
   socket.on("connect", () => {
     if (currentUser) {
@@ -118,7 +132,7 @@ function initializeNotifications() {
     if (!currentUser || notification.to !== currentUser) return;
 
     allNotifications.unshift(notification);
-    currentlyVisible = BATCH_SIZE;  // reset visible to show first batch
+    currentlyVisible = BATCH_SIZE; // reset visible to show first batch
     renderNotificationList();
     checkUnreadDot();
   });
@@ -130,7 +144,7 @@ function initializeNotifications() {
     dot.style.display = "none";
   });
 
-  document.addEventListener("click", event => {
+  document.addEventListener("click", (event) => {
     const bell = document.getElementById("notification-bell");
     const popup = document.getElementById("notification-popup");
     if (!bell.contains(event.target) && !popup.contains(event.target)) {
@@ -138,24 +152,30 @@ function initializeNotifications() {
     }
   });
 
-  fetch("http://localhost:3000/api/me", { method: "GET", credentials: "include" })
-    .then(res => res.json())
-    .then(data => {
+  // ✅ už nie localhost
+  fetch(api("/api/me"), { method: "GET", credentials: "include" })
+    .then((res) => res.json())
+    .then((data) => {
       if (!data.username) return;
       currentUser = data.username;
       document.getElementById("notification-container").style.display = "block";
       socket.emit("register-username", currentUser);
 
-      fetch("http://localhost:3000/api/notifications?limit=100", {
+      fetch(api("/api/notifications?limit=100"), {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
       })
-        .then(res => res.json())
-        .then(notifications => {
-          allNotifications = notifications.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        .then((res) => res.json())
+        .then((notifications) => {
+          allNotifications = notifications.sort(
+            (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+          );
           currentlyVisible = BATCH_SIZE;
           renderNotificationList();
           checkUnreadDot();
         });
+    })
+    .catch(() => {
+      // ak nie je prihlásený, notifikácie len nenačítame
     });
 }

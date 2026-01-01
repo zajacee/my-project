@@ -650,9 +650,9 @@ color: #f39c12; /* Highlight color on hover */
 }
 
 .copyright p {
-font-size: 14px;
-margin: 0;
-
+  font-size: 14px;
+  margin: 0;
+}
 
 
     /* Media Queries for Scaling */
@@ -825,7 +825,7 @@ margin: 0;
         <a href="privacy.pdf" target="_blank" class="footer-link">Ochrana osobných údajov</a>
       </div>
       <div class="copyright">
-        <p>&copy; 2025 DajToVon</p>
+        <p>&copy; 2026 DajToVon</p>
       </div>
     </div>
   </footer>
@@ -833,6 +833,15 @@ margin: 0;
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script>
   document.addEventListener('DOMContentLoaded', () => {
+
+    // ===== API BASE (lokál vs produkcia) =====
+const API_BASE =
+  (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+    ? "http://localhost:3000"
+    : "https://api.dajtovon.sk";
+
+const api = (path) => `${API_BASE}${path}`;
+
     let selectedFiles = [];
     const thumbnailContainer = document.getElementById('thumbnail-container');
     const fileInput = document.getElementById('images');
@@ -951,7 +960,7 @@ dragHandle.style.fontWeight = 'bold';
       messageDiv.textContent = "Chýba ID obsahu.";
       form.style.display = 'none';
     } else {
-      fetch('http://localhost:3000/user-content', { method: 'GET', credentials: 'include' })
+      fetch(api('/user-content'), { method: 'GET', credentials: 'include' })
         .then(res => res.json())
         .then(data => {
           const contentData = data.userContent.find(c => c.content.id === contentId);
@@ -1085,7 +1094,7 @@ dragHandle.style.fontWeight = 'bold';
       };
   
       document.getElementById('upload-progress').style.display = 'block';
-      xhr.open('PUT', `http://localhost:3000/edit-content/${contentId}`, true);
+      xhr.open('PUT', api(`/edit-content/${contentId}`), true);
       xhr.withCredentials = true;
       xhr.send(formData);
     });
@@ -1105,7 +1114,7 @@ dragHandle.style.fontWeight = 'bold';
     const logoutDropdown = document.getElementById("logout-dropdown");
     const logoutOption = document.getElementById("logout-option");
   
-    fetch('http://localhost:3000/api/me', { method: 'GET', credentials: 'include' })
+    fetch(api('/api/me'), { method: 'GET', credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (data.username) {
@@ -1130,7 +1139,7 @@ dragHandle.style.fontWeight = 'bold';
     });
   
     logoutOption.addEventListener("click", () => {
-      fetch("http://localhost:3000/logout", {
+      fetch(api('/logout'), {
         method: "POST",
         credentials: "include"
       }).then(() => {

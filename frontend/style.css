@@ -220,23 +220,24 @@ footer {
 .copyright p {
   font-size: 14px;
   margin: 0;
+}
 
 /* Media Queries for Scaling */
 @media screen and (max-width: 768px) {
-    html {
-        font-size: 14px; /* Scale down on small screens */
-    }
+  html {
+    font-size: 14px; /* Scale down on small screens */
+  }
 
-    #sidebar {
-        width: 200px; /* Reduce sidebar width on small screens */
-    }
+  #sidebar {
+    width: 200px; /* Reduce sidebar width on small screens */
+  }
 
-    #content {
-        margin-left: 200px; /* Adjust content area margin */
-        padding: 15px;
-    }
+  #content {
+    margin-left: 200px; /* Adjust content area margin */
+    padding: 15px;
+  }
 
-    button {
-        padding: 15px 30px;
-    }
+  button {
+    padding: 15px 30px;
+  }
 }

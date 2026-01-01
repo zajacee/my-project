@@ -95,8 +95,6 @@ app.use(cors({
 // ✅ Serve uploaded images to frontend
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
 
 // === Simple in-memory rate limiter (IP / user / optional resource) ===
 const RATE_STORE = new Map();

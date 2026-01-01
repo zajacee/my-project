@@ -464,8 +464,9 @@ header h1 {
 }
 
 .copyright p {
-    font-size: 14px;
-    margin: 0;
+  font-size: 14px;
+  margin: 0;
+}
 
     /* Media Queries for Scaling */
     @media screen and (max-width: 768px) {
@@ -594,12 +595,21 @@ header h1 {
             <a href="privacy.pdf" target="_blank" class="footer-link">Ochrana osobných údajov</a>
         </div>
         <div class="copyright">
-            <p>&copy; 2025 DajToVon</p>
+            <p>&copy; 2026 DajToVon</p>
         </div>
     </div>
 </footer>
 
   <script>
+    
+// ===== API BASE (lokál vs produkcia) =====
+const API_BASE =
+  (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+    ? "http://localhost:3000"
+    : "https://api.dajtovon.sk";
+
+const api = (path) => `${API_BASE}${path}`;
+
       const searchBar = document.getElementById('search-bar');
       const filterOptions = document.getElementById('filter-options');
       const recentContentSection = document.getElementById('recent-content');
@@ -625,7 +635,7 @@ header h1 {
 });
 
     // --- Check if logged in ---
-    fetch('http://localhost:3000/api/me', {
+    fetch(api('/api/me'), {
         method: 'GET',
         credentials: 'include'
     })
@@ -657,7 +667,7 @@ header h1 {
 
     // --- Logout ---
     logoutOption.addEventListener("click", () => {
-        fetch("http://localhost:3000/logout", {
+        fetch(api('/logout'), {
             method: "POST",
             credentials: "include"
         })
@@ -728,7 +738,7 @@ const formatDate = (date) => {
     const itemsPerPage = 10;
 
     function loadRecentContent(sortOption = 'date', filter = '') {
-    fetch('http://localhost:3000/all-content')
+    fetch(api('/all-content'))
         .then(response => response.json())
         .then(data => {
             const allContent = data.allContent || [];

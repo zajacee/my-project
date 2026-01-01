@@ -450,8 +450,9 @@ header h1 {
 }
 
 .copyright p {
-    font-size: 14px;
-    margin: 0;
+  font-size: 14px;
+  margin: 0;
+}
 
     /* Media Queries for Scaling */
     @media screen and (max-width: 768px) {
@@ -579,12 +580,20 @@ header h1 {
             <a href="privacy.pdf" target="_blank" class="footer-link">Ochrana osobných údajov</a>
         </div>
         <div class="copyright">
-            <p>&copy; 2025 DajToVon</p>
+            <p>&copy; 2026 DajToVon</p>
         </div>
     </div>
 </footer>
 
   <script>
+
+    // ===== API BASE (lokál vs produkcia) =====
+const API_BASE =
+  (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+    ? "http://localhost:3000"
+    : "https://api.dajtovon.sk";
+
+const api = (path) => `${API_BASE}${path}`;
 
     function escapeHtml(text) {
   if (!text) return '';
@@ -612,7 +621,7 @@ const itemsPerPage = 10;
     
     const usernameDisplay = document.getElementById('user-username');
 
-fetch('http://localhost:3000/api/me', {
+fetch(api('/api/me'), {
   method: 'GET',
   credentials: 'include'
 })
@@ -640,7 +649,7 @@ fetch('http://localhost:3000/api/me', {
 });
 
     // --- Check if logged in ---
-    fetch('http://localhost:3000/api/me', {
+    fetch(api('/api/me'), {
         method: 'GET',
         credentials: 'include'
     })
@@ -672,7 +681,7 @@ fetch('http://localhost:3000/api/me', {
 
     // --- Logout ---
     logoutOption.addEventListener("click", () => {
-        fetch("http://localhost:3000/logout", {
+        fetch(api('/logout'), {
             method: "POST",
             credentials: "include"
         })
@@ -770,7 +779,7 @@ const formatDate = (date) => {
 
 
      const loadRecentContent = (sortOption = 'date', filter = '') => {
-  fetch('http://localhost:3000/user-content', {
+  fetch(api('/user-content'), {
     method: 'GET',
     credentials: 'include',
   })
@@ -875,7 +884,7 @@ contentElement.querySelector('.edit-button').addEventListener('click', (e) => {
   const contentId = e.target.getAttribute('data-id');
 
   showAlert('Naozaj chcete odstrániť tento príspevok?', () => {
-    fetch(`http://localhost:3000/delete-content/${contentId}`, {
+    fetch(api(`/delete-content/${contentId}`), {
       method: 'DELETE',
       credentials: 'include'
     })

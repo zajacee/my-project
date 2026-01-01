@@ -406,7 +406,6 @@ footer {
     }
 
 
-
         /* Media Queries for Scaling */
         @media screen and (max-width: 768px) {
             html {
@@ -559,12 +558,20 @@ footer {
                 <a href="privacy.pdf" target="_blank" class="footer-link">Ochrana osobných údajov</a>
             </div>
             <div class="copyright">
-                <p>&copy; 2025 DajToVon</p>
+                <p>&copy; 2026 DajToVon</p>
             </div>
         </div>
     </footer>
     
     <script>
+
+      // ===== API BASE (lokál vs produkcia) =====
+const API_BASE =
+  (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+    ? "http://localhost:3000"
+    : "https://api.dajtovon.sk";
+
+const api = (path) => `${API_BASE}${path}`;
 
     function escapeHtml(unsafe) {
   return unsafe
@@ -574,13 +581,6 @@ footer {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
-
-
-if (location.hostname === "127.0.0.1") {
-    const newUrl = location.href.replace("127.0.0.1", "localhost");
-    location.replace(newUrl); // Use replace so back button doesn't go back to wrong domain
-  }
-
 
 document.addEventListener("DOMContentLoaded", function() {
   // Check if the user has already given consent
@@ -675,7 +675,7 @@ searchBar.addEventListener('keypress', (event) => {
 });
 
     // --- Check if logged in ---
-    fetch('http://localhost:3000/api/me', {
+    fetch(api('/api/me'), {
         method: 'GET',
         credentials: 'include'
     })
@@ -707,7 +707,7 @@ searchBar.addEventListener('keypress', (event) => {
 
     // --- Logout ---
     logoutOption.addEventListener("click", () => {
-        fetch("http://localhost:3000/logout", {
+        fetch(api('/logout'), {
             method: "POST",
             credentials: "include"
         })
@@ -729,7 +729,7 @@ searchBar.addEventListener('keypress', (event) => {
   const message = document.getElementById('message').value;
 
   try {
-    const res = await fetch('http://localhost:3000/send-message', {
+    const res = await fetch(api('/send-message'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, message })

@@ -657,10 +657,9 @@ footer {
 }
 
 .copyright p {
-    font-size: 14px;
-    margin: 0;
-
-
+  font-size: 14px;
+  margin: 0;
+}
 
         /* Media Queries for Scaling */
         @media screen and (max-width: 768px) {
@@ -869,7 +868,7 @@ footer {
                 <a href="privacy.pdf" target="_blank" class="footer-link">Ochrana osobných údajov</a>
             </div>
             <div class="copyright">
-                <p>&copy; 2025 DajToVon</p>
+                <p>&copy; 2026 DajToVon</p>
             </div>
         </div>
     </footer>
@@ -887,12 +886,18 @@ footer {
     .replace(/'/g, "&#039;");
 }
 
+// ===== API BASE (lokál vs produkcia) =====
+const API_BASE =
+  (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+    ? "http://localhost:3000"
+    : "https://api.dajtovon.sk";
+
+// jednoduchý helper na skladanie URL
+const api = (path) => `${API_BASE}${path}`;
+
+
     let selectedFiles = [];
 
-if (location.hostname === "127.0.0.1") {
-    const newUrl = location.href.replace("127.0.0.1", "localhost");
-    location.replace(newUrl); // Use replace so back button doesn't go back to wrong domain
-  }
 
 document.addEventListener("DOMContentLoaded", function() {
   // Check if the user has already given consent
@@ -953,10 +958,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         previewReadyPromise.then(() => {
    
-        fetch('http://localhost:3000/api/me', {
-            method: 'GET',
-            credentials: 'include'
-        })
+       fetch(api('/api/me'), {
+  method: 'GET',
+  credentials: 'include'
+})
+
         .then(res => {
             if (!res.ok) throw new Error("Not logged in");
             return res.json();
@@ -1009,7 +1015,7 @@ for (const { file } of selectedFiles) {
         document.getElementById('progress-text').textContent = 'Nahrávam... 0%';
 
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', 'http://localhost:3000/api/content');
+        xhr.open('POST', api('/api/content'));
         xhr.withCredentials = true;
         
         xhr.upload.onprogress = function (event) {
@@ -1155,7 +1161,7 @@ searchBar.addEventListener('keypress', (event) => {
 });
 
     // --- Check if logged in ---
-    fetch('http://localhost:3000/api/me', {
+    fetch(api('/api/me'), {
         method: 'GET',
         credentials: 'include'
     })
@@ -1187,10 +1193,10 @@ searchBar.addEventListener('keypress', (event) => {
 
     // --- Logout ---
     logoutOption.addEventListener("click", () => {
-        fetch("http://localhost:3000/logout", {
-            method: "POST",
-            credentials: "include"
-        })
+        fetch(api('/logout'), {
+  method: "POST",
+  credentials: "include"
+})
         .then(() => {
             loginText.textContent = "Prihlásiť";
             logoutDropdown.style.display = "none";
@@ -1228,7 +1234,7 @@ let currentIndex = 0;
 
     // --- Load recent content ---
     function loadRecentContent(filter = '', categoryFilterValue = '') {
-    fetch('http://localhost:3000/all-content')
+    fetch(api('/all-content'))
         .then(response => response.json())
         .then(data => {
             allContentCache = (data.allContent || []).filter(entry => {
