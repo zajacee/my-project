@@ -3,17 +3,15 @@ let allNotifications = [];
 let currentlyVisible = 5;
 const BATCH_SIZE = 5;
 
-// Použi globálne hodnoty z index.html, alebo fallback ak by neboli
-const API_BASE = window.API_BASE || (
+// nič s názvom API_BASE tu NEDEFINUJ
+const API_BASE_URL = window.API_BASE || (
   (location.hostname === "localhost" || location.hostname === "127.0.0.1")
     ? "http://localhost:3000"
     : "https://api.dajtovon.sk"
 );
 
-const api = window.api || ((path) => `${API_BASE}${path}`);
+const apiFetchUrl = window.api || ((path) => `${API_BASE_URL}${path}`);
 
-window.API_BASE = window.API_BASE || API_BASE;
-window.api = window.api || api;
 
 function timeAgo(timestamp) {
   const now = new Date();
@@ -62,7 +60,7 @@ function renderNotification(notification) {
 
   a.addEventListener("click", (e) => {
     e.preventDefault();
-    fetch(api(`/api/notifications/read/${notification._id}`), {
+    fetch(apiFetchUrl(`/api/notifications/read/${notification._id}`), {
       method: "POST",
       credentials: "include",
     })
@@ -121,7 +119,7 @@ function checkUnreadDot() {
 
 window.initializeNotifications = function initializeNotifications() {
   // ✅ Socket.IO na správnu URL (https -> wss automaticky)
-  const socket = io(API_BASE, {
+  const socket = io(API_BASE_URL, {
     withCredentials: true,
     transports: ["websocket", "polling"],
   });
@@ -157,7 +155,7 @@ window.initializeNotifications = function initializeNotifications() {
   });
 
   // ✅ už nie localhost
-  fetch(api("/api/me"), { method: "GET", credentials: "include" })
+  fetch(apiFetchUrl("/api/me"), { method: "GET", credentials: "include" })
     .then((res) => res.json())
     .then((data) => {
       if (!data.username) return;
@@ -165,7 +163,7 @@ window.initializeNotifications = function initializeNotifications() {
       document.getElementById("notification-container").style.display = "block";
       socket.emit("register-username", currentUser);
 
-      fetch(api("/api/notifications?limit=100"), {
+      fetch(apiFetchUrl("/api/notifications?limit=100"), {
         method: "GET",
         credentials: "include",
       })
