@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrácia a Prihlásenie</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      text-align: center;
+      padding: 50px;
+    }
+
+    .login-container, .register-container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    h2 {
+      margin-bottom: 15px;
+    }
+
+    .input-container {
+      position: relative;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 18px;
+      opacity: 0.5;
+      transition: opacity 0.2s ease;
+    }
+
+    .toggle-password.active {
+      opacity: 1;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    button:hover:enabled {
+      background-color: #2980b9;
+    }
+
+    .register-link, .forgot-password {
+      margin-top: 5px;
+      display: block;
+      color: #3498db;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .register-container {
+      display: none;
+    }
+
+    .consent-container {
+      display: flex;
+      align-items: center;
+      text-align: left;
+      font-size: 14px;
+      margin: 10px 0;
+    }
+
+    .consent-container input {
+      width: auto;
+      margin-right: 5px;
+    }
+
+    /* Forgot Password Modal */
+    .forgot-password-modal {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+      padding-top: 60px;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 8px;
+    }
+
+    .close-btn {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    /* Custom Alert Modal */
+    .custom-alert-modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding-top: 100px;
+    }
+
+    .alert-box {
+      background-color: white;
+      margin: 0 auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .alert-box button {
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .alert-box button:hover {
+      background-color: #2980b9;
+    }
+
+    .logo {
+   display: block;
+   margin: 10px auto 0;
+   width: 100px;
+   height: auto;
+   opacity: 1;
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- Registration Form -->
+  <div class="register-container" id="register-form">
+    <h2>Registrácia</h2>
+    <input type="text" placeholder="Používateľské meno" id="reg-username" maxlength="12" minlength="4" required>
+    <input type="email" placeholder="E-mail" id="reg-email">
+    <div class="input-container">
+      <input type="password" placeholder="Heslo" id="reg-password">
+      <span class="toggle-password" onclick="togglePassword('reg-password', this)">👁️</span>
+    </div>
+
+    <div class="consent-container">
+      <input type="checkbox" id="consent-checkbox">
+      <label for="consent-checkbox">
+        Súhlasím so <a href="terms.pdf" target="_blank"><u>Všeobecnými podmienkami poskytovania služieb</u></a> na serveroch DajToVon a vyhlasujem, že som sa oboznámil/a so <a href="privacy.pdf" target="_blank"><u>Zásadami ochrany osobných údajov</u></a>.
+      </label>
+    </div>
+
+    <button id="register-btn" onclick="register()" disabled>Registrovať</button>
+    <a href="javascript:void(0);" id="show-login-form" class="register-link">Máte účet? Prihláste sa</a>
+    <!-- Logo -->
+    <img src="logo.png" alt="Logo" class="logo">
+  </div>
+
+  <!-- Login Form -->
+  <div class="login-container">
+    <h2>Prihlásenie</h2>
+    <input type="text" placeholder="E-mail alebo používateľské meno" id="email-or-username">
+    <div class="input-container">
+      <input type="password" placeholder="Heslo" id="password">
+      <span class="toggle-password" onclick="togglePassword('password', this)">👁️</span>
+    </div>
+    <a href="javascript:void(0);" class="forgot-password" onclick="forgotPassword()">Nepamätám si svoje heslo</a>
+    <button onclick="login()">Prihlásiť sa</button>
+    <a href="javascript:void(0);" id="show-register-form" class="register-link">Nemáte účet? Zaregistrujte sa</a>
+    <!-- Logo -->
+    <img src="logo.png" alt="Logo" class="logo">
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgot-password-modal" class="forgot-password-modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeForgotPasswordModal()">&times;</span>
+      <h2>Obnovenie hesla</h2>
+      <p>Zadajte Váš e-mail, na ktorý Vám bude zaslaný odkaz na obnovenie hesla.</p>
+      <input type="email" placeholder="E-mail" id="forgot-password-email">
+      <button onclick="sendPasswordReset()">Odoslať</button>
+      <p id="forgot-password-message" style="color: green;"></p>
+    </div>
+  </div>
+
+  <!-- Custom Alert Modal -->
+  <div id="custom-alert-modal" class="custom-alert-modal">
+    <div class="alert-box">
+      <p id="alert-message"></p>
+      <button onclick="closeAlert()">OK</button>
+    </div>
+  </div>
+
+  <script>
+    // Show registration form when clicking "Nemáte účet? Zaregistrujte sa"
+    document.getElementById('show-register-form').addEventListener('click', function() {
+      document.querySelector('.login-container').style.display = 'none';
+      document.getElementById('register-form').style.display = 'block';
+    });
+
+    // Show login form when clicking "Máte účet? Prihláste sa"
+    document.getElementById('show-login-form').addEventListener('click', function() {
+      document.querySelector('.login-container').style.display = 'block';
+      document.getElementById('register-form').style.display = 'none';
+    });
+
+    // Toggle password visibility
+    function togglePassword(fieldId, iconElement) {
+      const passwordField = document.getElementById(fieldId);
+      if (passwordField.type === "password") {
+        passwordField.type = "text";
+        iconElement.classList.add("active");
+      } else {
+        passwordField.type = "password";
+        iconElement.classList.remove("active");
+      }
+    }
+
+    // Enable register button only if the consent checkbox is checked
+    document.getElementById('consent-checkbox').addEventListener('change', function() {
+      document.getElementById('register-btn').disabled = !this.checked;
+    });
+
+    // Forgot password function
+    function forgotPassword() {
+      document.getElementById('forgot-password-modal').style.display = 'block';
+    }
+
+    // Close forgot password modal
+    function closeForgotPasswordModal() {
+      document.getElementById('forgot-password-modal').style.display = 'none';
+    }
+
+    function showAlert(message, callback = null) {
+  document.getElementById('alert-message').textContent = message;
+  document.getElementById('custom-alert-modal').style.display = 'block';
+
+  // Set up event listener for "OK" button
+  document.querySelector('.alert-box button').onclick = function () {
+    document.getElementById('custom-alert-modal').style.display = 'none';
+    if (callback) callback(); // If there's a callback, execute it
+  };
+}
+
+    // Close custom alert
+    function closeAlert() {
+      document.getElementById('custom-alert-modal').style.display = 'none';
+    }
+
+    // Send password reset request
+    async function sendPasswordReset() {
+      const email = document.getElementById('forgot-password-email').value;
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!email) {
+        showAlert("Prosím, zadajte Váš e-mail.");
+        return;
+      }
+
+      if (!emailPattern.test(email)) {
+        showAlert("Prosím, zadajte platný e-mail.");
+        return;
+      }
+
+      try {
+        // Simulate API call
+        const response = await fetch('http://localhost:3000/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          document.getElementById('forgot-password-message').innerText = "Odkaz na obnovenie hesla bol odoslaný na Váš e-mail.";
+        } else {
+          showAlert(data.message || "Nastala chyba pri odosielaní odkazu.");
+        }
+      } catch (error) {
+        showAlert("Nastala chyba. Skúste to znova.");
+      }
+    }
+
+    // Registration function
+    async function register() {
+      const username = document.getElementById('reg-username').value;
+      const email = document.getElementById('reg-email').value;
+      const password = document.getElementById('reg-password').value;
+
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const passwordPattern = /^(?=.*\d).{8,}$/;
+
+      if (!username || !email || !password) {
+        showAlert("Prosím, vyplňte všetky polia.");
+        return;
+      }
+
+      if (!username || username.length < 4 || username.length > 12) {
+  showAlert("Používateľské meno musí obsahovať minimálne 4 a maximálne 12 znakov.");
+  return;
+}
+
+      if (!emailPattern.test(email)) {
+        showAlert("Prosím, zadajte platný e-mail.");
+        return;
+      }
+
+      if (!passwordPattern.test(password)) {
+        showAlert("Heslo musí obsahovať minimálne 8 znakov a aspoň jednu číslicu.");
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:3000/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, password })
+        });
+
+        const data = await response.json();
+        showAlert(data.message);
+
+        if (response.ok) {
+          document.querySelector('.login-container').style.display = 'block';
+          document.getElementById('register-form').style.display = 'none';
+        }
+      } catch (error) {
+        showAlert("Nastala chyba. Skúste to znova.");
+      }
+    }
+
+ // Updated Login function
+async function login() {
+  const emailOrUsername = document.getElementById('email-or-username').value;
+  const password = document.getElementById('password').value;
+
+  // Regular expression for email validation
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailOrUsername || !password) {
+    showAlert("Prosím, vyplňte všetky polia.");
+    return;
+  }
+
+  try {
+    const response = await fetch('http://localhost:3000/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        email: emailPattern.test(emailOrUsername) ? emailOrUsername : null,
+        username: !emailPattern.test(emailOrUsername) ? emailOrUsername : null,
+        password
+      })
+    });
+
+    const data = await response.json();
+    
+    if (response.ok) {
+      // ✅ Check return URL parameter
+      const params = new URLSearchParams(window.location.search);
+      const returnUrl = params.get('return') || 'index.html';
+
+      showAlert("Prihlásenie prebehlo úspešne!", () => {
+        window.location.href = returnUrl;
+      });
+    } else {
+      showAlert(data.message || "Nastala chyba pri prihlasovaní.");
+    }
+  } catch (error) {
+    showAlert("Nastala chyba. Skúste to znova.");
+  }
+}
+</script>
+
+</body>
+</html>

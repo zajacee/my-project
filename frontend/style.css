@@ -1,0 +1,242 @@
+/* Reset styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Ensures the same layout box model for all elements */
+html {
+    font-size: 16px; /* Base font size */
+}
+
+/* Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    color: #333;
+    padding: 1.25rem; /* Padding adjusted */
+    max-width: 100%;
+    margin: 0 auto; /* Make sure body is centered */
+}
+
+/* Header Styling */
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1.25rem;
+    text-align: center;
+    position: relative;
+}
+
+/* Header Title Styling */
+header h1 {
+    margin: 0;
+    font-size: 2rem; /* Ensure the same title size */
+    cursor: pointer; /* Makes it clickable */
+    
+}
+
+/* Header Search Bar Styling */
+#search-bar {
+    padding: 0.5rem;
+    width: 80%;
+    max-width: 300px; /* 300px max width */
+    margin-top: 0.625rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Sidebar Styling */
+#sidebar {
+    background-color: #2c3e50;
+    color: #fff;
+    padding: 1.25rem;
+    width: 240px; /* Sidebar fixed width */
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+}
+
+#sidebar h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    margin-top: 50px; /* Align sidebar heading */
+}
+
+#sidebar ul {
+    list-style: none;
+    margin-top: 5px;
+}
+
+#sidebar ul li {
+    margin-bottom: 10px;
+}
+
+#sidebar ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+
+/* Make Tema, Obsah, Kategoria bold */
+#sidebar ul li a.bold {
+    font-weight: bold;
+}
+
+#sidebar ul li a:hover {
+    color: #f39c12;
+}
+
+/* Main Content Area */
+#content {
+    margin-left: 240px; /* Match sidebar width */
+    padding: 20px;
+    max-width: calc(100% - 240px); /* Avoid overflow */
+}
+
+/* Content Heading Styling */
+#content h2 {
+    font-size: 1.8rem; /* 28.8px */
+    margin-bottom: 20px;
+}
+
+/* Content Form */
+#content form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 900px; /* Max width for content */
+    margin: 0 auto;
+}
+
+/* Form Inputs & Textareas */
+#content form input[type="text"],
+#content form select,
+#content form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    display: block;
+}
+
+/* Style for the textarea */
+#content form textarea {
+    resize: vertical;
+    overflow-x: hidden;
+    min-height: 150px;
+    width: 91%;
+    margin-left: 2cm;
+}
+
+/* Make Labels for Téma, Obsah, Kategória Bold */
+#content form label {
+    font-weight: normal; /* Default to normal for all labels */
+}
+
+#content form label[for="title"], 
+#content form label[for="content-text"], 
+#content form label[for="category"] {
+    font-weight: bold; /* Bold only for specific labels */
+}
+
+/* File Upload Styling */
+.file-upload {
+    display: flex;
+    align-items: center;
+}
+
+.file-upload .file-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: #3498db;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+/* Button Styling */
+button {
+    padding: 20px 40px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    width: auto;
+    display: block;
+    margin-left: auto;
+    margin-top: 30px;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+/* Recent Content Section */
+#recent-content {
+    margin-top: 50px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Footer Styling */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    margin-top: 20px;
+  }
+
+  .footer-link {
+    font-size: 14px;
+    color: #fff; /* Set link color */
+  text-decoration: underline; /* Remove the underline */
+}
+
+.footer-link:hover {
+  color: #f39c12; /* Highlight color on hover */
+}
+
+.copyright p {
+  font-size: 14px;
+  margin: 0;
+
+/* Media Queries for Scaling */
+@media screen and (max-width: 768px) {
+    html {
+        font-size: 14px; /* Scale down on small screens */
+    }
+
+    #sidebar {
+        width: 200px; /* Reduce sidebar width on small screens */
+    }
+
+    #content {
+        margin-left: 200px; /* Adjust content area margin */
+        padding: 15px;
+    }
+
+    button {
+        padding: 15px 30px;
+    }
+}

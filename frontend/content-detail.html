@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Detail</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+    
+        /* Ensures the same layout box model for all elements */
+        html {
+            font-size: 16px; /* Base font size */
+        }
+    
+.thumbnail {
+    max-width: 200px; /* or any preferred size */
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.thumbnail:hover {
+    transform: scale(1.05);
+}
+
+        /* Body Styling */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+            padding: 1.25rem; /* Padding adjusted */
+            max-width: 100%;
+            margin: 0 auto; /* Make sure body is centered */
+            padding-top: 50px; /* Adjust this value as needed */
+        }
+    
+        header {
+    background-color: #333;
+    color: #fff;
+    padding: 1.25rem;
+    display: flex;
+    justify-content: center; /* Centers title */
+    text-align: center;
+    position: relative;
+    height: 80px; /* Set a fixed height */
+}
+
+/* Ensure title is visible and centered */
+header h1 {
+    margin: 0;
+    font-size: 2rem;
+    cursor: pointer;
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+       
+    
+        /* Header Search Bar Styling */
+        #search-bar {
+            padding: 0.5rem;
+            width: 80%;
+            max-width: 300px; /* 300px max width */
+            border: 1px solid #ccc;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            position: absolute;
+            right: 1.25rem;
+            top: 38%;
+            transform: translateY(-50%);
+        }
+
+        .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+
+#login-button {
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    gap: 8px;  /* Space between text and icon */
+    position: absolute;
+    top: -75px;
+    right: 20px;
+    padding: 8px 10px;
+    width: 160px;  /* Fixed width */
+    height: 40px;  /* Fixed height */
+    background-color: white;
+    color: black;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+#login-button img {
+    width: 26px;  /* Adjust icon size */
+    height: 24px;
+}
+
+#login-button:hover {
+    background-color: #f0f0f0;
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    top: 0px; /* Adjust dropdown positioning */
+    right: 20px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    width: 150px;  /* Fixed width */
+    height: 80px;  /* Auto height to fit content */
+    text-align: center;
+    z-index: 1000;
+    padding: 5px 0; /* Adjust padding inside the dropdown */
+}
+
+.dropdown button {
+    width: 100%;
+    padding: 2px 0; /* Reduce space inside buttons */
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1rem;
+    white-space: nowrap; /* Prevent text wrapping */
+    display: flex;
+    align-items: center; /* Align text and icon properly */
+    justify-content: center; /* Center text horizontally */
+    color: black;
+    text-align: left;
+    line-height: 1.5; /* Reduce spacing between text lines */
+    margin-top: 5px; /* Moves the text up */
+       }
+
+.dropdown button:first-child {
+    margin-bottom: 3px; /* Reduce space between buttons */
+}
+
+.dropdown button img {
+    margin-right: 5px; /* Adjust spacing between icon and text */
+}
+
+.dropdown button:hover {
+    background-color: #f0f0f0;
+}
+
+/* Ensure username, icon, and date are in one line */
+.content-meta {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #555;
+    gap: 10px; /* Adds space between elements */
+    flex-wrap: wrap; /* Prevents overlap on small screens */
+    margin-bottom: 10px; 
+}
+
+.content-meta small {
+    font-size: 0.9rem; /* Adjust size (default small is ~0.8rem) */
+    }
+
+    /* Fix spacing between content-meta and category */
+#content-detail .content-meta {
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+#content-detail p.category-line {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+#comment-input {
+  width: 100%;
+  margin-bottom: 0;
+  box-sizing: border-box;
+  padding: 8px;
+  font-size: 1rem;
+  resize: vertical; /* optional: allows height resizing */
+}
+
+.comment-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  font-size: 1rem;
+  resize: vertical;
+}
+
+.comment-like,
+.comment-dislike {
+  cursor: pointer;
+}
+
+#comments-load-more-container {
+  text-align: center;
+  margin-top: 0px;
+}
+
+#comments-load-more-button {
+  display: none;              /* JS prepína na 'flex' */
+  cursor: pointer;
+  font-size: 18px;
+  color: #3498db;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#comments-load-more-button:hover {
+  font-weight: bold;
+}
+    
+.user-link {
+    text-decoration: none;
+    font-size: 0.9rem;
+    color: #007bff;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    }
+
+.user-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.small-user-icon {
+    width: 16px;
+    height: 14px;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+        /* Custom Alert Modal */
+    .custom-alert-modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding-top: 100px;
+    }
+
+    .notification-username {
+  color: #007bff;
+  font-weight: bold;
+}
+
+    .alert-box {
+      background-color: white;
+      margin: 0 auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .alert-box button {
+        width: 100%;
+        padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .alert-box button:hover {
+      background-color: #2980b9;
+    }
+    
+        /* Sidebar Styling */
+        #sidebar {
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 1.25rem;
+            width: 240px; /* Sidebar fixed width */
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+        }
+    
+        #sidebar h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            margin-top: 20px; /* Moved closer to the top */
+        }
+    
+        #sidebar ul {
+            list-style: none;
+            margin-top: 5px;
+        }
+    
+        #sidebar ul li {
+            margin-bottom: 10px;
+        }
+    
+        #sidebar ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+    
+        #sidebar ul li a.bold {
+            font-weight: bold;
+        }
+    
+        #sidebar ul li a:hover {
+            color: #f39c12;
+        }
+    
+        /* Sidebar "Domov" link styling */
+        #sidebar h2 a {
+            color: #517dcf; /* Default color */
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold; /* Make Domov link bold */
+        }
+    
+        #sidebar h2 a:hover {
+            color: #f39c12; /* Change color on hover */
+        }
+    
+        /* Main Content Area */
+        #content {
+            margin-left: 240px; /* Match sidebar width */
+            padding: 20px;
+            max-width: calc(100% - 240px); /* Avoid overflow */
+        }
+    
+        /* Content Heading Styling */
+        #content h2 {
+            font-size: 1.5rem; /* 28.8px */
+            margin-bottom: 20px;
+        }
+
+        #content-detail h2 {
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+    
+        /* Recent Content Section */
+        #recent-content {
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    
+        #recent-content .content-item p {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+    
+        /* Styling for each content item */
+        .content-item {
+            margin-bottom: 20px; /* Adds space between each item */
+            padding: 15px; /* Adds some padding inside each content item */
+            background-color: #fafafa; /* Light background to separate from others */
+            border-radius: 5px; /* Rounded corners for each content item */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Subtle shadow effect */
+        }
+    
+        /* Adds a small border to make them more distinct */
+        .content-item:not(:last-child) {
+            border-bottom: 1px solid #ddd;
+        }
+        #content-detail p {
+            margin-bottom: 1em;
+            text-align: justify; /* Justify the text inside paragraphs in the content detail */
+            white-space: pre-wrap; /* This will preserve all white space, including line breaks */
+        }
+    
+        /* Justify the text in the recent content section */
+        #recent-content .content-item p {
+            text-align: justify; /* Ensures text is evenly spaced between the margins */
+            font-size: 1rem; /* Adjust the size of the content text */
+        }
+    
+        /* Recent Content Section Heading */
+        #recent-content h3 {
+            font-size: 1.5rem; /* Make the "Nedávno pridané" heading larger */
+            margin-bottom: 20px; /* Space between heading and content */
+        }
+
+/* kotva pre absolútne pozicovaný panel */
+.comment-input-wrap { position: relative; row-gap: 0; width: 100%; }
+
+/* tlačidlo nalavo */
+.emoji-wrap { display: flex; align-items: center; gap: 0px; margin-top: -30px; justify-content: flex-start; }
+
+/* ⬅ zviditeľnenie tlačidla Emoji */
+#emoji-toggle {
+  font-size: 1rem;  /* bolo 1rem */
+  padding: 4px 8px;  display: inline-flex;
+  margin-left: 0;
+  align-items: center;
+  gap: 0px;
+
+  /* ZMEŇ EN: tieto 3 parametre robia najväčší rozdiel */
+  background: #f7fafc;      /* bolo: #ffffff */
+  border: 1px solid #94a3b8;/* bolo: #ddd */
+  color: #1f2937;           /* pridané: tmavší text */
+
+  font-weight: 600;         /* pridané: výraznejší text */
+  padding: 8px 12px;        /* bolo: 6px 10px (väčšie, pohodlnejšie) */
+  border-radius: 10px;      /* bolo: 8px */
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,.06); /* pridané: jemný tieň */
+  transition: background .15s, border-color .15s, box-shadow .15s, transform .05s;
+}
+
+#emoji-toggle:hover {
+  background: #eef2f7;      /* bolo: #f5f5f5 */
+  border-color: #64748b;    /* pridané: výraznejší okraj pri hoveri */
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+
+#emoji-toggle:active {
+  transform: translateY(1px); /* klik feedback */
+}
+
+#emoji-toggle:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.35); /* pridané: viditeľný focus ring */
+  border-color: #3b82f6;
+}
+
+/* panel zarovno ĽAVÉHO okraja textarea – na šírku textarey */
+.emoji-panel {
+  position: absolute; z-index: 1200; left: 0; right: auto; top: calc(100% + 6px);
+  width: 100%; max-width: 100%;
+  background: #fff; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 6px 18px rgba(0,0,0,.12);
+  padding: 8px; max-height: 260px; overflow: auto; display: none;
+}
+
+
+/* viac menších emoji na riadok */
+.emoji-grid { display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px; }
+.emoji-btn { font-size: 18px; line-height: 1; padding: 4px; background: transparent; border: none; cursor: pointer; border-radius: 6px; }
+.emoji-btn:hover { background: #f0f0f0; }
+
+@media (max-width: 600px) {
+  .emoji-grid { grid-template-columns: repeat(10, 1fr); }
+  .emoji-btn { font-size: 16px; padding: 3px; }
+}
+    
+       /* Footer Styling */
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #333;
+      color: #fff;
+      margin-top: 20px;
+    }
+
+    .footer-link {
+      font-size: 14px;
+      color: #fff; /* Set link color */
+    text-decoration: underline; /* Remove the underline */
+}
+
+.footer-link:hover {
+    color: #f39c12; /* Highlight color on hover */
+}
+
+#like-btn,
+#dislike-btn {
+  display: inline-block;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+#like-btn.liked {
+  transform: scale(1.5);
+}
+
+#dislike-btn.disliked {
+  transform: scale(1.5);
+}
+
+.comment-like,
+.comment-dislike {
+  display: inline-block;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+/* Active state: scaled up */
+.comment-like.liked,
+.comment-dislike.disliked {
+  transform: scale(1.5);
+}
+
+.copyright p {
+    font-size: 14px;
+    margin: 0;
+    } 
+    
+        /* Media Queries for Scaling */
+        @media screen and (max-width: 768px) {
+            html {
+                font-size: 14px; /* Scale down on small screens */
+            }
+    
+            #sidebar {
+                width: 200px; /* Reduce sidebar width on small screens */
+            }
+    
+            #content {
+                margin-left: 200px; /* Adjust content area margin */
+                padding: 15px;
+            }
+    
+            button {
+                padding: 15px 30px;
+            }
+        }
+    </style>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="notifications.js" defer></script>    
+</head>
+<body>
+<header>
+  <div class="top-bar">
+    <h1><a href="index.html" style="text-decoration: none; color: inherit;">DajToVon</a></h1>
+    <input type="text" id="search-bar" placeholder="Hľadať...">
+
+    <!-- User Menu -->
+    <div class="user-menu">
+      <!-- 🔔 Notification Bell inside user-menu -->
+      <!-- 🔔 Notification Bell positioned top right -->
+<div id="notification-container" class="notification-container" style="display: none; position: absolute; top: -45px; right: 200px; font-size: 1.5rem; cursor: pointer;">
+  <span id="notification-bell" title="Notifikácie">🔔</span>
+  <span id="bell-dot" style="
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background: red;
+    border-radius: 50%;
+    display: none;
+  "></span>
+
+<div id="notification-popup" style="
+  display: none;
+  position: absolute;
+  top: 30px;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  padding: 10px;
+  min-width: 300px;
+  max-width: 90vw;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  color: black;
+  z-index: 1000;
+">
+  <h4 style="margin: 0 0 10px; font-size: 1rem; font-weight: bold; font-family: Arial, sans-serif; color: black;">🔔 Notifikácie</h4>
+  <ul id="notification-list" style="list-style: none; padding: 0; margin: 0; font-size: 0.9rem;"></ul>
+</div>
+</div>
+
+      <button id="login-button">
+        <img id="user-icon" src="user-icon.png" alt="User Icon">
+        <span id="login-text">Prihlásiť</span>
+      </button>
+      <div class="dropdown" id="logout-dropdown">
+        <button id="my-content" onclick="window.location.href='userprofile.html'">Moje príspevky</button>
+        <button id="logout-option">
+          <img src="logout-icon.png" alt="Logout Icon" style="width: 20px; height: 20px; margin-right: 8px;">
+          Odhlásiť
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+    <!-- Custom Alert Modal -->
+    <div id="custom-alert-modal" class="custom-alert-modal">
+    <div class="alert-box">
+        <p id="alert-message"></p>
+        <button onclick="closeAlert()">OK</button>
+    </div>
+</div>
+
+<div id="sidebar">
+        <!-- Updated Domov link with new color -->
+        <h2><a href="index.html" class="sidebar-link">Domov</a></h2>
+        
+        <h2>Kategórie</h2>
+        <ul>
+            <li><a href="vedomosti.html">Vedomosti</a></li>
+            <li><a href="skusenosti.html">Skúsenosti</a></li>
+            <li><a href="praca.html">Práca</a></li>
+            <li><a href="predmety.html">Predmety</a></li>
+            <li><a href="ine.html">Iné</a></li>
+        </ul>
+        <h2><a href="contact.html" class="sidebar-link">Kontakt</a></h2>
+    </div>
+
+    <div id="content" style="margin-left: 240px; padding: 20px; max-width: calc(100% - 240px);">
+        <section id="content-detail">
+            <!-- Content detail will be loaded here -->
+        </section>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="terms.pdf" target="_blank" class="footer-link">Všeobecné podmienky</a> |
+                <a href="privacy.pdf" target="_blank" class="footer-link">Ochrana osobných údajov</a>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 DajToVon</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+
+            const categoryMapping = {
+            vedomosti: "Vedomosti",
+            skusenosti: "Skúsenosti",
+            praca: "Práca",
+            predmety: "Predmety",
+            ine: "Iné"
+        };
+
+        // ✅ Relative time helper
+function timeAgo(timestamp) {
+  const now = new Date();
+  const diffMs = now - new Date(timestamp);
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHr = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHr / 24);
+
+  if (diffSec < 60) return "pred chvíľou";
+  if (diffMin < 60) return `pred ${diffMin} min`;
+  if (diffHr < 24) return `pred ${diffHr} hod`;
+  return `pred ${diffDay} dňami`;
+}
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+function getTokenFromCookie() {
+  const match = document.cookie.match(/(?:^|;\s*)token=([^;]+)/);
+  return match ? match[1] : null;
+}
+
+  
+    const searchBar = document.getElementById('search-bar');
+    const urlParams = new URLSearchParams(window.location.search);
+    const contentId = urlParams.get('contentId'); // Get contentId from URL
+
+    const loginButton = document.getElementById('login-button');
+    const loginText = document.getElementById('login-text');
+    const logoutDropdown = document.getElementById("logout-dropdown");
+    const logoutOption = document.getElementById("logout-option");
+
+        // --- Login button ---
+        loginButton.addEventListener('click', () => {
+    const currentUrl = window.location.href;
+    window.location.href = `login.html?return=${encodeURIComponent(currentUrl)}`;
+});
+
+let currentUser = null;
+
+    // --- Check if logged in ---
+    fetch('http://localhost:3000/api/me', {
+        method: 'GET',
+        credentials: 'include'
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Not logged in");
+        return response.json();
+    })
+
+   .then(data => {
+    if (data.username) {
+        currentUser = data.username;
+
+      
+
+            loginText.textContent = data.username;
+
+            document.getElementById("notification-container").style.display = "block"; // ✅ Show bell after login
+
+            
+            
+            loginButton.replaceWith(loginButton.cloneNode(true));
+            const newLoginButton = document.getElementById('login-button');
+            newLoginButton.addEventListener('click', (event) => {
+                logoutDropdown.style.display = logoutDropdown.style.display === "block" ? "none" : "block";
+                event.stopPropagation();
+            });
+        }
+    })
+    .catch((err) => {
+        console.warn("Not logged in:", err);
+    });
+
+    // --- Hide dropdown on click outside ---
+    document.addEventListener("click", (event) => {
+        if (!loginButton.contains(event.target) && !logoutDropdown.contains(event.target)) {
+            logoutDropdown.style.display = "none";
+        }
+    });
+
+    // --- Logout ---
+    logoutOption.addEventListener("click", () => {
+        fetch("http://localhost:3000/logout", {
+            method: "POST",
+            credentials: "include"
+        })
+        .then(() => {
+            loginText.textContent = "Prihlásiť";
+            logoutDropdown.style.display = "none";
+            showAlert("Boli ste odhlásený!", () => window.location.reload());
+        })
+        .catch(err => {
+            console.error("Logout error:", err);
+            showAlert("Chyba pri odhlasovaní.");
+        });
+    });
+
+    function showAlert(message, onOk = null, isConfirm = false, onCancel = null) {
+  const modal = document.getElementById("custom-alert-modal");
+  const alertBox = document.querySelector(".alert-box");
+
+  // Clear existing buttons
+  alertBox.innerHTML = `<p id="alert-message">${message}</p>`;
+
+  if (isConfirm) {
+    const confirmBtn = document.createElement('button');
+    confirmBtn.textContent = "Áno";
+    confirmBtn.style.marginTop = "10px";
+    confirmBtn.onclick = () => {
+      modal.style.display = "none";
+      if (onOk) onOk();
+    };
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = "Nie";
+    cancelBtn.style.marginTop = "10px";
+    cancelBtn.style.backgroundColor = "#aaa";
+    cancelBtn.onclick = () => {
+      modal.style.display = "none";
+      if (onCancel) onCancel();
+    };
+
+    alertBox.appendChild(confirmBtn);
+    alertBox.appendChild(cancelBtn);
+  } else {
+    const okBtn = document.createElement('button');
+    okBtn.textContent = "OK";
+    okBtn.onclick = () => {
+      modal.style.display = "none";
+      if (onOk) onOk();
+    };
+    alertBox.appendChild(okBtn);
+  }
+
+  modal.style.display = "block";
+}
+
+    // Handle missing contentId in URL
+    if (!contentId) {
+        document.getElementById('content-detail').innerHTML = '<p>Content ID is missing in the URL.</p>';
+        return;
+    }
+
+                const formatDate = (date) => {
+        const d = new Date(date);
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const seconds = String(d.getSeconds()).padStart(2, '0');
+        return `${day}/${month}/${year}, ${hours}:${minutes}:${seconds}`;
+      };
+
+
+     // Function to handle search submission
+     function performSearch() {
+        const query = searchBar.value.trim();
+        if (query !== '') {
+            window.location.href = `search-results.html?q=${encodeURIComponent(query)}`;
+        }
+    }
+
+    // Listen for "Enter" key press on search bar
+    searchBar.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent form submission (if applicable)
+            performSearch();
+        }
+    });
+
+    // Restore search bar when leaving search results
+    function resetSearchSettings() {
+        searchBar.value = ''; // Clear search bar
+    }
+
+    // Detect when the user navigates away from search-results.html
+    window.addEventListener('pageshow', (event) => {
+        if (!document.referrer.includes('search-results.html')) {
+            resetSearchSettings();
+        }
+    });
+
+    fetch('http://localhost:3000/all-content')
+  .then(res => res.json())
+  .then(data => {
+    const allContent = data.allContent || [];
+    const entry = allContent.find(entry => String(entry.content.id) === String(contentId));
+    if (!entry) {
+      document.getElementById('content-detail').innerHTML = `<p>Content not found.</p>`;
+      return;
+    }
+
+    const item = entry.content; // ✅ consistent with the rest of your app
+
+// Register the view
+fetch(`http://localhost:3000/view/${contentId}`, {
+  method: 'POST'
+});
+
+    const formattedDate = formatDate(item.date);
+
+
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+let allComments = [];
+let commentsIndex = 0;
+const commentsPerPage = 5;
+let userReactions = {};
+
+function fetchStats() {
+  fetch(`http://localhost:3000/stats/${contentId}`, {
+    method: 'GET',
+    credentials: 'include' // ✅ This sends the cookie with the request
+  })
+  .then(res => {
+    if (!res.ok) {
+      console.warn("fetchStats() failed:", res.statusText);
+      return null;  // avoid breaking the page
+    }
+    return res.json();
+  })
+  .then(stats => {
+    if (!stats) return;
+
+  userReactions = stats.userReactions || {};
+  updateReactionStyles(); // ✅ add this
+
+  
+      console.log("✅ fetchStats() response:", stats);
+      document.getElementById('views-count').innerText = stats.views;
+      document.getElementById('like-count').innerText = stats.likes;
+      document.getElementById('dislike-count').innerText = stats.dislikes;
+
+     // uložíme všetky komentáre a vyrenderujeme prvú „stránku“
+allComments = stats.comments || [];
+commentsIndex = 0;
+renderCommentsPage();   // nová funkcia – tá vykreslí max. 5 a pripojí handlery
+});
+}
+
+function renderCommentsPage() {
+  const commentsList = document.getElementById('comments-list');
+  const loadMoreBtn = document.getElementById('comments-load-more-button');
+
+ if (!commentsList) return; // bezpečnosť
+
+  // žiadne komentáre
+  if (!allComments || allComments.length === 0) {
+    commentsList.innerHTML = `<p style="color: #666; font-style: italic;">Zatiaľ neboli pridané žiadne komentáre.</p>`;
+    if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+    return;
+  }
+
+  // prvé renderovanie vyčistí list
+  if (commentsIndex === 0) {
+    commentsList.innerHTML = '';
+  }
+
+  // ďalších 5 (alebo koľko ostáva)
+  const nextSlice = allComments.slice(commentsIndex, commentsIndex + commentsPerPage);
+  if (nextSlice.length === 0) {
+    if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+    return;
+  }
+
+  // vygeneruj HTML pre práve zobrazovaný balík
+  const chunkHtml = nextSlice.map(c => {
+    const isOwner = currentUser === c.username;
+    const userReaction = userReactions[String(c._id)];
+    const safeText = escapeHtml(c.text);
+    const safeUsername = escapeHtml(c.username);
+
+    return `
+      <div style="border-bottom: 1px solid #e0e0e0; padding: 10px 0;">
+        <div class="content-meta">
+          <a href="usercontent.html?username=${encodeURIComponent(safeUsername)}" class="user-link">
+            <img src="user-icon.png" alt="User Icon" class="small-user-icon">
+            <strong>${safeUsername}</strong>
+          </a>
+          <span><small>• ${formatDate(c.timestamp)}</small></span>
+          ${isOwner ? `
+            <span class="comment-actions" data-id="${c._id}" style="display: flex; gap: 8px; cursor: pointer;">
+              <span class="edit-comment" title="Upraviť">✏️</span>
+              <span class="delete-comment" title="Odstrániť">🗑️</span>
+            </span>` : ''}
+        </div>
+        <p style="margin: 5px 0; word-wrap: break-word; white-space: pre-wrap;">${safeText}</p>
+        <div style="font-size: 0.9rem; color: #666;">
+          <span class="comment-like ${userReaction === 'like' ? 'liked' : ''}" data-id="${c._id}">👍</span>
+          <span class="comment-like-count">${c.likes || 0}</span>
+          <span class="comment-dislike ${userReaction === 'dislike' ? 'disliked' : ''}" data-id="${c._id}">👎</span>
+          <span class="comment-dislike-count">${c.dislikes || 0}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  commentsList.insertAdjacentHTML('beforeend', chunkHtml);
+
+  // posuň ukazovateľ
+  commentsIndex += nextSlice.length;
+
+  // zobraz alebo skry tlačidlo „Načítať ďalšie“
+  if (commentsIndex < allComments.length) {
+    loadMoreBtn.style.display = 'inline-block';
+  } else {
+    loadMoreBtn.style.display = 'none';
+  }
+
+  // po pridaní do DOM naviaž udalosti
+  attachCommentHandlers();
+}
+
+function attachCommentHandlers() {
+  // toto je presunuté z tvojho pôvodného setTimeout(...) – nechaj logiku zhodnú
+  document.querySelectorAll('.comment-like').forEach(btn => {
+    const commentId = btn.getAttribute('data-id');
+    const safeId = encodeURIComponent(commentId);
+
+    btn.onclick = () => {
+      if (!currentUser) {
+        showAlert("Pre hodnotenie komentárov musíte byť prihlásený.");
+        return;
+      }
+      const currentReaction = userReactions[String(commentId)];
+
+      if (currentReaction === 'like') {
+        btn.classList.remove('liked');
+        delete userReactions[commentId];
+        fetch(`http://localhost:3000/comment-neutral/${contentId}/${safeId}`, {
+          method: 'POST',
+          credentials: 'include'
+        }).then(fetchStats);
+      } else {
+        btn.classList.add('liked');
+        btn.parentElement.querySelector('.comment-dislike')?.classList.remove('disliked');
+        delete userReactions[commentId];
+        fetch(`http://localhost:3000/comment-like/${contentId}/${safeId}`, {
+          method: 'POST',
+          credentials: 'include'
+        }).then(fetchStats);
+      }
+    };
+  });
+
+  document.querySelectorAll('.comment-dislike').forEach(btn => {
+    const commentId = btn.getAttribute('data-id');
+    const safeId = encodeURIComponent(commentId);
+
+    btn.onclick = () => {
+      if (!currentUser) {
+        showAlert("Pre hodnotenie komentárov musíte byť prihlásený.");
+        return;
+      }
+      const currentReaction = userReactions[String(commentId)];
+
+      if (currentReaction === 'dislike') {
+        btn.classList.remove('disliked');
+        delete userReactions[commentId];
+        fetch(`http://localhost:3000/comment-neutral/${contentId}/${safeId}`, {
+          method: 'POST',
+          credentials: 'include'
+        }).then(fetchStats);
+      } else {
+        btn.classList.add('disliked');
+        btn.parentElement.querySelector('.comment-like')?.classList.remove('liked');
+        delete userReactions[commentId];
+        fetch(`http://localhost:3000/comment-dislike/${contentId}/${safeId}`, {
+          method: 'POST',
+          credentials: 'include'
+        }).then(fetchStats);
+      }
+    };
+  });
+
+  document.querySelectorAll('.delete-comment').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const commentId = btn.parentElement.getAttribute('data-id');
+      const safeId = encodeURIComponent(commentId);
+
+      showAlert("Naozaj chcete vymazať tento komentár?", () => {
+        fetch(`http://localhost:3000/comment/${contentId}/${safeId}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        }).then(() => fetchStats());
+      }, true);
+    });
+  });
+
+  document.querySelectorAll('.edit-comment').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const commentId = btn.parentElement.getAttribute('data-id');
+      const commentContainer = btn.closest('div').parentElement;
+      const commentTextElement = commentContainer.querySelector('p');
+      const originalText = commentTextElement.textContent;
+
+      if (commentContainer.querySelector('textarea')) return;
+
+      commentTextElement.style.display = 'none';
+
+      const textarea = document.createElement('textarea');
+      textarea.value = originalText;
+      textarea.rows = 3;
+      textarea.className = 'comment-textarea';
+
+      const actionsSpan = document.createElement('span');
+      actionsSpan.style.display = 'flex';
+      actionsSpan.style.gap = '8px';
+      actionsSpan.style.marginTop = '5px';
+      actionsSpan.style.cursor = 'pointer';
+
+      const saveBtn = document.createElement('span');
+      saveBtn.textContent = '💾';
+      saveBtn.title = 'Uložiť';
+      saveBtn.style.cursor = 'pointer';
+      saveBtn.style.fontSize = '1rem';
+
+      const cancelBtn = document.createElement('span');
+      cancelBtn.textContent = '❌';
+      cancelBtn.title = 'Zrušiť';
+      cancelBtn.style.cursor = 'pointer';
+      cancelBtn.style.fontSize = '1rem';
+
+      actionsSpan.appendChild(saveBtn);
+      actionsSpan.appendChild(cancelBtn);
+      commentContainer.appendChild(textarea);
+      commentContainer.appendChild(actionsSpan);
+
+      cancelBtn.addEventListener('click', () => {
+        textarea.remove();
+        actionsSpan.remove();
+        commentTextElement.style.display = 'block';
+      });
+
+      saveBtn.addEventListener('click', () => {
+        const newText = textarea.value.trim();
+        if (!newText) return showAlert("Text komentára nemôže byť prázdny");
+
+        const safeId = encodeURIComponent(commentId);
+        fetch(`http://localhost:3000/comment/${contentId}/${safeId}`, {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: newText })
+        }).then(() => fetchStats());
+      });
+    });
+  });
+}
+
+
+function updateReactionStyles() {
+  const likeBtn = document.getElementById('like-btn');
+  const dislikeBtn = document.getElementById('dislike-btn');
+
+  if (likeBtn && dislikeBtn) {
+    likeBtn.classList.remove('liked');
+    dislikeBtn.classList.remove('disliked');
+
+    if (userReactions['content'] === 'like') {
+      likeBtn.classList.add('liked');
+    } else if (userReactions['content'] === 'dislike') {
+      dislikeBtn.classList.add('disliked');
+    }
+  }
+}
+    const safeTitle = escapeHtml(item.topic.replace(/</g, "").replace(/>/g, ""));
+     const imagesHTML = item.images?.length
+    ? item.images.map(image => `
+       <a href="${escapeHtml(image)}" data-lightbox="content-gallery" data-title="${safeTitle}">
+        <img src="${escapeHtml(image)}" alt="Image related to ${escapeHtml(item.topic)}" class="uploaded-image thumbnail" />
+        </a>
+      `).join('')
+    : '';
+
+    const formattedContent = item.content
+  .split('\n') // rozdelí každé nové zalomenie
+  .map(line => escapeHtml(line.trim()))  // ✅ escape here
+  .filter(line => line.length > 0) // ignoruj prázdne riadky
+  .map(line => `<p>${line}</p>`)
+  .join('');
+
+  document.getElementById('content-detail').innerHTML = `
+  <h2>${escapeHtml(item.topic)}</h2>
+  ${formattedContent}
+  <div style="margin-bottom: 20px;"></div>
+  <p class="category-line"><strong>Kategória:</strong> <a href="${item.category.toLowerCase()}.html" style="color: #517dcf;">${categoryMapping[item.category] || item.category}</a></p>
+  <div class="content-meta">
+    <a href="usercontent.html?username=${encodeURIComponent(entry.username)}" class="user-link">
+      <img src="user-icon.png" alt="User Icon" class="small-user-icon">
+      <strong>${escapeHtml(entry.username)}</strong>
+    </a> 
+    <span><small>• ${formattedDate}</small></span>
+  </div>
+
+  <div class="content-images">${imagesHTML}</div>
+
+ <div id="interaction-section" style="margin-top: 20px; font-size: 1rem; color: #555;">
+  <span id="stats-text">
+    👁️ <span id="views-count">0</span> |
+    <span id="like-btn" style="cursor: pointer;">👍</span> <span id="like-count">0</span> |
+    <span id="dislike-btn" style="cursor: pointer;">👎</span> <span id="dislike-count">0</span>
+  </span>
+</div>
+
+ <div id="comments-section" style="margin-top: 40px; background-color: #fefefe; border: 1px solid #ddd; border-radius: 8px; padding: 20px;">
+  <div class="comment-input-wrap">
+    <textarea id="comment-input" rows="3" placeholder="Sem napíšte komentár..."></textarea>
+
+    <!-- Emoji UI pevne v DOM, tlačidlo nalavo -->
+    <div class="emoji-wrap">
+      <button id="emoji-toggle" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Vybrať emoji">😊❤️🙏</button>
+      <div id="emoji-panel" class="emoji-panel" role="dialog" aria-label="Panel s emoji">
+        <div class="emoji-grid" id="emoji-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <button id="post-comment-btn" style="margin-top: 8px;">Pridať komentár</button>
+
+  <h3 style="border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 20px;">💬 Komentáre</h3>
+   <div id="comments-list" style="margin-top: 10px;"></div>
+ <div id="comments-load-more-container" style="text-align: center; margin-top: 0px;">
+  <div id="comments-load-more-button" style="display: none; cursor: pointer; font-size: 18px; display: flex; justify-content: center; align-items: center; gap: 8px;">
+    <span>Zobraziť staršie</span>
+    <span style="font-size: 1.4rem;">🔽</span>
+  </div>
+</div>
+
+
+ <div id="contact-section" style="margin-top: 20px; background-color: #fefefe; border: 1px solid #ddd; border-radius: 8px; padding: 20px;">
+     <h3 style="padding-bottom: 10px; margin-bottom: 10px;">
+    ✉️ Kontaktovať autora prostredníctvom e-mailu
+  </h3>
+  <textarea id="contact-input" rows="3" placeholder="Sem môžete napísať správu autorovi príspevku..." style="width:100%; box-sizing:border-box; padding:8px; font-size:1rem; resize:vertical;"></textarea>
+    <button id="send-contact-btn" style="margin-top: 5px;">Odoslať správu</button>
+    </div>
+`;
+
+const commentsLoadMoreBtn = document.getElementById('comments-load-more-button');
+if (commentsLoadMoreBtn) {
+  commentsLoadMoreBtn.addEventListener('click', () => {
+    renderCommentsPage(); // načíta ďalších 5
+  });
+}
+
+(function setupEmojiPicker(){
+  const textarea = document.getElementById('comment-input');
+  const toggle   = document.getElementById('emoji-toggle');
+  const panel    = document.getElementById('emoji-panel');
+  const grid     = document.getElementById('emoji-grid');
+  if (!textarea || !toggle || !panel || !grid) return;
+
+  const EMOJIS = [
+    '😀','😃','😄','😁','😆','🥹','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','😙','😚',
+    '😋','😛','😜','🤪','😝','🫠','🤗','🤭','🤫','🤔','🫡','🤐','🤨','😐','😑','😶','🫥','😏','😒','🙄',
+    '😬','😴','🤤','😪','😮','😯','😲','🥱','🤒','🤕','🤧','🥵','🥶','🤮','🤢','😵','🤯','😎','🤓',
+    '👍','👎','👏','🙌','🤝','🙏','💪','🔥','✨','🎉','✅','❌','❤️','🧡','💛','💚','💙','💜','🖤','🤍'
+  ];
+  grid.innerHTML = EMOJIS.map(e => `<button type="button" class="emoji-btn" data-e="${e}" aria-label="${e}">${e}</button>`).join('');
+
+  function insertAtCursor(el, text) {
+    el.focus();
+    const s = el.selectionStart ?? el.value.length;
+    const e = el.selectionEnd ?? el.value.length;
+    el.value = el.value.slice(0, s) + text + el.value.slice(e);
+    const caret = s + text.length;
+    el.setSelectionRange(caret, caret);
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function openPanel() { panel.style.display = 'block'; toggle.setAttribute('aria-expanded','true'); document.addEventListener('click', onDocClick); }
+  function closePanel(){ panel.style.display = 'none';  toggle.setAttribute('aria-expanded','false'); document.removeEventListener('click', onDocClick); }
+  function onDocClick(ev){ if (!panel.contains(ev.target) && ev.target !== toggle) closePanel(); }
+
+  toggle.addEventListener('click', () => (panel.style.display === 'block' ? closePanel() : openPanel()));
+  grid.addEventListener('click', (e) => { const b = e.target.closest('.emoji-btn'); if (b) insertAtCursor(textarea, b.dataset.e); });
+})();
+
+
+fetchStats();
+
+// Kontaktovať autora – handler (viditeľné iba pre neautora) + showAlert validácia
+const contactSection = document.getElementById('contact-section');
+const contactBtn     = document.getElementById('send-contact-btn');
+const contactInput   = document.getElementById('contact-input');
+
+if (contactSection && contactBtn && contactInput) {
+  const isAuthor = !!(currentUser && entry && currentUser === entry.username);
+
+  // Skryť sekciu pre autora
+  if (isAuthor) {
+    contactSection.style.display = 'none';
+  } else {
+    contactSection.style.display = 'block';
+
+    // Zruš staré handlery na tlačidle
+    const cleanBtn = contactBtn.cloneNode(true);
+    contactBtn.parentNode.replaceChild(cleanBtn, contactBtn);
+
+    cleanBtn.addEventListener('click', () => {
+      if (!currentUser) {
+        showAlert("Pre odosielanie správ musíte byť prihlásený");
+        return;
+      }
+
+      const text = (contactInput.value || '').trim();
+      if (text.length < 5) {
+        showAlert("Správa musí obsahovať minimálne 5 znakov");
+        return;
+      }
+
+      fetch(`http://localhost:3000/contact-author/${contentId}`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, name: currentUser })
+      })
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+
+        if (res.status === 400 && /príliš krátk/.test((data.message || '').toLowerCase())) {
+          showAlert("Správa musí obsahovať minimálne 5 znakov");
+          return;
+        }
+
+        if (res.status === 429) {
+          showAlert(data.message || "Príliš veľa správ. Skúste to prosím neskôr.");
+          return;
+        }
+
+        if (!res.ok) {
+          throw new Error(data.message || "Nepodarilo sa odoslať správu autorovi");
+        }
+
+        contactInput.value = '';
+        showAlert("Vaša správa bola úspešne odoslaná");
+      })
+      .catch((err) => {
+        console.error(err);
+        showAlert("Nepodarilo sa odoslať správu. Skúste to prosím neskôr.");
+      });
+    });
+  }
+} else {
+  console.warn('Kontakt sekcia: chýba niektorý z elementov.');
+}
+
+
+document.getElementById('post-comment-btn').addEventListener('click', () => {
+  const commentText = document.getElementById('comment-input').value.trim();
+ if (!commentText) {
+  showAlert("Pre pridanie komentára prosím vyplňte pole");
+  return;
+}
+
+fetch(`http://localhost:3000/comment/${contentId}`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: commentText })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Nepodarilo sa odoslať komentár");
+    return res.json();
+  })
+  .then(() => {
+    document.getElementById('comment-input').value = '';
+    fetchStats(); // refresh comments
+  })
+  .catch(err => {
+    console.error(err);
+    showAlert("Pre pridávanie komentárov musíte byť prihlásený.");
+  });
+});
+
+document.getElementById('like-btn').addEventListener('click', () => {
+  if (!currentUser) {
+    showAlert("Pre hodnotenie obsahu musíte byť prihlásený.");
+    return;
+  }
+
+  const likeBtn = document.getElementById('like-btn');
+  const dislikeBtn = document.getElementById('dislike-btn');
+  const isLiked = likeBtn.classList.contains('liked');
+
+  if (isLiked) {
+    likeBtn.classList.remove('liked');
+    fetch(`http://localhost:3000/neutral/${contentId}`, {
+      method: 'POST',
+      credentials: 'include'
+    }).then(() => fetchStats());
+  } else {
+    likeBtn.classList.add('liked');
+    dislikeBtn.classList.remove('disliked');
+    fetch(`http://localhost:3000/like/${contentId}`, {
+      method: 'POST',
+      credentials: 'include'
+    }).then(() => fetchStats());
+  }
+});
+
+document.getElementById('dislike-btn').addEventListener('click', () => {
+  if (!currentUser) {
+    showAlert("Pre hodnotenie obsahu musíte byť prihlásený.");
+    return;
+  }
+
+  const likeBtn = document.getElementById('like-btn');
+  const dislikeBtn = document.getElementById('dislike-btn');
+  const isDisliked = dislikeBtn.classList.contains('disliked');
+
+  if (isDisliked) {
+    dislikeBtn.classList.remove('disliked');
+    fetch(`http://localhost:3000/neutral/${contentId}`, {
+      method: 'POST',
+      credentials: 'include'
+    }).then(() => fetchStats());
+  } else {
+    dislikeBtn.classList.add('disliked');
+    likeBtn.classList.remove('liked');
+    fetch(`http://localhost:3000/dislike/${contentId}`, {
+      method: 'POST',
+      credentials: 'include'
+    }).then(() => fetchStats());
+  }
+});
+
+             });
+            });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox-plus-jquery.min.js"></script>
+<script>
+lightbox.option({
+        'albumLabel': "Obrázok %1 z %2" // Translates "Image X of Y"
+    });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeNotifications();
+  });
+</script>
+</body>
+</html>

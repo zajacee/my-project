@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Výsledky vyhľadávania</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Full styles from vedomosti.html */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+       /* Body Styling */
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      background-color: #f4f4f4;
+      color: #333;
+      padding: 1.25rem; /* Padding adjusted */
+      max-width: 100%;
+      margin: 0 auto; /* Make sure body is centered */
+      padding-top: 50px; /* Adjust this value as needed */
+    }
+
+    /* Header Styling */
+    header {
+    background-color: #333;
+    color: #fff;
+    padding: 1.25rem;
+    display: flex;
+    justify-content: center; /* Centers title */
+    text-align: center;
+    position: relative;
+    height: 80px; /* Set a fixed height */
+}
+
+    /* Ensure title is visible and centered */
+header h1 {
+    margin: 0;
+    font-size: 2rem;
+    cursor: pointer;
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+
+#login-button {
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    gap: 8px;  /* Space between text and icon */
+    position: absolute;
+    top: -75px;
+    right: 20px;
+    padding: 8px 10px;
+    width: 160px;  /* Fixed width */
+    height: 40px;  /* Fixed height */
+    background-color: white;
+    color: black;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+#login-button img {
+    width: 26px;  /* Adjust icon size */
+    height: 24px;
+}
+
+#login-button:hover {
+    background-color: #f0f0f0;
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    top: 0px; /* Adjust dropdown positioning */
+    right: 20px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    width: 150px;  /* Fixed width */
+    height: 80px;  /* Auto height to fit content */
+    text-align: center;
+    z-index: 1000;
+    padding: 5px 0; /* Adjust padding inside the dropdown */
+}
+
+.dropdown button {
+    width: 100%;
+    padding: 2px 0; /* Reduce space inside buttons */
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1rem;
+    white-space: nowrap; /* Prevent text wrapping */
+    display: flex;
+    align-items: center; /* Align text and icon properly */
+    justify-content: center; /* Center text horizontally */
+    color: black;
+    text-align: left;
+    line-height: 1.5; /* Reduce spacing between text lines */
+    margin-top: 5px; /* Moves the text up */
+       }
+
+.dropdown button:first-child {
+    margin-bottom: 3px; /* Reduce space between buttons */
+}
+
+.dropdown button img {
+    margin-right: 5px; /* Adjust spacing between icon and text */
+}
+
+.dropdown button:hover {
+    background-color: #f0f0f0;
+}
+
+.notification-username {
+  color: #007bff;
+  font-weight: bold;
+}
+
+/* Ensure username, icon, and date are in one line */
+.content-meta {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #555;
+    gap: 10px; /* Adds space between elements */
+    flex-wrap: wrap; /* Prevents overlap on small screens */
+}
+
+.content-meta small {
+    font-size: 0.9rem; /* Adjust size (default small is ~0.8rem) */
+    }
+
+.user-link {
+    text-decoration: none;
+    font-size: 0.9rem;
+    color: #007bff;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    }
+
+.user-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.small-user-icon {
+    width: 16px;
+    height: 14px;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+
+
+        /* Custom Alert Modal */
+    .custom-alert-modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding-top: 100px;
+    }
+
+    .alert-box {
+      background-color: white;
+      margin: 0 auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .alert-box button {
+        width: 100%;
+        padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .alert-box button:hover {
+      background-color: #2980b9;
+    }
+
+        #search-title, .no-results {
+    font-size: 1.5rem; /* Same size */
+    font-weight: normal; /* Both have normal font weight */
+    color: #333; /* Same text color */
+    margin-bottom: 20px; /* Consistent spacing */
+}
+
+#search-title strong, .no-results strong {
+    font-weight: bold; /* Keep the search phrase bold */
+}
+
+        /* Recent Content Section */
+    #recent-content {
+      margin-top: 50px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      
+    }
+
+        #search-bar {
+            padding: 0.5rem;
+            width: 80%;
+            max-width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            position: absolute;
+            right: 1.25rem;
+            top: 38%;
+            transform: translateY(-50%);
+        }
+
+        #sidebar {
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 1.25rem;
+            width: 240px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+        }
+
+        #sidebar h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      margin-top: 20px; /* Moved closer to the top */
+    }
+
+    #sidebar ul {
+      list-style: none;
+      margin-top: 5px;
+    }
+
+    #sidebar ul li {
+      margin-bottom: 10px;
+    }
+
+    #sidebar ul li a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.1rem;
+    }
+
+    #sidebar ul li a.bold {
+      font-weight: bold;
+    }
+
+    #sidebar ul li a:hover {
+      color: #f39c12;
+    }
+
+    /* Sidebar "Domov" link styling */
+    #sidebar h2 a {
+      color: #517dcf; /* Default color */
+      text-decoration: none;
+      font-size: 1.5rem;
+      font-weight: bold; /* Make Domov link bold */
+    }
+
+    #sidebar h2 a:hover {
+      color: #f39c12; /* Change color on hover */
+    }
+
+
+        #content {
+            margin-left: 240px;
+            padding: 20px;
+            max-width: calc(100% - 240px);
+        }
+
+        #search-results {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Adds a small border to make them more distinct */
+    .content-item:not(:last-child) {
+      border-bottom: 1px solid #ddd;
+    }
+
+    * Change the title color in recent content */
+#content-item a {
+    color: #517dcf; /* Change this to your desired color */
+    text-decoration: underline; /* Removes underline */
+    font-weight: bold; /* Optional: Makes it bolder */
+}
+
+#content-item a:hover {
+    color: #2980b9; /* Change color on hover */
+}
+
+
+    /* Styling for non-clickable content (rest of the content) */
+    .content-item p {
+      color: #333; /* Keep it black */
+      text-decoration: none; /* No underline */
+    }
+
+    /* "Čítať viac" link styling */
+    .read-more {
+      color: #3498db;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .read-more:hover {
+      color: #2980b9;
+    }
+
+
+        .content-thumbnail {
+            flex-shrink: 0;
+            width: 120px;
+            height: 120px;
+            overflow: hidden;
+            border-radius: 5px;
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        
+        
+p:nth-child(3) {
+    margin-top: 10px; /* Increase this value for more space */
+}
+
+       
+/* Content text */
+.content-text {
+  flex-grow: 1;
+   min-width: 0;  
+}
+
+/* lámanie veľmi dlhých názvov/URL bez medzier */
+.content-text h4,
+.content-text h4 a {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;   /* moderné prelamovanie kdekoľvek */
+  word-break: break-word;    /* fallback pre staršie prehliadače */
+}
+       
+.no-results b {
+    font-weight: bold; /* Ensure the searched phrase stays bold */
+    color: #333; /* Slightly darker text for contrast */
+}
+
+#recent-content-items {
+  order: 1;
+}
+
+#load-more-container {
+  order: 2;
+  text-align: center;
+  }
+
+  #load-more-button {
+  display: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #3498db;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+#load-more-button:hover {
+  font-weight: bold;
+}
+
+        /* Footer Styling */
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #333;
+      color: #fff;
+      margin-top: 20px;
+    }
+
+    .footer-link {
+      font-size: 14px;
+      color: #fff; /* Set link color */
+    text-decoration: underline; /* Remove the underline */
+}
+
+.footer-link:hover {
+    color: #f39c12; /* Highlight color on hover */
+}
+
+.copyright p {
+    font-size: 14px;
+    margin: 0;
+
+             /* Media Queries for Scaling */
+    @media screen and (max-width: 768px) {
+      html {
+        font-size: 14px; /* Scale down on small screens */
+      }
+
+      #sidebar {
+        width: 200px; /* Reduce sidebar width on small screens */
+      }
+
+      #content {
+        margin-left: 200px; /* Adjust content area margin */
+        padding: 15px;
+      }
+      
+        }
+    </style>
+     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="notifications.js" defer></script>
+</head>
+<body>
+    <header>
+        <div class="top-bar">
+            <h1><a href="index.html" style="text-decoration: none; color: inherit;">DajToVon</a></h1>
+            <input type="text" id="search-bar" placeholder="Hľadať...">
+            <div class="user-menu">
+               <!-- 🔔 Notification Bell inside user-menu -->
+      <!-- 🔔 Notification Bell positioned top right -->
+<div id="notification-container" class="notification-container" style="display: none; position: absolute; top: -45px; right: 200px; font-size: 1.5rem; cursor: pointer;">
+  <span id="notification-bell" title="Notifikácie">🔔</span>
+  <span id="bell-dot" style="
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background: red;
+    border-radius: 50%;
+    display: none;
+  "></span>
+
+<div id="notification-popup" style="
+  display: none;
+  position: absolute;
+  top: 30px;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  padding: 10px;
+  min-width: 300px;
+  max-width: 90vw;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  color: black;
+  z-index: 1000;
+">
+  <h4 style="margin: 0 0 10px; font-size: 1rem; font-weight: bold; font-family: Arial, sans-serif; color: black;">🔔 Notifikácie</h4>
+  <ul id="notification-list" style="list-style: none; padding: 0; margin: 0; font-size: 0.9rem;"></ul>
+</div>
+</div>
+                <button id="login-button">
+                    <img id="user-icon" src="user-icon.png" alt="User Icon">
+                    <span id="login-text">Prihlásiť</span>
+                </button>
+                <div class="dropdown" id="logout-dropdown">
+                    <button id="my-content" onclick="window.location.href='userprofile.html'">Moje príspevky</button>
+                    <button id="logout-option">
+                        <img src="logout-icon.png" alt="Logout Icon" style="width: 20px; height: 20px; margin-right: 8px;">
+                        Odhlásiť
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Custom Alert Modal -->
+<div id="custom-alert-modal" class="custom-alert-modal">
+    <div class="alert-box">
+        <p id="alert-message"></p>
+        <button onclick="closeAlert()">OK</button>
+    </div>
+  </div>
+
+<div id="sidebar">
+    <h2><a href="index.html" class="sidebar-link">Domov</a></h2>
+    <h2>Kategórie</h2>
+    <ul>
+        <li><a href="vedomosti.html">Vedomosti</a></li>
+        <li><a href="skusenosti.html">Skúsenosti</a></li>
+        <li><a href="praca.html">Práca</a></li>
+        <li><a href="predmety.html">Predmety</a></li>
+        <li><a href="ine.html">Iné</a></li>
+    </ul>
+    <h2><a href="contact.html" class="sidebar-link">Kontakt</a></h2>
+</div>
+
+<div id="content">
+  <section id="search-results">
+    <h3 id="search-title">Výsledky vyhľadávania</h3>
+    <div id="results-container"></div>
+
+    <div id="load-more-container" style="text-align: center; margin-top: 20px;">
+        <div id="load-more-button">
+          <span>Načítať viac</span>
+          <span style="font-size: 1.4rem;">🔽</span>
+        </div>
+      </div>
+  </section>
+</div>
+
+<footer>
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="terms.pdf" target="_blank" class="footer-link">Všeobecné podmienky</a> |
+        <a href="privacy.pdf" target="_blank" class="footer-link">Ochrana osobných údajov</a>
+      </div>
+      <div class="copyright">
+        <p>&copy; 2025 DajToVon</p>
+      </div>
+    </div>
+  </footer>
+
+<script>
+
+function escapeHtml(text) {
+  if (!text) return '';
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const query = params.get('q')?.trim();
+      const resultsContainer = document.getElementById('results-container');
+      const searchTitle = document.getElementById('search-title');
+      const loadMoreButton = document.getElementById('load-more-button');
+    
+      const itemsPerPage = 10;
+      let currentIndex = 0;
+      let allFilteredResults = [];
+    
+      const removeDiacritics = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    
+      const categoryMapping = {
+        vedomosti: "Vedomosti",
+        skusenosti: "Skúsenosti",
+        praca: "Práca",
+        predmety: "Predmety",
+        ine: "Iné"
+      };
+    
+      const formatDate = (date) => {
+        const d = new Date(date);
+        return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}, ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+      };
+    
+      function renderNextBatch() {
+        const batch = allFilteredResults.slice(currentIndex, currentIndex + itemsPerPage);
+        batch.forEach(entry => {
+          const item = entry.content;
+          const safeContent = escapeHtml(item.content);
+          const truncatedContent = safeContent.length > 200 ? safeContent.substring(0, 200) + '...' : safeContent;
+          const showReadMore = item.content.length > 200;
+          const formattedDate = formatDate(item.date);
+          const thumbnail = item.images?.[0] || 'logo.png';
+    
+          const el = document.createElement('div');
+          el.classList.add('content-item');
+          el.innerHTML = `
+            <div class="content-thumbnail">
+              <img src="${thumbnail}" alt="Thumbnail" class="thumbnail">
+            </div>
+            <div class="content-text">
+             <h4><a href="content-detail.html?contentId=${item.id}">${escapeHtml(item.topic)}</a></h4>
+              <p>${truncatedContent} ${showReadMore ? `<span class="read-more" data-id="${item.id}">Čítať viac</span>` : ''}</p>
+              <p><strong>Kategória:</strong> <a href="${item.category.toLowerCase()}.html" style="color: #517dcf;">${categoryMapping[item.category] || item.category}</a></p>
+              <div class="content-meta">
+                <a href="usercontent.html?username=${encodeURIComponent(entry.username)}" class="user-link">
+                  <img src="user-icon.png" alt="User Icon" class="small-user-icon">
+                  <strong>${item.username}</strong>
+                </a>
+                <small>• ${formattedDate}</small>
+                <small>• 👁️ ${item.views || 0} | 💬 ${item.commentsCount || 0} | 👍 ${item.likesCount || 0} | 👎 ${item.dislikesCount || 0}</small>
+              </div>
+            </div>`;
+          resultsContainer.appendChild(el);
+        });
+    
+        currentIndex += itemsPerPage;
+    
+        if (currentIndex >= allFilteredResults.length) {
+          loadMoreButton.style.display = 'none';
+        } else {
+          loadMoreButton.style.display = 'flex';
+        }
+    
+        document.querySelectorAll('.read-more').forEach(item => {
+          item.addEventListener('click', e => {
+            const id = e.target.getAttribute('data-id');
+            window.location.href = `content-detail.html?contentId=${id}`;
+          });
+        });
+      }
+    
+      function renderResults(allContent) {
+        if (!query) {
+          resultsContainer.innerHTML = `<p class="no-results">Nenašli sa žiadne výsledky pre hľadaný výraz.</p>`;
+          return;
+        }
+    
+        const normQuery = removeDiacritics(query).toLowerCase();
+    
+        allFilteredResults = allContent
+          .filter(entry => {
+            const topic = removeDiacritics(entry.content.topic || '').toLowerCase();
+            const content = removeDiacritics(entry.content.content || '').toLowerCase();
+            return topic.includes(normQuery) || content.includes(normQuery);
+          })
+          .sort((a, b) => new Date(b.content.date) - new Date(a.content.date));
+    
+        searchTitle.innerHTML = `Výsledky pre hľadaný výraz <strong>'${escapeHtml(query)}'</strong>, počet výsledkov <strong>${allFilteredResults.length}</strong>`;
+        resultsContainer.innerHTML = '';
+        currentIndex = 0;
+    
+        if (allFilteredResults.length === 0) {
+          resultsContainer.innerHTML = `<p class="no-results">Nenašli sa žiadne výsledky pre hľadaný výraz <strong>'${query}'</strong></p>`;
+          loadMoreButton.style.display = 'none';
+          return;
+        }
+    
+        renderNextBatch();
+      }
+    
+      // --- Load and cache content ---
+      const cacheTime = 5 * 60 * 1000;
+      const now = Date.now();
+      const cached = localStorage.getItem('contentList');
+      const cachedTime = localStorage.getItem('contentListTimestamp');
+    
+     const skipCache = !!query; // true if user is searching
+
+if (!skipCache && cached && cachedTime && (now - cachedTime < cacheTime)) {
+  renderResults(JSON.parse(cached));
+} else {
+  fetch('http://localhost:3000/all-content')
+    .then(res => res.json())
+    .then(data => {
+      const allContent = data.allContent || [];
+      if (!skipCache) {
+        localStorage.setItem('contentList', JSON.stringify(allContent));
+        localStorage.setItem('contentListTimestamp', now.toString());
+      }
+      renderResults(allContent);
+    })
+          .catch(err => {
+            console.error("Chyba pri načítaní obsahu:", err);
+            resultsContainer.innerHTML = `<p class="no-results">Nepodarilo sa načítať výsledky.</p>`;
+          });
+      }
+    
+      document.getElementById('search-bar').addEventListener('keypress', e => {
+        if (e.key === 'Enter') {
+          const searchValue = e.target.value.trim();
+          if (searchValue) {
+            window.location.href = `search-results.html?q=${encodeURIComponent(searchValue)}`;
+          }
+        }
+      });
+    
+      document.getElementById('load-more-button').addEventListener('click', renderNextBatch);
+    
+      // --- Login/logout logic (unchanged) ---
+      const loginButton = document.getElementById('login-button');
+      const loginText = document.getElementById('login-text');
+      const logoutDropdown = document.getElementById("logout-dropdown");
+      const logoutOption = document.getElementById("logout-option");
+    
+      loginButton.addEventListener('click', () => {
+        const currentUrl = window.location.href;
+        window.location.href = `login.html?return=${encodeURIComponent(currentUrl)}`;
+      });
+    
+      fetch('http://localhost:3000/api/me', {
+        method: 'GET',
+        credentials: 'include'
+      })
+        .then(response => {
+          if (!response.ok) throw new Error("Not logged in");
+          return response.json();
+        })
+        .then(data => {
+          if (data.username) {
+            loginText.textContent = data.username;
+            loginButton.replaceWith(loginButton.cloneNode(true));
+            const newLoginButton = document.getElementById('login-button');
+            newLoginButton.addEventListener('click', (event) => {
+              logoutDropdown.style.display = logoutDropdown.style.display === "block" ? "none" : "block";
+              event.stopPropagation();
+            });
+          }
+        })
+        .catch(err => console.warn("Not logged in:", err));
+    
+      document.addEventListener("click", (event) => {
+        if (!loginButton.contains(event.target) && !logoutDropdown.contains(event.target)) {
+          logoutDropdown.style.display = "none";
+        }
+      });
+    
+      logoutOption.addEventListener("click", () => {
+        fetch("http://localhost:3000/logout", {
+          method: "POST",
+          credentials: "include"
+        })
+          .then(() => {
+            loginText.textContent = "Prihlásiť";
+            logoutDropdown.style.display = "none";
+            showAlert("Boli ste odhlásený!", () => window.location.reload());
+          })
+          .catch(err => {
+            console.error("Logout error:", err);
+            showAlert("Chyba pri odhlasovaní.");
+          });
+      });
+    
+      function showAlert(message, callback = null) {
+        document.getElementById("alert-message").textContent = message;
+        document.getElementById("custom-alert-modal").style.display = "block";
+        document.querySelector(".alert-box button").onclick = function () {
+          document.getElementById("custom-alert-modal").style.display = "none";
+          if (callback) callback();
+        };
+      }
+    });
+    </script>
+    <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeNotifications();
+  });
+</script>
+</body>
+</html>
