@@ -91,6 +91,38 @@ const app = express();
 // ✅ Behind Render proxy
 app.set('trust proxy', 1);
 
+// 🔴 DOČASNÝ DEBUG ENDPOINT – ZMAZAŤ PO POUŽITÍ
+app.get("/debug/zoho-account", async (req, res) => {
+  try {
+    const domain = process.env.ZOHO_ACCOUNT_DOMAIN || "zoho.eu";
+
+    const tokenRes = await fetch(`https://accounts.${domain}/oauth/v2/token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        refresh_token: process.env.ZOHO_REFRESH_TOKEN,
+        client_id: process.env.ZOHO_CLIENT_ID,
+        client_secret: process.env.ZOHO_CLIENT_SECRET,
+        grant_type: "refresh_token",
+      }),
+    });
+
+    const token = await tokenRes.json();
+
+    const accRes = await fetch(`https://mail.${domain}/api/accounts`, {
+      headers: {
+        Authorization: `Zoho-oauthtoken ${token.access_token}`,
+      },
+    });
+
+    const data = await accRes.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+
 const PORT = process.env.PORT || 3000;
 const SECRET_KEY = process.env.SECRET_KEY;
 if (!SECRET_KEY) {
