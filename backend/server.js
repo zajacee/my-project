@@ -220,12 +220,12 @@ app.post('/forgot-password', async (req, res) => {
       toAddress: user.email,
       subject: "Obnovenie hesla – DajToVon",
       html: `
-        <p>Prišla nám požiadavka na obnovenie hesla.</p>
+        <p>Prišla nám požiadavka na obnovenie hesla k Vášmu účtu.</p>
         <p>Pre obnovenie hesla prosím kliknite na odkaz nižšie (platný 30 minút):</p>
         <p><a href="${resetUrl}">${resetUrl}</a></p>
         <hr>
-        <p>Ak ste o obnovenie hesla nepožiadali vy, tento e-mail ignorujte.
-Z bezpečnostných dôvodov sa v tomto prípade na vašom účte nevykonajú žiadne zmeny.</p>
+        <p>Ak ste o obnovenie hesla nepožiadali vy, tento e-mail prosím ignorujte.
+Z bezpečnostných dôvodov sa v tomto prípade na Vašom účte nevykonajú žiadne zmeny.</p>
       `
     });
 
@@ -1355,7 +1355,7 @@ const publicUrl =
     await sendZohoMail({
   toAddress: owner.email,      // autor príspevku
   replyTo: senderEmail,        // aby autor odpovedal priamo userovi
-  subject: `Správa k vášmu príspevku: ${item.topic}`,
+  subject: `Správa k Vášmu príspevku: ${item.topic}`,
   html: `
     <p><strong>Príspevok:</strong> ${esc(item.topic)}</p>
     <p><strong>Od:</strong> ${esc(senderName)} &lt;${esc(senderEmail)}&gt;</p>
