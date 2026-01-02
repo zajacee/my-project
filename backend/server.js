@@ -88,6 +88,49 @@ const { randomUUID } = require('crypto');
 const { Types } = require('mongoose'); // at the top of your file
 
 const app = express();
+
+const crypto = require('crypto');
+
+const PASSWORD_RESET_SECRET = process.env.PASSWORD_RESET_SECRET;
+if (!PASSWORD_RESET_SECRET) {
+  throw new Error("Missing PASSWORD_RESET_SECRET env variable");
+}
+
+function base64url(buf) {
+  return Buffer.from(buf).toString('base64')
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+function signResetToken(payloadObj) {
+  const payload = base64url(JSON.stringify(payloadObj));
+  const sig = base64url(
+    crypto.createHmac('sha256', PASSWORD_RESET_SECRET).update(payload).digest()
+  );
+  return `${payload}.${sig}`;
+}
+
+function verifyResetToken(token) {
+  const [payload, sig] = String(token || '').split('.');
+  if (!payload || !sig) return null;
+
+  const expected = base64url(
+    crypto.createHmac('sha256', PASSWORD_RESET_SECRET).update(payload).digest()
+  );
+
+  // timing-safe compare
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return null;
+  if (!crypto.timingSafeEqual(a, b)) return null;
+
+  const json = JSON.parse(Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8'));
+  if (!json?.uid || !json?.exp) return null;
+  if (Date.now() > json.exp) return null;
+
+  return json;
+}
+
+
 // ✅ Behind Render proxy
 app.set('trust proxy', 1);
 
@@ -150,6 +193,93 @@ app.use(cors({
 
 // ✅ Serve uploaded images to frontend
 app.use('/uploads', express.static(path.join(__dirname, UPLOAD_DIR)));
+
+// ================= FORGOT PASSWORD =================
+app.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body || {};
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || ''));
+    if (!emailOk) return res.status(400).json({ message: "Zadajte platný e-mail." });
+
+    const user = await User.findOne({ email: String(email).toLowerCase().trim() });
+
+    // vždy odpovedz OK (anti-enumeration)
+    res.json({ success: true, message: "Ak e-mail existuje, poslali sme odkaz na obnovenie hesla." });
+
+    if (!user) return;
+
+    const token = signResetToken({
+      uid: String(user._id),
+      exp: Date.now() + 30 * 60 * 1000
+    });
+
+    const base = (process.env.PUBLIC_FRONTEND_URL || 'https://dajtovon.sk').replace(/\/+$/, '');
+    const resetUrl = `${base}/reset-password.html?token=${encodeURIComponent(token)}`;
+
+    await sendZohoMail({
+      toAddress: user.email,
+      subject: "Obnovenie hesla – DajToVon",
+      html: `
+        <p>Prišlo nám požiadanie o obnovenie hesla.</p>
+        <p>Kliknite na odkaz (platí 30 minút):</p>
+        <p><a href="${resetUrl}">${resetUrl}</a></p>
+        <hr>
+        <p>Ak ste to neboli vy, tento email ignorujte.</p>
+      `
+    });
+
+  } catch (err) {
+    console.error("❌ forgot-password:", err);
+    res.json({ success: true, message: "Ak e-mail existuje, poslali sme odkaz na obnovenie hesla." });
+  }
+});
+
+// ================= RESET PASSWORD =================
+app.post('/reset-password', async (req, res) => {
+  try {
+    const { token, password } = req.body || {};
+
+    if (!token || !password) {
+      return res.status(400).json({ message: "Neplatná požiadavka." });
+    }
+
+    // min. 8 znakov + aspoň jedna číslica
+    const passwordOk = /^(?=.*\d).{8,}$/.test(String(password));
+    if (!passwordOk) {
+      return res.status(400).json({
+        message: "Heslo musí mať minimálne 8 znakov a aspoň jednu číslicu."
+      });
+    }
+
+    const payload = verifyResetToken(token);
+    if (!payload) {
+      return res.status(400).json({
+        message: "Odkaz je neplatný alebo expirovaný."
+      });
+    }
+
+    const user = await User.findById(payload.uid);
+    if (!user) {
+      return res.status(400).json({
+        message: "Odkaz je neplatný alebo expirovaný."
+      });
+    }
+
+    user.password = await bcrypt.hash(String(password), 10);
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Heslo bolo úspešne zmenené."
+    });
+
+  } catch (err) {
+    console.error("❌ reset-password:", err);
+    res.status(500).json({
+      message: "Chyba servera. Skúste neskôr."
+    });
+  }
+});
 
 
 
@@ -1142,7 +1272,7 @@ app.put('/edit-content/:id', authenticateUser, (req, res) => {
 
 const contactPageLimiter = makeRateLimiter({
   windowMs: 30 * 60_000, // 30 minút
-  max: 5,                // max 5 správ za okno
+  max: 3,                // max 5 správ za okno
   keyFn: (req) => `contactPage:${getClientIp(req)}`
 });
 

@@ -323,20 +323,26 @@ const api = (path) => `${API_BASE}${path}`;
       try {
         // Simulate API call
         const response = await fetch(api('/forgot-password'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email })
-        });
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include',
+  body: JSON.stringify({ email })
+});
 
         const data = await response.json();
-        if (response.ok) {
-          document.getElementById('forgot-password-message').innerText = "Odkaz na obnovenie hesla bol odoslaný na Váš e-mail.";
-        } else {
-          showAlert(data.message || "Nastala chyba pri odosielaní odkazu.");
-        }
-      } catch (error) {
-        showAlert("Nastala chyba. Skúste to znova.");
-      }
+       if (response.ok) {
+  document.getElementById('forgot-password-message').innerText =
+    "Odkaz na obnovenie hesla bol odoslaný na Váš e-mail.";
+
+  document.getElementById('forgot-password-email').value = "";
+
+  setTimeout(() => {
+    closeForgotPasswordModal();
+    document.getElementById('forgot-password-message').innerText = "";
+  }, 2000);
+} else {
+  showAlert(data.message || "Nastala chyba pri odosielaní odkazu.");
+}
     }
 
     // Registration function
