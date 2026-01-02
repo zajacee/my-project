@@ -157,43 +157,91 @@
 </head>
 <body>
 
-  <!-- Registration Form -->
-  <div class="register-container" id="register-form">
-    <h2>Registrácia</h2>
-    <input type="text" placeholder="Používateľské meno" id="reg-username" maxlength="12" minlength="4" required>
-    <input type="email" placeholder="E-mail" id="reg-email">
-    <div class="input-container">
-      <input type="password" placeholder="Heslo" id="reg-password">
-      <span class="toggle-password" onclick="togglePassword('reg-password', this)">👁️</span>
-    </div>
+<!-- Registration Form -->
+<form class="register-container" id="register-form" onsubmit="register(); return false;">
+  <h2>Registrácia</h2>
 
-    <div class="consent-container">
-      <input type="checkbox" id="consent-checkbox">
-      <label for="consent-checkbox">
-        Súhlasím so <a href="terms.pdf" target="_blank"><u>Všeobecnými podmienkami poskytovania služieb</u></a>
-        na serveroch DajToVon a vyhlasujem, že som sa oboznámil/a so
-        <a href="privacy.pdf" target="_blank"><u>Zásadami ochrany osobných údajov</u></a>.
-      </label>
-    </div>
+  <input
+    type="text"
+    placeholder="Používateľské meno"
+    id="reg-username"
+    maxlength="12"
+    minlength="4"
+    required
+    autocomplete="username"
+  >
 
-    <button id="register-btn" onclick="register()" disabled>Registrovať</button>
-    <a href="javascript:void(0);" id="show-login-form" class="register-link">Máte účet? Prihláste sa</a>
-    <img src="logo.png" alt="Logo" class="logo">
+  <input
+    type="email"
+    placeholder="E-mail"
+    id="reg-email"
+    autocomplete="email"
+  >
+
+  <div class="input-container">
+    <input
+      type="password"
+      placeholder="Heslo"
+      id="reg-password"
+      autocomplete="new-password"
+    >
+    <span class="toggle-password" onclick="togglePassword('reg-password', this)">👁️</span>
   </div>
+
+  <div class="consent-container">
+    <input type="checkbox" id="consent-checkbox">
+    <label for="consent-checkbox">
+      Súhlasím so
+      <a href="terms.pdf" target="_blank"><u>Všeobecnými podmienkami poskytovania služieb</u></a>
+      na serveroch DajToVon a vyhlasujem, že som sa oboznámil/a so
+      <a href="privacy.pdf" target="_blank"><u>Zásadami ochrany osobných údajov</u></a>.
+    </label>
+  </div>
+
+  <button type="submit" id="register-btn" disabled>Registrovať</button>
+
+  <a href="javascript:void(0);" id="show-login-form" class="register-link">
+    Máte účet? Prihláste sa
+  </a>
+
+  <img src="logo.png" alt="Logo" class="logo">
+</form>
+
 
   <!-- Login Form -->
-  <div class="login-container">
-    <h2>Prihlásenie</h2>
-    <input type="text" placeholder="E-mail alebo používateľské meno" id="email-or-username">
-    <div class="input-container">
-      <input type="password" placeholder="Heslo" id="password">
-      <span class="toggle-password" onclick="togglePassword('password', this)">👁️</span>
-    </div>
-    <a href="javascript:void(0);" class="forgot-password" onclick="forgotPassword()">Nepamätám si svoje heslo</a>
-    <button onclick="login()">Prihlásiť sa</button>
-    <a href="javascript:void(0);" id="show-register-form" class="register-link">Nemáte účet? Zaregistrujte sa</a>
-    <img src="logo.png" alt="Logo" class="logo">
+<form class="login-container" onsubmit="login(); return false;">
+  <h2>Prihlásenie</h2>
+
+  <input
+    type="text"
+    placeholder="E-mail alebo používateľské meno"
+    id="email-or-username"
+    autocomplete="username"
+  >
+
+  <div class="input-container">
+    <input
+      type="password"
+      placeholder="Heslo"
+      id="password"
+      autocomplete="current-password"
+    >
+    <span class="toggle-password" onclick="togglePassword('password', this)">👁️</span>
   </div>
+
+  <a href="javascript:void(0);" class="forgot-password" onclick="forgotPassword()">
+    Nepamätám si svoje heslo
+  </a>
+
+  <button type="submit">Prihlásiť sa</button>
+
+  <a href="javascript:void(0);" id="show-register-form" class="register-link">
+    Nemáte účet? Zaregistrujte sa
+  </a>
+
+  <img src="logo.png" alt="Logo" class="logo">
+</form>
+
 
   <!-- Forgot Password Modal -->
   <div id="forgot-password-modal" class="forgot-password-modal">

@@ -220,11 +220,12 @@ app.post('/forgot-password', async (req, res) => {
       toAddress: user.email,
       subject: "Obnovenie hesla – DajToVon",
       html: `
-        <p>Prišlo nám požiadanie o obnovenie hesla.</p>
-        <p>Kliknite na odkaz (platí 30 minút):</p>
+        <p>Prišla nám požiadavka na obnovenie hesla.</p>
+        <p>Pre obnovenie hesla prosím kliknite na odkaz nižšie (platný 30 minút):</p>
         <p><a href="${resetUrl}">${resetUrl}</a></p>
         <hr>
-        <p>Ak ste to neboli vy, tento email ignorujte.</p>
+        <p>Ak ste o obnovenie hesla nepožiadali vy, tento e-mail ignorujte.
+Z bezpečnostných dôvodov sa v tomto prípade na vašom účte nevykonajú žiadne zmeny.</p>
       `
     });
 
