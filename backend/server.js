@@ -34,6 +34,9 @@ const { randomUUID } = require('crypto');
 const { Types } = require('mongoose'); // at the top of your file
 
 const app = express();
+// ✅ Behind Render proxy
+app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 3000;
 const SECRET_KEY = process.env.SECRET_KEY;
 if (!SECRET_KEY) {
@@ -260,78 +263,50 @@ app.post('/api/content', authenticateUser, (req, res) => {
       return res.status(400).json({ message: err.message || 'Neplatný súbor.' });
     }
 
-    const { topic, content, category, date, id } = req.body;
-    const loggedInUser = req.user.username;
+const { topic, content, category, date } = req.body;
+const loggedInUser = req.user.username;
 
-    if (!topic?.trim() || !content?.trim() || !category?.trim() || !date?.trim()) {
-        return res.status(400).json({ message: "Prosím, vyplňte všetky polia" });
-    }
+if (!topic?.trim() || !content?.trim() || !category?.trim() || !date?.trim()) {
+  return res.status(400).json({ message: "Prosím, vyplňte všetky polia" });
+}
 
-    try {
-        const user = await User.findOne({ username: loggedInUser });
+try {
+  const user = await User.findOne({ username: loggedInUser });
 
-        if (!user) {
-            return res.status(404).json({ message: "Zadaný používateľ neexistuje" });
-        }
+  if (!user) {
+    return res.status(404).json({ message: "Zadaný používateľ neexistuje" });
+  }
 
-        const imageUrls = (req.files || []).map(file => `/uploads/${file.filename}`);
+  const imageUrls = (req.files || []).map(file => `/uploads/${file.filename}`);
 
-        const existingIndex = user.content.findIndex(
-  item => String(item.id) === String(id)
-);
+  const newContent = {
+    topic,
+    content,
+    category,
+    date,
+    id: randomUUID(),
+    images: imageUrls,
+    username: loggedInUser,
+    views: 0,
+    likes: [],
+    dislikes: [],
+    comments: []
+  };
 
-        if (existingIndex !== -1) {
-            // 🛠 If existing content is found with same ID, update it
+  user.content.push(newContent);
+  await user.save();
 
-            // 🧹 Optionally remove old images if present
-            const oldImages = user.content[existingIndex].images || [];
-            oldImages.forEach(imagePath => {
-                const fullPath = path.join(__dirname, imagePath.replace(/^\/+/, ''));
-                fs.unlink(fullPath, (err) => {
-                    if (err) {
-                        console.warn(`⚠️ Nepodarilo sa odstrániť obrázok: ${fullPath}`, err.message);
-                    }
-                });
-            });
-
-            // ✅ Update the content
-            user.content[existingIndex] = {
-                ...user.content[existingIndex],
-                topic,
-                content,
-                category,
-                date,
-                images: imageUrls
-            };
-        } else {
-            // ➕ Add new content
-            const newContent = {
-  topic,
-  content,
-  category,
-  date,
-  id: randomUUID(),
-  images: imageUrls,
-  username: loggedInUser,
-  views: 0,
-  likes: [],
-  dislikes: [],
-  comments: []
-};
-
-            user.content.push(newContent);
-        }
-
-        await user.save();
-        res.json({ success: true, message: "Obsah bol pridaný alebo aktualizovaný!" });
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Chyba servera, skúste to prosím neskôr" });
-    }
+  return res.json({
+    success: true,
+    message: "Obsah bol pridaný!",
+    id: newContent.id
+  });
+} catch (error) {
+  console.error("❌ Chyba pri ukladaní obsahu:", error);
+  return res.status(500).json({ message: "Chyba servera" });
+}
 });
 });
-
 
 
 // ✅ **Get ALL Public Content**
@@ -928,8 +903,14 @@ app.get('/user-content', authenticateUser, async (req, res) => {
 
 // ✅ **Logout**
 app.post('/logout', (req, res) => {
-    res.clearCookie('token'); // Clear the cookie to log out
-    res.json({ message: "Odhlásenie prebehlo úspešne!" }); // Logout success in Slovak
+  const isProd = process.env.NODE_ENV === 'production';
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    path: '/',
+  });
+  res.json({ message: "Odhlásenie prebehlo úspešne!" });
 });
 
 // ✅ DELETE a content item
@@ -1217,9 +1198,6 @@ const publicUrl =
   }
 });
 
-
-// ✅ Behind Render proxy
-app.set('trust proxy', 1);
 
 // ✅ Health check endpoint (Render)
 app.get('/health', (req, res) => res.status(200).send('ok'));
