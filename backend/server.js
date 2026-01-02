@@ -5,16 +5,26 @@ if (process.env.NODE_ENV !== 'production') {
 const nodemailer = require('nodemailer');
 const SENDER = process.env.ZOHO_SENDER;
 const RECIPIENT = process.env.ZOHO_RECIPIENT;
-
 const transporter = nodemailer.createTransport({
-  host: "smtp.zoho.eu",   // Or "smtp.zoho.com" for global accounts
-  port: 465,              // 465 for SSL, 587 for TLS
-  secure: true,           // true for port 465, false for port 587
+  host: "smtp.zoho.eu",
+  port: 587,
+  secure: false, // STARTTLS (nie SSL)
   auth: {
     user: process.env.ZOHO_USER,
     pass: process.env.ZOHO_PASS
-  }
+  },
+  requireTLS: true,
+
+  // ✅ aby to neviselo 2 min a hneď si videl chybu
+  connectionTimeout: 10_000,
+  greetingTimeout: 10_000,
+  socketTimeout: 10_000
 });
+
+transporter.verify()
+  .then(() => console.log("✅ Zoho SMTP ready"))
+  .catch(err => console.error("❌ Zoho SMTP verify failed:", err));
+
 
 const express = require('express');
 const cors = require('cors');
