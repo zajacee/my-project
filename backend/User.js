@@ -48,8 +48,8 @@ const contentSchema = new mongoose.Schema({
       username: String,
       text: String,
       timestamp: {
-        type: String,
-        default: () => new Date().toISOString()
+        type: Date,
+         default: Date.now
       },
       likes: {
         type: [String],
@@ -86,6 +86,7 @@ const userSchema = new mongoose.Schema({
     default: [] // Embedded content objects
    },
 
+   
   notifications: {
   type: [
     new mongoose.Schema({
@@ -102,6 +103,10 @@ const userSchema = new mongoose.Schema({
   default: []
 }
 });
+
+userSchema.index({ username: 1 });
+userSchema.index({ email: 1 });
+userSchema.index({ "content.id": 1 });
 
 const User = mongoose.model('User', userSchema);
 

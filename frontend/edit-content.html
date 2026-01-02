@@ -944,13 +944,14 @@ dragHandle.style.fontWeight = 'bold';
   
       if (!thumbnailContainer.classList.contains('sortable-initialized')) {
         Sortable.create(thumbnailContainer, {
-          animation: 150,
-          onEnd: () => {
-            selectedFiles = Array.from(thumbnailContainer.children).map(el => {
-              return selectedFiles.find(f => f.id === el.dataset.id);
-            }).filter(Boolean);
-          }
-        });
+  animation: 150,
+  handle: '.drag-handle', // ✅ iba cez ikonku ✥
+  onEnd: () => {
+    selectedFiles = Array.from(thumbnailContainer.children).map(el => {
+      return selectedFiles.find(f => f.id === el.dataset.id);
+    }).filter(Boolean);
+  }
+});
         thumbnailContainer.classList.add('sortable-initialized');
       }
     }
@@ -959,6 +960,7 @@ dragHandle.style.fontWeight = 'bold';
     if (!contentId) {
       messageDiv.textContent = "Chýba ID obsahu.";
       form.style.display = 'none';
+      return;
     } else {
       fetch(api('/user-content'), { method: 'GET', credentials: 'include' })
         .then(res => res.json())

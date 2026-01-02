@@ -1,0 +1,4 @@
+dajtovon_app
+8cY2hOBeHG2nGdKy
+
+mongodb+srv://dajtovon_app:8cY2hOBeHG2nGdKy@cluster.i6ews.mongodb.net/dajtovon?appName=Cluster

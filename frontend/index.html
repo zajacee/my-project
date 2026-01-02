@@ -978,7 +978,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const content = document.getElementById('content-text').value;
             const category = document.getElementById('category').value;
             const now = new Date();
-            const contentId = Date.now().toString(); // Simple solution for now
             const formattedDate = now.toISOString();
             
 
@@ -995,8 +994,7 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('category', category);
             formData.append('date', formattedDate);
             formData.append('username', storedUsername);
-            formData.append('id', contentId);
-
+            
 const seen = new Set();
 
 for (const { file } of selectedFiles) {

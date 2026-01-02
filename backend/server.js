@@ -21,20 +21,29 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 const multer = require('multer'); // Import Multer
 const fs = require('fs');
+const UPLOAD_DIR = process.env.UPLOAD_DIR || 'uploads';
+
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
+
 const { randomUUID } = require('crypto');
 const { Types } = require('mongoose'); // at the top of your file
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const SECRET_KEY = process.env.SECRET_KEY;
+if (!SECRET_KEY) {
+  throw new Error("Missing SECRET_KEY env variable");
+}
 const mongoose = require('mongoose');
 const User = require('./User'); // Adjust the path accordingly
 
 // Set up Multer to handle image uploads
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Store images in the 'uploads' folder
-  },
+destination: function (req, file, cb) {
+  cb(null, UPLOAD_DIR);
+},
   filename: function (req, file, cb) {
     const ext = path.extname(file.originalname).toLowerCase();
     cb(null, `${randomUUID()}${ext}`); // Unique + safe filename
@@ -60,40 +69,28 @@ const upload = multer({
   }
 });
 
-// ✅ Connect to MongoDB locally without deprecated options
-mongoose.connect('mongodb://localhost:27017/your_database_name')
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log("✅ Connected to MongoDB locally");
-
-    
-    // ✅ Query the 'users' collection to check if users exist
-    User.find({})
-      .then(users => {
-        if (users.length > 0) {
-          console.log("✅ Users found:", users);
-        } else {
-          console.log("❌ No users found.");
-        }
-      })
-      .catch(err => {
-        console.error("❌ Error retrieving users:", err);
-      });
+    console.log("✅ Connected to MongoDB");
   })
   .catch(err => {
     console.error("❌ MongoDB Connection Error:", err);
   });
-
   
 // Middleware
+
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'https://dajtovon.sk';
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: ['http://127.0.0.1:5500', 'http://localhost:5500'],
-    credentials: true
+  origin: FRONTEND_ORIGIN,
+  credentials: true
 }));
 
 // ✅ Serve uploaded images to frontend
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, UPLOAD_DIR)));
+
 
 
 // === Simple in-memory rate limiter (IP / user / optional resource) ===
@@ -144,7 +141,6 @@ function getClientIp(req) {
 // ✅ **Authentication Middleware**
 const authenticateUser = (req, res, next) => {
     const token = req.cookies.token;
-    console.log('Token from cookies:', token);  // Log the token to verify it's present
 
     if (!token) {
         return res.status(401).json({ message: "Unauthorized access. Please log in." });
@@ -227,12 +223,15 @@ app.post('/login', async (req, res) => {
         const token = jwt.sign({ username: user.username, email: user.email }, SECRET_KEY, { expiresIn: '1h' });
 
        // Set the token in cookies
-       res.cookie('token', token, {
-        httpOnly: true,
-        secure: false,        // for dev, don't use https
-        sameSite: 'Lax',      // allows cross-origin cookies in dev
-        maxAge: 3600000       // 1 hour
-      });
+       const isProd = process.env.NODE_ENV === 'production';
+
+res.cookie('token', token, {
+  httpOnly: true,
+  secure: isProd,                 // prod true (HTTPS)
+  sameSite: isProd ? 'none' : 'lax',
+  path: '/',
+  maxAge: 3600000
+});
 
 
         // Send a success message with the user's username
@@ -1186,7 +1185,10 @@ app.post('/contact-author/:id', authenticateUser, contactAuthorLimiter, async (r
 
   // sanitácia pre HTML mail
   const esc = (s='') => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  const publicUrl = `http://127.0.0.1:5500/content-detail.html?contentId=${encodeURIComponent(id)}`;
+  const PUBLIC_FRONTEND_URL = process.env.PUBLIC_FRONTEND_URL || 'https://dajtovon.sk';
+
+const publicUrl =
+  `${PUBLIC_FRONTEND_URL}/content-detail.html?contentId=${encodeURIComponent(id)}`;
 
   try {
     await transporter.sendMail({
@@ -1213,62 +1215,60 @@ app.post('/contact-author/:id', authenticateUser, contactAuthorLimiter, async (r
 });
 
 
-// ✅ **Start Server**
-const http = require('http').createServer(app);
+// ✅ Behind Render proxy
+app.set('trust proxy', 1);
+
+// ✅ Health check endpoint (Render)
+app.get('/health', (req, res) => res.status(200).send('ok'));
+
+const http = require('http');
 const { Server } = require('socket.io');
-const io = new Server(http, {
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
   cors: {
-    origin: ['http://127.0.0.1:5500', 'http://localhost:5500'],
+    origin: FRONTEND_ORIGIN,
     credentials: true
-  }
-});
-
-
-http.listen(3000, '127.0.0.1', () => {
-  console.log('🚀 Server running with WebSocket at http://127.0.0.1:3000');
+  },
+  transports: ['websocket', 'polling']
 });
 
 const connectedUsers = {}; // username -> Set of socket IDs
 
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
+
 io.on('connection', (socket) => {
   console.log("🟢 Socket connected:", socket.id);
 
- socket.on('register-username', (username) => {
-  if (!username) return;
+  socket.on('register-username', (username) => {
+    if (!username) return;
 
-  console.log(`🧪 Registering username ${username} on socket ${socket.id}`);
+    // Remove socket from any previous username
+    for (const sockets of Object.values(connectedUsers)) {
+      sockets.delete(socket.id);
+    }
 
-  // Remove this socket from any old username
-  for (const sockets of Object.values(connectedUsers)) {
-    sockets.delete(socket.id);
-  }
+    if (!connectedUsers[username]) connectedUsers[username] = new Set();
+    connectedUsers[username].add(socket.id);
 
-  if (!connectedUsers[username]) {
-    connectedUsers[username] = new Set();
-  }
-  connectedUsers[username].add(socket.id);
-
-  console.log('📦 Current connectedUsers:', Object.fromEntries(
-    Object.entries(connectedUsers).map(([k, v]) => [k, Array.from(v)])
-  ));
-
-  socket.username = username;
-   // ✅ Let client know it's ready
-  socket.emit('username-registered', username);
-});
+    socket.username = username;
+    socket.emit('username-registered', username);
+  });
 
   socket.on('disconnect', () => {
-  for (const [username, sockets] of Object.entries(connectedUsers)) {
-    if (sockets.has(socket.id)) {
-      sockets.delete(socket.id);
-      console.log(`🔴 Socket disconnected: ${socket.id} for user ${username}`);
-      if (sockets.size === 0) {
-        delete connectedUsers[username];
+    for (const [username, sockets] of Object.entries(connectedUsers)) {
+      if (sockets.has(socket.id)) {
+        sockets.delete(socket.id);
+        console.log(`🔴 Socket disconnected: ${socket.id} for user ${username}`);
+        if (sockets.size === 0) delete connectedUsers[username];
+        break;
       }
-      break;
     }
-  }
+  });
 });
-});
+
 
 
