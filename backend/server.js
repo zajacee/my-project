@@ -2,28 +2,72 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 
-const nodemailer = require('nodemailer');
-const SENDER = process.env.ZOHO_SENDER;
-const RECIPIENT = process.env.ZOHO_RECIPIENT;
-const transporter = nodemailer.createTransport({
-  host: "smtp.zoho.eu",
-  port: 587,
-  secure: false, // STARTTLS (nie SSL)
-  auth: {
-    user: process.env.ZOHO_USER,
-    pass: process.env.ZOHO_PASS
-  },
-  requireTLS: true,
+// ===== ZOHO MAIL API (no SMTP) =====
+let zohoTokenCache = { accessToken: null, expiresAt: 0 };
 
-  // ✅ aby to neviselo 2 min a hneď si videl chybu
-  connectionTimeout: 10_000,
-  greetingTimeout: 10_000,
-  socketTimeout: 10_000
-});
+async function getZohoAccessToken() {
+  const domain = process.env.ZOHO_ACCOUNT_DOMAIN || "zoho.eu";
 
-transporter.verify()
-  .then(() => console.log("✅ Zoho SMTP ready"))
-  .catch(err => console.error("❌ Zoho SMTP verify failed:", err));
+  if (zohoTokenCache.accessToken && Date.now() < zohoTokenCache.expiresAt - 60_000) {
+    return zohoTokenCache.accessToken;
+  }
+
+  const tokenRes = await fetch(`https://accounts.${domain}/oauth/v2/token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      refresh_token: process.env.ZOHO_REFRESH_TOKEN,
+      client_id: process.env.ZOHO_CLIENT_ID,
+      client_secret: process.env.ZOHO_CLIENT_SECRET,
+      grant_type: "refresh_token",
+    }),
+  });
+
+  const tokenJson = await tokenRes.json();
+  if (!tokenRes.ok || !tokenJson.access_token) {
+    throw new Error(`Zoho token error: ${JSON.stringify(tokenJson)}`);
+  }
+
+  const expiresInSec = Number(tokenJson.expires_in) || 3600;
+  zohoTokenCache.accessToken = tokenJson.access_token;
+  zohoTokenCache.expiresAt = Date.now() + expiresInSec * 1000;
+
+  return zohoTokenCache.accessToken;
+}
+
+async function sendZohoMail({ toAddress, subject, html, replyTo }) {
+  const domain = process.env.ZOHO_ACCOUNT_DOMAIN || "zoho.eu";
+  const accessToken = await getZohoAccessToken();
+
+  const payload = {
+    fromAddress: process.env.ZOHO_FROM_ADDRESS,
+    toAddress,
+    subject,
+    content: html,
+    mailFormat: "html",
+  };
+
+  if (replyTo) payload.replyTo = replyTo;
+
+  const resp = await fetch(
+    `https://mail.${domain}/api/accounts/${process.env.ZOHO_ACCOUNT_ID}/messages`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Zoho-oauthtoken ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+
+  const json = await resp.json().catch(() => ({}));
+  if (!resp.ok) {
+    throw new Error(`Zoho send error: ${resp.status} ${JSON.stringify(json)}`);
+  }
+
+  return json;
+}
 
 
 const express = require('express');
@@ -1122,29 +1166,21 @@ app.post('/send-message', contactPageLimiter, async (req, res) => {
   
 
 try {
-    await transporter.sendMail({
-      from: `"Dajtovon.sk" <${SENDER}>`, // must be your Zoho mailbox
-      to: RECIPIENT,                     // ✅ real recipient, not undefined
-      replyTo: email,                                    // user typed email
-      subject: 'Kontaktný formulár - nová správa',
-      html: `
-        <p><strong>Od:</strong> ${escape(email)}</p>
-        <p><strong>Správa:</strong><br>${escape(message).replace(/\n/g,'<br>')}</p>
-      `,
-      envelope: {
-        from: SENDER,                    // align SMTP MAIL FROM
-        to: RECIPIENT
-      },
-      headers: {
-        'X-Contact-Page': 'dajtovon.sk'
-      }
-    });
+  await sendZohoMail({
+    toAddress: process.env.ZOHO_TO_ADDRESS, // admin recipient
+    replyTo: email,
+    subject: "Kontaktný formulár - nová správa",
+    html: `
+      <p><strong>Od:</strong> ${escape(email)}</p>
+      <p><strong>Správa:</strong><br>${escape(message).replace(/\n/g,'<br>')}</p>
+    `,
+  });
 
-    res.json({ message: "Vaša správa bola úspešne odoslaná!" });
-  } catch (err) {
-    console.error("Chyba pri odosielaní emailu:", err);
-    res.status(500).json({ message: "Nepodarilo sa odoslať správu." });
-  }
+  res.json({ message: "Vaša správa bola úspešne odoslaná!" });
+} catch (err) {
+  console.error("Chyba pri odosielaní emailu:", err);
+  res.status(500).json({ message: "Nepodarilo sa odoslať správu." });
+}
 });
 
 // Rate limit pre kontaktovanie autora: 3 správy / 10 min / používateľ / príspevok
@@ -1185,20 +1221,17 @@ const publicUrl =
   `${PUBLIC_FRONTEND_URL}/content-detail.html?contentId=${encodeURIComponent(id)}`;
 
   try {
-    await transporter.sendMail({
-      from: `"DajToVon – správa k príspevku" <${SENDER}>`,
-      to: owner.email,                  // email autora (neposielame na frontend)
-      replyTo: senderEmail,             // kľúčové: autor odpovie priamo používateľovi
-      subject: `Správa k vášmu príspevku: ${item.topic}`,
-      html: `
-        <p><strong>Príspevok:</strong> ${esc(item.topic)}</p>
-        <p><strong>Od:</strong> ${esc(senderName)} &lt;${esc(senderEmail)}&gt;</p>
-        <p><strong>Správa:</strong><br>${esc(message).replace(/\n/g,'<br>')}</p>
-        <hr>
-        <p><a href="${publicUrl}">Otvoriť príspevok</a></p>
-      `,
-      envelope: { from: SENDER, to: owner.email },
-      headers: { 'X-DajToVon-Contact': 'content-author' }
+    await sendZohoMail({
+  toAddress: owner.email,      // autor príspevku
+  replyTo: senderEmail,        // aby autor odpovedal priamo userovi
+  subject: `Správa k vášmu príspevku: ${item.topic}`,
+  html: `
+    <p><strong>Príspevok:</strong> ${esc(item.topic)}</p>
+    <p><strong>Od:</strong> ${esc(senderName)} &lt;${esc(senderEmail)}&gt;</p>
+    <p><strong>Správa:</strong><br>${esc(message).replace(/\n/g,'<br>')}</p>
+    <hr>
+    <p><a href="${publicUrl}">Otvoriť príspevok</a></p>
+  `,
     });
 
     res.json({ message: "Vaša správa bola odoslaná autorovi." });

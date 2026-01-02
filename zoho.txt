@@ -1,0 +1,32 @@
+Client ID 
+1000.WU2XAUFKY64TYLI2LS4POH9MSNQ6YK
+1000.OEY84K5YZI49V0T17Q41YAO88L196U
+
+Client Secret
+8d9722a0a1b5dd7a92027756f7578dc6152b057bff
+f29c179ec962def29b501b38f3d34889eae8f83f50
+
+
+Generated Code
+1000.7621dd6dd9d625cb4996796ff634451b.3b8fc551d7a671c664254b784fa500b4
+
+https://accounts.zoho.eu/oauth/v2/token?grant_type=authorization_code&client_id=1000.OEY84K5YZI49V0T17Q41YAO88L196U&client_secret=f29c179ec962def29b501b38f3d34889eae8f83f50&code=1000.7621dd6dd9d625cb4996796ff634451b.3b8fc551d7a671c664254b784fa500b4
+
+
+$body = @{
+  grant_type    = "authorization_code"
+  client_id     = "1000.OEY84K5YZI49V0T17Q41YAO88L196U"
+  client_secret = "f29c179ec962def29b501b38f3d34889eae8f83f50"
+  code          = "1000.d5cc1d293a16da96de989f8367c2795f.6df1c6cca6d77b2f4b2ae74ef0e777a0"
+}
+
+Invoke-RestMethod -Method Post `
+  -Uri "https://accounts.zoho.eu/oauth/v2/token" `
+  -Body $body
+
+access_token  : 1000.76a09737decc03c483c92e6c13cecd7f.0b43151d7938b5b4e9f86488e6f76c9e
+refresh_token : 1000.ebee09909fe1a1946636f8fafae7519b.5a5cbb8f71b3856186bda4d9d1c7d0aa
+scope         : ZohoMail.messages.CREATE
+api_domain    : https://www.zohoapis.eu
+token_type    : Bearer
+expires_in    : 3600
