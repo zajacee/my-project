@@ -23,13 +23,9 @@
       position: relative;
     }
 
-    h2 {
-      margin-bottom: 15px;
-    }
+    h2 { margin-bottom: 15px; }
 
-    .input-container {
-      position: relative;
-    }
+    .input-container { position: relative; }
 
     input {
       width: 100%;
@@ -49,10 +45,7 @@
       opacity: 0.5;
       transition: opacity 0.2s ease;
     }
-
-    .toggle-password.active {
-      opacity: 1;
-    }
+    .toggle-password.active { opacity: 1; }
 
     button {
       width: 100%;
@@ -63,15 +56,8 @@
       border-radius: 4px;
       cursor: pointer;
     }
-
-    button:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-
-    button:hover:enabled {
-      background-color: #2980b9;
-    }
+    button:disabled { background-color: #ccc; cursor: not-allowed; }
+    button:hover:enabled { background-color: #2980b9; }
 
     .register-link, .forgot-password {
       margin-top: 5px;
@@ -81,9 +67,7 @@
       font-size: 14px;
     }
 
-    .register-container {
-      display: none;
-    }
+    .register-container { display: none; }
 
     .consent-container {
       display: flex;
@@ -92,22 +76,18 @@
       font-size: 14px;
       margin: 10px 0;
     }
-
-    .consent-container input {
-      width: auto;
-      margin-right: 5px;
-    }
+    .consent-container input { width: auto; margin-right: 5px; }
 
     /* Forgot Password Modal */
     .forgot-password-modal {
-      display: none; /* Hidden by default */
-      position: fixed; /* Stay in place */
-      z-index: 1; /* Sit on top */
+      display: none;
+      position: fixed;
+      z-index: 1;
       left: 0;
       top: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+      background-color: rgba(0, 0, 0, 0.4);
       padding-top: 60px;
     }
 
@@ -127,9 +107,7 @@
       font-size: 28px;
       font-weight: bold;
     }
-
-    .close-btn:hover,
-    .close-btn:focus {
+    .close-btn:hover, .close-btn:focus {
       color: black;
       text-decoration: none;
       cursor: pointer;
@@ -166,19 +144,15 @@
       border-radius: 4px;
       cursor: pointer;
     }
-
-    .alert-box button:hover {
-      background-color: #2980b9;
-    }
+    .alert-box button:hover { background-color: #2980b9; }
 
     .logo {
-   display: block;
-   margin: 10px auto 0;
-   width: 100px;
-   height: auto;
-   opacity: 1;
-}
-
+      display: block;
+      margin: 10px auto 0;
+      width: 100px;
+      height: auto;
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
@@ -196,13 +170,14 @@
     <div class="consent-container">
       <input type="checkbox" id="consent-checkbox">
       <label for="consent-checkbox">
-        Súhlasím so <a href="terms.pdf" target="_blank"><u>Všeobecnými podmienkami poskytovania služieb</u></a> na serveroch DajToVon a vyhlasujem, že som sa oboznámil/a so <a href="privacy.pdf" target="_blank"><u>Zásadami ochrany osobných údajov</u></a>.
+        Súhlasím so <a href="terms.pdf" target="_blank"><u>Všeobecnými podmienkami poskytovania služieb</u></a>
+        na serveroch DajToVon a vyhlasujem, že som sa oboznámil/a so
+        <a href="privacy.pdf" target="_blank"><u>Zásadami ochrany osobných údajov</u></a>.
       </label>
     </div>
 
     <button id="register-btn" onclick="register()" disabled>Registrovať</button>
     <a href="javascript:void(0);" id="show-login-form" class="register-link">Máte účet? Prihláste sa</a>
-    <!-- Logo -->
     <img src="logo.png" alt="Logo" class="logo">
   </div>
 
@@ -217,7 +192,6 @@
     <a href="javascript:void(0);" class="forgot-password" onclick="forgotPassword()">Nepamätám si svoje heslo</a>
     <button onclick="login()">Prihlásiť sa</button>
     <a href="javascript:void(0);" id="show-register-form" class="register-link">Nemáte účet? Zaregistrujte sa</a>
-    <!-- Logo -->
     <img src="logo.png" alt="Logo" class="logo">
   </div>
 
@@ -228,7 +202,7 @@
       <h2>Obnovenie hesla</h2>
       <p>Zadajte Váš e-mail, na ktorý Vám bude zaslaný odkaz na obnovenie hesla.</p>
       <input type="email" placeholder="E-mail" id="forgot-password-email">
-      <button onclick="sendPasswordReset()">Odoslať</button>
+      <button id="forgot-password-send-btn" onclick="sendPasswordReset()">Odoslať</button>
       <p id="forgot-password-message" style="color: green;"></p>
     </div>
   </div>
@@ -242,21 +216,21 @@
   </div>
 
   <script>
-// ===== API BASE (lokál vs produkcia) =====
-const API_BASE =
-  (location.hostname === "localhost" || location.hostname === "127.0.0.1")
-    ? "http://localhost:3000"
-    : "https://api.dajtovon.sk";
+    // ===== API BASE (lokál vs produkcia) =====
+    const API_BASE =
+      (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+        ? "http://localhost:3000"
+        : "https://api.dajtovon.sk";
 
-const api = (path) => `${API_BASE}${path}`;
+    const api = (path) => `${API_BASE}${path}`;
 
-    // Show registration form when clicking "Nemáte účet? Zaregistrujte sa"
+    // Show registration form
     document.getElementById('show-register-form').addEventListener('click', function() {
       document.querySelector('.login-container').style.display = 'none';
       document.getElementById('register-form').style.display = 'block';
     });
 
-    // Show login form when clicking "Máte účet? Prihláste sa"
+    // Show login form
     document.getElementById('show-login-form').addEventListener('click', function() {
       document.querySelector('.login-container').style.display = 'block';
       document.getElementById('register-form').style.display = 'none';
@@ -274,12 +248,12 @@ const api = (path) => `${API_BASE}${path}`;
       }
     }
 
-    // Enable register button only if the consent checkbox is checked
+    // Enable register button only if consent checked
     document.getElementById('consent-checkbox').addEventListener('change', function() {
       document.getElementById('register-btn').disabled = !this.checked;
     });
 
-    // Forgot password function
+    // Forgot password modal open
     function forgotPassword() {
       document.getElementById('forgot-password-modal').style.display = 'block';
     }
@@ -287,25 +261,24 @@ const api = (path) => `${API_BASE}${path}`;
     // Close forgot password modal
     function closeForgotPasswordModal() {
       document.getElementById('forgot-password-modal').style.display = 'none';
+      document.getElementById('forgot-password-message').innerText = "";
     }
 
     function showAlert(message, callback = null) {
-  document.getElementById('alert-message').textContent = message;
-  document.getElementById('custom-alert-modal').style.display = 'block';
+      document.getElementById('alert-message').textContent = message;
+      document.getElementById('custom-alert-modal').style.display = 'block';
 
-  // Set up event listener for "OK" button
-  document.querySelector('.alert-box button').onclick = function () {
-    document.getElementById('custom-alert-modal').style.display = 'none';
-    if (callback) callback(); // If there's a callback, execute it
-  };
-}
+      document.querySelector('.alert-box button').onclick = function () {
+        document.getElementById('custom-alert-modal').style.display = 'none';
+        if (callback) callback();
+      };
+    }
 
-    // Close custom alert
     function closeAlert() {
       document.getElementById('custom-alert-modal').style.display = 'none';
     }
 
-    // Send password reset request
+    // ✅ FIXED: Send password reset request
     async function sendPasswordReset() {
       const email = document.getElementById('forgot-password-email').value;
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -320,29 +293,36 @@ const api = (path) => `${API_BASE}${path}`;
         return;
       }
 
+      const btn = document.getElementById('forgot-password-send-btn');
+      btn.disabled = true;
+
       try {
-        // Simulate API call
         const response = await fetch(api('/forgot-password'), {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  credentials: 'include',
-  body: JSON.stringify({ email })
-});
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email })
+        });
 
-        const data = await response.json();
-       if (response.ok) {
-  document.getElementById('forgot-password-message').innerText =
-    "Odkaz na obnovenie hesla bol odoslaný na Váš e-mail.";
+        const data = await response.json().catch(() => ({}));
 
-  document.getElementById('forgot-password-email').value = "";
+        if (response.ok) {
+          document.getElementById('forgot-password-message').innerText =
+            "Odkaz na obnovenie hesla bol odoslaný na Váš e-mail.";
 
-  setTimeout(() => {
-    closeForgotPasswordModal();
-    document.getElementById('forgot-password-message').innerText = "";
-  }, 2000);
-} else {
-  showAlert(data.message || "Nastala chyba pri odosielaní odkazu.");
-}
+          document.getElementById('forgot-password-email').value = "";
+
+          setTimeout(() => {
+            closeForgotPasswordModal();
+          }, 2000);
+        } else {
+          showAlert(data.message || "Nastala chyba pri odosielaní odkazu.");
+        }
+      } catch (error) {
+        showAlert("Nastala chyba. Skúste to znova.");
+      } finally {
+        btn.disabled = false;
+      }
     }
 
     // Registration function
@@ -359,10 +339,10 @@ const api = (path) => `${API_BASE}${path}`;
         return;
       }
 
-      if (!username || username.length < 4 || username.length > 12) {
-  showAlert("Používateľské meno musí obsahovať minimálne 4 a maximálne 12 znakov.");
-  return;
-}
+      if (username.length < 4 || username.length > 12) {
+        showAlert("Používateľské meno musí obsahovať minimálne 4 a maximálne 12 znakov.");
+        return;
+      }
 
       if (!emailPattern.test(email)) {
         showAlert("Prosím, zadajte platný e-mail.");
@@ -381,8 +361,8 @@ const api = (path) => `${API_BASE}${path}`;
           body: JSON.stringify({ username, email, password })
         });
 
-        const data = await response.json();
-        showAlert(data.message);
+        const data = await response.json().catch(() => ({}));
+        showAlert(data.message || "Registrácia prebehla.");
 
         if (response.ok) {
           document.querySelector('.login-container').style.display = 'block';
@@ -393,49 +373,46 @@ const api = (path) => `${API_BASE}${path}`;
       }
     }
 
- // Updated Login function
-async function login() {
-  const emailOrUsername = document.getElementById('email-or-username').value;
-  const password = document.getElementById('password').value;
+    // Login function
+    async function login() {
+      const emailOrUsername = document.getElementById('email-or-username').value;
+      const password = document.getElementById('password').value;
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  // Regular expression for email validation
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailOrUsername || !password) {
+        showAlert("Prosím, vyplňte všetky polia.");
+        return;
+      }
 
-  if (!emailOrUsername || !password) {
-    showAlert("Prosím, vyplňte všetky polia.");
-    return;
-  }
+      try {
+        const response = await fetch(api('/login'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            email: emailPattern.test(emailOrUsername) ? emailOrUsername : null,
+            username: !emailPattern.test(emailOrUsername) ? emailOrUsername : null,
+            password
+          })
+        });
 
-  try {
-    const response = await fetch(api('/login'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        email: emailPattern.test(emailOrUsername) ? emailOrUsername : null,
-        username: !emailPattern.test(emailOrUsername) ? emailOrUsername : null,
-        password
-      })
-    });
+        const data = await response.json().catch(() => ({}));
 
-    const data = await response.json();
-    
-    if (response.ok) {
-      // ✅ Check return URL parameter
-      const params = new URLSearchParams(window.location.search);
-      const returnUrl = params.get('return') || 'index.html';
+        if (response.ok) {
+          const params = new URLSearchParams(window.location.search);
+          const returnUrl = params.get('return') || 'index.html';
 
-      showAlert("Prihlásenie prebehlo úspešne!", () => {
-        window.location.href = returnUrl;
-      });
-    } else {
-      showAlert(data.message || "Nastala chyba pri prihlasovaní.");
+          showAlert("Prihlásenie prebehlo úspešne!", () => {
+            window.location.href = returnUrl;
+          });
+        } else {
+          showAlert(data.message || "Nastala chyba pri prihlasovaní.");
+        }
+      } catch (error) {
+        showAlert("Nastala chyba. Skúste to znova.");
+      }
     }
-  } catch (error) {
-    showAlert("Nastala chyba. Skúste to znova.");
-  }
-}
-</script>
+  </script>
 
 </body>
 </html>
