@@ -1,4 +1,7 @@
-require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
+
 const nodemailer = require('nodemailer');
 const SENDER = process.env.ZOHO_SENDER;
 const RECIPIENT = process.env.ZOHO_RECIPIENT;

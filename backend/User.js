@@ -104,8 +104,6 @@ const userSchema = new mongoose.Schema({
 }
 });
 
-userSchema.index({ username: 1 });
-userSchema.index({ email: 1 });
 userSchema.index({ "content.id": 1 });
 
 const User = mongoose.model('User', userSchema);
