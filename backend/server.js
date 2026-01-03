@@ -303,7 +303,7 @@ function makeRateLimiter({ windowMs, max, keyFn, onLimit }) {
       const retryAfterSec = Math.ceil((windowMs - (now - bucket[0])) / 1000);
       res.setHeader('Retry-After', retryAfterSec);
       if (typeof onLimit === 'function') onLimit(req, key);
-      return res.status(429).json({ message: `Príliš veľa požiadaviek. Skúste znova o ${retryAfterSec} s.` });
+      return res.status(429).json({ message: `Príliš veľa požiadaviek. Skúste to prosím znova o ${retryAfterSec} s.` });
     }
 
     bucket.push(now);
