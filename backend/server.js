@@ -1388,7 +1388,7 @@ const publicUrl =
   replyTo: process.env.ZOHO_FROM_ADDRESS, // overená Zoho adresa     
   subject: `Správa k Vášmu príspevku: ${item.topic}`,
   html: `
-  <p><em>Z portálu <strong>DajToVon.sk</strong> Vám prišla nová správa.</em></p>
+  <p>Z portálu <strong>DajToVon.sk</strong> Vám prišla nová správa.</p>
   
     <p><strong>Príspevok:</strong> ${esc(item.topic)}</p>
     <p><strong>Odosielateľ:</strong> ${esc(senderName)} &lt;${esc(senderEmail)}&gt;</p>
