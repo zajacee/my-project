@@ -69,20 +69,13 @@ async function sendZohoMail({ toAddress, subject, html, replyTo }) {
   return json;
 }
 
-
+const cloudinary = require('cloudinary').v2;
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
-const path = require('path');
 const multer = require('multer'); // Import Multer
-const fs = require('fs');
-const UPLOAD_DIR = process.env.UPLOAD_DIR || 'uploads';
-
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-}
 
 const { randomUUID } = require('crypto');
 const { Types } = require('mongoose'); // at the top of your file
@@ -139,19 +132,37 @@ const SECRET_KEY = process.env.SECRET_KEY;
 if (!SECRET_KEY) {
   throw new Error("Missing SECRET_KEY env variable");
 }
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+function uploadBufferToCloudinary(buffer, options = {}) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      options,
+      (err, result) => err ? reject(err) : resolve(result)
+    );
+    stream.end(buffer);
+  });
+}
+
+async function deleteFromCloudinary(publicId) {
+  if (!publicId) return;
+  try {
+    await cloudinary.uploader.destroy(publicId);
+  } catch (err) {
+    console.warn("⚠️ Cloudinary delete failed:", publicId, err.message);
+  }
+}
+
 const mongoose = require('mongoose');
 const User = require('./User'); // Adjust the path accordingly
 
-// Set up Multer to handle image uploads
-const storage = multer.diskStorage({
-destination: function (req, file, cb) {
-  cb(null, UPLOAD_DIR);
-},
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, `${randomUUID()}${ext}`); // Unique + safe filename
-  }
-});
+// Multer config for Cloudinary (memory storage)
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
@@ -191,8 +202,6 @@ app.use(cors({
   credentials: true
 }));
 
-// ✅ Serve uploaded images to frontend
-app.use('/uploads', express.static(path.join(__dirname, UPLOAD_DIR)));
 
 // ================= FORGOT PASSWORD =================
 app.post('/forgot-password', async (req, res) => {
@@ -435,7 +444,7 @@ res.cookie('token', token, {
 
 // ✅ **Add Content (Updated)**: Handle image file uploads
 app.post('/api/content', authenticateUser, (req, res) => {
-  upload.array('images')(req, res, async (err) => {
+  upload.array('images', 6)(req, res, async (err) => {
     // ✅ Multer / fileFilter error -> pošli pekný JSON pre frontend
     if (err) {
       if (err.name === 'MulterError') {
@@ -462,15 +471,27 @@ try {
     return res.status(404).json({ message: "Zadaný používateľ neexistuje" });
   }
 
-  const imageUrls = (req.files || []).map(file => `/uploads/${file.filename}`);
+  const uploaded = await Promise.all(
+  (req.files || []).map(file =>
+    uploadBufferToCloudinary(file.buffer, {
+      folder: 'dajtovon/posts',
+      resource_type: 'image',
+    })
+  )
+);
+
+const images = uploaded.map(r => ({
+  url: r.secure_url,
+  publicId: r.public_id
+}));
 
   const newContent = {
     topic,
     content,
     category,
-    date,
+    date: new Date(date),
     id: randomUUID(),
-    images: imageUrls,
+    images: images,
     username: loggedInUser,
     views: 0,
     likes: [],
@@ -1118,20 +1139,14 @@ app.delete('/delete-content/:id', authenticateUser, async (req, res) => {
         return res.status(404).json({ message: "Obsah s daným ID neexistuje" });
       }
   
-      // Delete images from disk
       if (Array.isArray(contentToDelete.images)) {
-        contentToDelete.images.forEach(imagePath => {
-          const fullPath = path.join(__dirname, imagePath.replace(/^\/+/, ''));
-          fs.unlink(fullPath, (err) => {
-            if (err) {
-              console.warn(`❌ Error deleting file ${fullPath}:`, err.message);
-            } else {
-              console.log(`🗑️ Deleted file: ${fullPath}`);
-            }
-          });
-        });
-      }
-  
+  await Promise.all(
+    contentToDelete.images.map(img =>
+      deleteFromCloudinary(img.publicId)
+    )
+  );
+}
+ 
       // Remove the content from user's content array
       user.content = user.content.filter(item => String(item.id) !== String(contentIdToDelete));
       await user.save();
@@ -1199,7 +1214,7 @@ app.post('/api/notifications/read/:id', authenticateUser, async (req, res) => {
 
 // ✅ PUT update content by ID
 app.put('/edit-content/:id', authenticateUser, (req, res) => {
-  upload.array('images')(req, res, async (err) => {
+  upload.array('images', 6)(req, res, async (err) => {
     // ✅ Multer / fileFilter error -> JSON pre frontend
     if (err) {
       if (err.name === 'MulterError') {
@@ -1221,15 +1236,18 @@ app.put('/edit-content/:id', authenticateUser, (req, res) => {
     let keepImages = [];
     try {
         if (existingImages) {
-            keepImages = JSON.parse(existingImages); // Array of image URLs
+            keepImages = JSON.parse(existingImages); // Array of { url, publicId }
         }
     } catch (err) {
         console.error("❌ Failed to parse existingImages:", err);
     }
 
-    // New uploaded files
-    const imageUrls = (req.files || []).map(file => `/uploads/${file.filename}`);
-    const finalImageList = [...keepImages, ...imageUrls];
+
+    // 🔐 SAFETY FILTER – povolí len { url, publicId }
+keepImages = (keepImages || []).filter(
+  x => x && typeof x === 'object' && x.url && x.publicId
+);
+    
 
     try {
         const user = await User.findOne({ username: loggedInUser });
@@ -1242,18 +1260,31 @@ app.put('/edit-content/:id', authenticateUser, (req, res) => {
             return res.status(404).json({ message: "Obsah s daným ID neexistuje" });
         }
 
-        // Delete images that were removed
-        const imagesToDelete = contentItem.images.filter(img => !finalImageList.includes(img));
-        imagesToDelete.forEach(imagePath => {
-            const fullPath = path.join(__dirname, imagePath.replace(/^\/+/, ''));
-            fs.unlink(fullPath, err => {
-                if (err) {
-                    console.warn(`❌ Chyba pri odstraňovaní obrázka: ${fullPath}`, err.message);
-                } else {
-                    console.log(`🗑️ Odstránený obrázok: ${fullPath}`);
-                }
-            });
-        });
+        const uploaded = await Promise.all(
+  (req.files || []).map(file =>
+    uploadBufferToCloudinary(file.buffer, {
+      folder: 'dajtovon/posts',
+      resource_type: 'image',
+    })
+  )
+);
+
+const newImages = uploaded.map(r => ({
+  url: r.secure_url,
+  publicId: r.public_id
+}));
+
+const finalImageList = [...keepImages, ...newImages];
+
+const finalPublicIds = new Set(finalImageList.map(x => x.publicId));
+const removed = (contentItem.images || []).filter(
+  img => img?.publicId && !finalPublicIds.has(img.publicId)
+);
+
+await Promise.all(
+  removed.map(img => deleteFromCloudinary(img.publicId))
+);
+
 
         // Update content fields
         contentItem.topic = topic || contentItem.topic;
@@ -1354,13 +1385,18 @@ const publicUrl =
   try {
     await sendZohoMail({
   toAddress: owner.email,      // autor príspevku
-  replyTo: senderEmail,        // aby autor odpovedal priamo userovi
+  replyTo: process.env.ZOHO_FROM_ADDRESS, // overená Zoho adresa     
   subject: `Správa k Vášmu príspevku: ${item.topic}`,
   html: `
     <p><strong>Príspevok:</strong> ${esc(item.topic)}</p>
     <p><strong>Od:</strong> ${esc(senderName)} &lt;${esc(senderEmail)}&gt;</p>
     <p><strong>Správa:</strong><br>${esc(message).replace(/\n/g,'<br>')}</p>
     <hr>
+     <p>
+    <a href="mailto:${esc(senderEmail)}?subject=${encodeURIComponent('Re: ' + item.topic)}">
+      Odpovedať používateľovi
+    </a>
+  </p>
     <p><a href="${publicUrl}">Otvoriť príspevok</a></p>
   `,
     });

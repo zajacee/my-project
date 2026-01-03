@@ -1,109 +1,70 @@
 const mongoose = require('mongoose');
 
-const contentSchema = new mongoose.Schema({
-  topic: {
-    type: String,
-    required: true,
+const imageSchema = new mongoose.Schema(
+  {
+    url: { type: String, required: true },
+    publicId: { type: String, required: true }
   },
-  content: {
-    type: String,
-    required: true,
+  { _id: false }
+);
+
+const commentSchema = new mongoose.Schema(
+  {
+    username: { type: String, required: true },
+    text: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now },
+    likes: { type: [String], default: [] },
+    dislikes: { type: [String], default: [] }
   },
-  category: {
-    type: String,
-    required: true,
+  { _id: true, versionKey: false }
+);
+
+const contentSchema = new mongoose.Schema(
+  {
+    topic: { type: String, required: true },
+    content: { type: String, required: true },
+    category: { type: String, required: true },
+    date: { type: Date, default: Date.now },
+    id: { type: String, required: true },
+    images: { type: [imageSchema], default: [] },
+    username: { type: String, required: true },
+    views: { type: Number, default: 0 },
+    likes: { type: [String], default: [] },
+    dislikes: { type: [String], default: [] },
+    comments: { type: [commentSchema], default: [] }
   },
-  date: {
-    type: Date,
-    default: Date.now,
+  { versionKey: false }
+);
+
+const notificationSchema = new mongoose.Schema(
+  {
+    type: { type: String, enum: ['like', 'dislike', 'comment'], required: true },
+    from: { type: String, required: true },
+    to: { type: String, required: true },
+    contentId: { type: String, required: true },
+    contentTitle: { type: String },
+    targetType: { type: String, enum: ['content', 'comment'], default: 'content' },
+    timestamp: { type: Date, default: Date.now },
+    read: { type: Boolean, default: false }
   },
-  id: {
-    type: String,
-    required: true,
-  },
-  images: {
-    type: [String],
-    default: [],
-  },
-  username: {
-    type: String,
-    required: true,
-  },
-  // ✅ Add these:
-  views: {
-    type: Number,
-    default: 0,
-  },
-  likes: {
-    type: [String],
-    default: [],
-  },
-  dislikes: {
-    type: [String],
-    default: [],
-  },
- comments: {
-  type: [
-    new mongoose.Schema({
-      username: String,
-      text: String,
-      timestamp: {
-        type: Date,
-         default: Date.now
-      },
-      likes: {
-        type: [String],
-        default: []
-      },
-      dislikes: {
-        type: [String],
-        default: []
-      }
-    }) // ✅ KEEP _id enabled by default
-  ],
-  default: []
-}
-});
+  { _id: true, versionKey: false }
+);
 
 // User schema to hold user details and an array of content
-const userSchema = new mongoose.Schema({
-  username: { 
-    type: String, 
-    required: true, 
-    unique: true 
-  },
-  email: { 
-    type: String, 
-    required: true, 
-    unique: true 
-  },
-  password: { 
-    type: String, 
-    required: true 
-  },
-  content: { 
-    type: [contentSchema], 
-    default: [] // Embedded content objects
-   },
+// ✅ User schema
+const userSchema = new mongoose.Schema(
+  {
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
 
+    content: { type: [contentSchema], default: [] },
+
+    notifications: { type: [notificationSchema], default: [] }
+  },
+  { versionKey: false }
+);
    
-  notifications: {
-  type: [
-    new mongoose.Schema({
-      type: { type: String, enum: ['like', 'dislike', 'comment'], required: true },
-      from: { type: String, required: true },
-      to: { type: String, required: true }, // ✅ ADD THIS
-      contentId: { type: String, required: true },
-      contentTitle: { type: String },
-      targetType: { type: String, enum: ['content', 'comment'], default: 'content' },
-      timestamp: { type: Date, default: Date.now },
-      read: { type: Boolean, default: false }
-    }, { _id: true }) // ✅ ADD THIS
-  ],
-  default: []
-}
-});
-
 userSchema.index({ "content.id": 1 });
 
 const User = mongoose.model('User', userSchema);

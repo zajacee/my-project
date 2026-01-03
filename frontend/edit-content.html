@@ -906,7 +906,7 @@ const api = (path) => `${API_BASE}${path}`;
         img.style.height = '100%';
         img.style.objectFit = 'contain';
         if (isExisting) {
-          img.src = file;
+           img.src = file.url;
         } else {
           const reader = new FileReader();
           reader.onload = e => img.src = e.target.result;
@@ -973,24 +973,32 @@ dragHandle.style.fontWeight = 'bold';
           document.getElementById('content-text').value = content;
           document.getElementById('category').value = category;
   
-          images.forEach(url => {
+images.forEach(imgObj => {
   const id = crypto.randomUUID();
-  const img = new Image();
-  img.src = url;
+  const url = imgObj.url;
 
-  // Fetch HEAD to get content-length (size in bytes)
   fetch(url, { method: 'HEAD' })
     .then(res => {
       const size = parseInt(res.headers.get("Content-Length")) || 0;
-      selectedFiles.push({ file: url, id, isExisting: true, size });
+      selectedFiles.push({
+        file: imgObj,          // ✅ ukladáme celý objekt
+        id,
+        isExisting: true,
+        size
+      });
       updateFileListDisplay();
     })
     .catch(() => {
-      // If size can't be determined, assume large value to be safe
-      selectedFiles.push({ file: url, id, isExisting: true, size: 1024 * 1024 }); // 1MB fallback
+      selectedFiles.push({
+        file: imgObj,
+        id,
+        isExisting: true,
+        size: 1024 * 1024
+      });
       updateFileListDisplay();
     });
 });
+
   
           updateFileListDisplay();
         })
@@ -1054,8 +1062,11 @@ dragHandle.style.fontWeight = 'bold';
       button.style.opacity = 0.6;
   
       const formData = new FormData(form);
-      const keepImageUrls = selectedFiles.filter(f => f.isExisting).map(f => f.file);
-      formData.append('existingImages', JSON.stringify(keepImageUrls));
+      const keepImages = selectedFiles
+  .filter(f => f.isExisting)
+  .map(f => f.file); // ✅ {url, publicId}
+
+formData.append('existingImages', JSON.stringify(keepImages));
       selectedFiles.filter(f => !f.isExisting).forEach(f => formData.append('images', f.file));
       formData.set('date', new Date().toISOString());
   
