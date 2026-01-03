@@ -580,9 +580,15 @@ const API_BASE =
 
 const api = (path) => `${API_BASE}${path}`;
 
-function escapeHtml(text) {
-  if (!text) return '';
-  return text
+ function imageToUrl(img) {
+  if (!img) return '';
+  if (typeof img === 'string') return img;                 // staré príspevky
+  if (typeof img === 'object' && typeof img.url === 'string') return img.url; // Cloudinary
+  return '';
+}
+
+function escapeHtml(unsafe) {
+  return String(unsafe ?? '')
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -630,7 +636,7 @@ function escapeHtml(text) {
           el.classList.add('content-item');
           el.innerHTML = `
             <div class="content-thumbnail">
-              <img src="${thumbnail}" alt="Thumbnail" class="thumbnail">
+              <img src="${escapeHtml(thumbnailSrc)}" alt="Thumbnail" class="thumbnail">
             </div>
             <div class="content-text">
              <h4><a href="content-detail.html?contentId=${item.id}">${escapeHtml(item.topic)}</a></h4>

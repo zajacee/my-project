@@ -595,9 +595,15 @@ const API_BASE =
 
 const api = (path) => `${API_BASE}${path}`;
 
-    function escapeHtml(text) {
-  if (!text) return '';
-  return text
+   function imageToUrl(img) {
+  if (!img) return '';
+  if (typeof img === 'string') return img;                 // staré príspevky
+  if (typeof img === 'object' && typeof img.url === 'string') return img.url; // Cloudinary
+  return '';
+}
+
+function escapeHtml(unsafe) {
+  return String(unsafe ?? '')
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -826,8 +832,7 @@ const batch = filteredContent.slice(currentIndex, currentIndex + itemsPerPage);
 batch.forEach(entry => {
   const item = entry.content;
                 const formattedDate = formatDate(item.date);
-                const firstImage = item.images?.[0] || 'logo.png';
-                const thumbnailSrc = firstImage ? firstImage : 'logo.png';
+                const thumbnailSrc = imageToUrl(item.images?.[0]) || 'logo.png';
                 const rawContent = typeof item.content === 'string' ? item.content : '';
 const safeContent = escapeHtml(rawContent);
 const truncatedContent = safeContent.length > 200 ? safeContent.substring(0, 200) + '...' : safeContent;
@@ -838,7 +843,7 @@ const showReadMore = rawContent.length > 200;
 
                 contentElement.innerHTML = `
   <div class="content-thumbnail">
-    <img src="${thumbnailSrc}" alt="Thumbnail" class="thumbnail">
+    <img src="${escapeHtml(thumbnailSrc)}" alt="Thumbnail" class="thumbnail">
   </div>
   <div class="content-text">
     <a href="content-detail.html?contentId=${item.id}">

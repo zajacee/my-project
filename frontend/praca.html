@@ -623,8 +623,15 @@ const api = (path) => `${API_BASE}${path}`;
     const logoutDropdown = document.getElementById("logout-dropdown");
     const logoutOption = document.getElementById("logout-option");
 
-    function escapeHtml(text) {
-  return text
+    function imageToUrl(img) {
+  if (!img) return '';
+  if (typeof img === 'string') return img;                 // staré príspevky
+  if (typeof img === 'object' && typeof img.url === 'string') return img.url; // Cloudinary
+  return '';
+}
+
+function escapeHtml(unsafe) {
+  return String(unsafe ?? '')
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -784,7 +791,7 @@ function renderNextBatch() {
         const item = entry.content;
         const username = entry.username;
         const formattedDate = formatDate(item.date);
-        const thumbnailSrc = item.images?.[0] || 'logo.png';
+        const thumbnailSrc = imageToUrl(item.images?.[0]) || 'logo.png';
         const safeContent = escapeHtml(item.content);
         const truncatedContent = safeContent.length > 200 ? safeContent.slice(0, 200) + '...' : safeContent;
 
@@ -792,7 +799,7 @@ function renderNextBatch() {
         contentElement.classList.add('content-item');
         contentElement.innerHTML = `
             <div class="content-thumbnail">
-                <img src="${thumbnailSrc}" alt="Thumbnail" class="thumbnail">
+                <img src="${escapeHtml(thumbnailSrc)}" alt="Thumbnail" class="thumbnail">
             </div>
             <div class="content-text">
                 <a href="content-detail.html?contentId=${item.id}">

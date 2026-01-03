@@ -573,8 +573,15 @@ const API_BASE =
 
 const api = (path) => `${API_BASE}${path}`;
 
-    function escapeHtml(unsafe) {
-  return unsafe
+     function imageToUrl(img) {
+  if (!img) return '';
+  if (typeof img === 'string') return img;                 // staré príspevky
+  if (typeof img === 'object' && typeof img.url === 'string') return img.url; // Cloudinary
+  return '';
+}
+
+function escapeHtml(unsafe) {
+  return String(unsafe ?? '')
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
