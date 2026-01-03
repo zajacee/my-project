@@ -870,16 +870,21 @@ fetch(api(`/view/${contentId}`), {
 
     const formattedDate = formatDate(item.date);
 
+    function imageToUrl(img) {
+  if (!img) return '';
+  if (typeof img === 'string') return img;                // staré dáta
+  if (typeof img === 'object' && typeof img.url === 'string') return img.url; // Cloudinary
+  return '';
+}
 
 function escapeHtml(unsafe) {
-  return unsafe
+  return String(unsafe ?? '')
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
-
 
 let allComments = [];
 let commentsIndex = 0;
@@ -1144,13 +1149,18 @@ function updateReactionStyles() {
   }
 }
     const safeTitle = escapeHtml(item.topic.replace(/</g, "").replace(/>/g, ""));
-     const imagesHTML = item.images?.length
-    ? item.images.map(image => `
-       <a href="${escapeHtml(image)}" data-lightbox="content-gallery" data-title="${safeTitle}">
-        <img src="${escapeHtml(image)}" alt="Image related to ${escapeHtml(item.topic)}" class="uploaded-image thumbnail" />
-        </a>
-      `).join('')
-    : '';
+  const imagesHTML = (item.images || []).map(img => {
+  const url = imageToUrl(img);
+  if (!url) return '';
+  return `
+    <a href="${escapeHtml(url)}" data-lightbox="content-gallery" data-title="${safeTitle}">
+      <img src="${escapeHtml(url)}"
+           alt="Image related to ${escapeHtml(item.topic)}"
+           class="uploaded-image thumbnail" />
+    </a>
+  `;
+}).join('');
+
 
     const formattedContent = item.content
   .split('\n') // rozdelí každé nové zalomenie

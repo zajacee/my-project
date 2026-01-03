@@ -877,8 +877,15 @@ footer {
 
    <script>
 
+    function imageToUrl(img) {
+  if (!img) return '';
+  if (typeof img === 'string') return img;               // staré príspevky
+  if (typeof img === 'object' && img.url) return img.url; // Cloudinary
+  return '';
+}
+
     function escapeHtml(unsafe) {
-  return unsafe
+  return String(unsafe ?? '')
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -1274,7 +1281,7 @@ if (!contentItemsContainer) {
     nextItems.forEach(entry => {
         const item = entry.content;
         const username = entry.username;
-        const firstImage = item.images?.[0] || 'logo.png';
+        const firstImage = imageToUrl(item.images?.[0]) || 'logo.png';
         const formattedDate = formatDate(new Date(item.date));
         const truncatedContent = item.content.length > 200 ? item.content.substring(0, 200) + '...' : item.content;
         const showReadMore = item.content.length > 200;
@@ -1289,7 +1296,7 @@ const safeUsername = escapeHtml(item.username);
 
             contentElement.innerHTML = `
   <div class="content-thumbnail">
-    <img src="${firstImage}" alt="Thumbnail" class="thumbnail">
+    <img src="${escapeHtml(firstImage)}" alt="Thumbnail" class="thumbnail">
   </div>
   <div class="content-text">
     <h4><a href="content-detail.html?contentId=${item.id}">${safeTopic}</a></h4>
