@@ -630,7 +630,7 @@ function escapeHtml(unsafe) {
           const truncatedContent = safeContent.length > 200 ? safeContent.substring(0, 200) + '...' : safeContent;
           const showReadMore = item.content.length > 200;
           const formattedDate = formatDate(item.date);
-          const thumbnail = item.images?.[0] || 'logo.png';
+          const thumbnailSrc = imageToUrl(item.images?.[0]) || 'logo.png';
     
           const el = document.createElement('div');
           el.classList.add('content-item');
