@@ -132,13 +132,12 @@ header h1 {
     display: block;
 }
 
-/* Style for the textarea */
 #content form textarea {
-    resize: vertical;
-    overflow-x: hidden;
-    min-height: 150px;
-    width: 91%;
-    margin-left: 2cm;
+  resize: vertical;
+  overflow-x: hidden;
+  min-height: 150px;
+  width: 100%;
+  margin-left: 0;
 }
 
 /* Make Labels for Téma, Obsah, Kategória Bold */
@@ -222,22 +221,11 @@ footer {
   margin: 0;
 }
 
-/* Media Queries for Scaling */
-@media screen and (max-width: 768px) {
-  html {
-    font-size: 14px; /* Scale down on small screens */
-  }
-
-  #sidebar {
-    width: 200px; /* Reduce sidebar width on small screens */
-  }
-
-  #content {
-    margin-left: 200px; /* Adjust content area margin */
-    padding: 15px;
-  }
-
-  button {
-    padding: 15px 30px;
-  }
+#hamburger{
+  display:none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  width: auto;
 }
