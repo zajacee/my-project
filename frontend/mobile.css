@@ -1,0 +1,176 @@
+/* =========================
+   MOBILE.CSS
+   Len pre mobil / tablet
+========================= */
+
+@media (max-width: 768px) {
+
+  /* ===== BASIC RESET ===== */
+  body {
+    padding: 0 !important;
+    padding-top: 0 !important;
+    overflow-x: hidden;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    height: auto !important;
+    padding: 15px !important;
+    text-align: center;
+    position: relative;
+  }
+
+  header h1 {
+    position: static !important;
+    transform: none !important;
+    margin: 0 0 10px 0;
+  }
+
+  /* Search bar */
+  #search-bar {
+    position: static !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 10px 0 0 0 !important;
+  }
+
+  /* ===== HAMBURGER BUTTON ===== */
+  #hamburger {
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    z-index: 1101;
+
+    font-size: 28px;
+    line-height: 1;
+
+    width: auto !important;
+    margin: 0 !important;
+    padding: 6px 10px !important;
+
+    background: transparent !important;
+    border: none !important;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  /* ===== USER MENU (login + notifikácie) ===== */
+  .user-menu {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  #login-button,
+  #notification-container {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    left: auto !important;
+    transform: none !important;
+
+    margin: 10px auto 0 !important;
+  }
+
+  /* ===== OVERLAY ===== */
+  #overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 1100;
+  }
+
+  #overlay.show {
+    display: block;
+  }
+
+  /* ===== SIDEBAR – HAMBURGER MODE ===== */
+  #sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+
+    height: 100%;
+    width: 260px !important;
+    max-width: 85vw;
+
+    padding: 15px !important;
+    overflow-y: auto;
+
+    transform: translateX(-105%);
+    transition: transform 0.25s ease;
+
+    z-index: 1200;
+  }
+
+  #sidebar.open {
+    transform: translateX(0);
+  }
+
+  #sidebar h2 {
+    margin-top: 50px !important;
+  }
+
+  /* ===== CONTENT ===== */
+  #content {
+    margin-left: 0 !important;
+    max-width: 100% !important;
+    padding: 15px !important;
+  }
+
+  /* ===== FORM ===== */
+  #content form {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  #content form input,
+  #content form select,
+  #content form textarea {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  textarea {
+    min-height: 160px;
+  }
+
+  /* Prebiť globálny button štýl */
+  button {
+    width: 100%;
+    margin: 25px 0 0 0;
+  }
+
+  /* ===== RECENT CONTENT ===== */
+  #recent-content {
+    padding: 15px;
+  }
+
+  #recent-content h3 {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  /* ===== CONTENT ITEMS ===== */
+  .content-item {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .content-thumbnail {
+    width: 100% !important;
+    height: 180px !important;
+  }
+
+  .thumbnail {
+    object-fit: contain;
+  }
+}
