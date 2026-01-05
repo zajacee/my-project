@@ -350,3 +350,15 @@
   }
 
 }
+
+/* Nadpis + filter: filter vždy doprava */
+#recent-content h3{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#recent-content h3 #filter-options{
+  margin-left: auto;
+  width: 180px; /* ak chceš stále rovnako */
+}
