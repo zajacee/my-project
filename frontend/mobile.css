@@ -89,7 +89,7 @@
     justify-content: flex-end !important;
     gap: 12px !important;
     margin: 0 !important;
-    position: relative !important; /* kotva pre dropdown */
+    position: relative !important; /* ✅ NEW: kotva pre dropdown */
   }
 
   #notification-container {
@@ -139,15 +139,25 @@
      - odstráni margin-top z desktopu
      - zruší fixnú výšku dropdownu
      - vycentruje text aj ikonku
+     - ✅ NEW: zarovná doprava pod login + odsadenie dole
   ========================= */
 
   /* dropdown box */
   #logout-dropdown.dropdown,
   #logout-dropdown {
-    height: auto !important;          /* ✅ zruší 80px fix */
-    padding: 6px 0 !important;       /* jemný padding */
+    /* ✅ NEW: presne pod loginom, doprava */
+    position: absolute !important;
+    top: calc(100% + 10px) !important;  /* ✅ NEW: odsadenie dole od login */
+    right: 0 !important;                 /* ✅ NEW: zarovnať doprava s login */
+    left: auto !important;
+    transform: none !important;
+
+    z-index: 3000 !important;
+
+    height: auto !important;             /* ✅ zruší 80px fix */
+    padding: 6px 0 !important;           /* jemný padding */
     width: 240px !important;
-    max-width: 86vw !important;
+    max-width: 90vw !important;          /* ✅ NEW: aby sa zmestil */
     border-radius: 10px !important;
   }
 
@@ -177,8 +187,8 @@
   /* druhé tlačidlo s ikonou – ikonku mierne hore (aby “Odhlásiť” nepadalo) */
   #logout-dropdown #logout-option img {
     display: block !important;
-    margin-right: 8px !important;     /* necháš, ale je stabilné */
-    transform: translateY(-2px) !important; /* ✅ posunie vizuálne vyššie */
+    margin-right: 8px !important;
+    transform: translateY(-3px) !important; /* ✅ NEW: o kúsok viac hore */
   }
 
   #logout-dropdown button:focus,

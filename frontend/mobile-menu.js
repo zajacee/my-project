@@ -1,12 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
+
   /* =========================
      HAMBURGER / SIDEBAR
   ========================= */
-  const btn = document.getElementById("hamburger");
+  const hamburger = document.getElementById("hamburger");
   const sidebar = document.getElementById("sidebar");
   const overlay = document.getElementById("overlay");
 
-  if (btn && sidebar && overlay) {
+  if (hamburger && sidebar && overlay) {
     const isOpen = () => sidebar.classList.contains("open");
 
     const openMenu = () => {
@@ -21,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.style.overflow = "";
     };
 
-    btn.addEventListener("click", (e) => {
+    hamburger.addEventListener("click", (e) => {
       e.preventDefault();
       isOpen() ? closeMenu() : openMenu();
     });
@@ -29,8 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     overlay.addEventListener("click", closeMenu);
 
     sidebar.addEventListener("click", (e) => {
-      const hit = e.target.closest("a, button");
-      if (hit) closeMenu();
+      if (e.target.closest("a, button")) closeMenu();
     });
 
     document.addEventListener("keydown", (e) => {
@@ -43,34 +43,28 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================
-     DROPDOWN: zruš "stále aktívne"
-     - nerobí toggle (to už máš v svojom kóde)
-     - len zatvorí pri kliku mimo + blur
+     DROPDOWN – ZAVRIE SA KLIKOM MIMO
   ========================= */
+  const userMenu = document.querySelector(".user-menu");
+  const loginBtn = document.getElementById("login-button");
   const dropdown = document.getElementById("logout-dropdown");
 
-  const closeDropdown = () => {
-    if (!dropdown) return;
-    dropdown.style.display = "none";
-    const lb = document.getElementById("login-button");
-    if (lb) lb.blur();
-  };
+  if (userMenu && loginBtn && dropdown) {
 
-  // klik mimo (aj na mobile je lepšie počúvať aj touchstart)
-  const outsideHandler = (e) => {
-    const lb = document.getElementById("login-button");
-    if (!dropdown || !lb) return;
+    const closeDropdown = () => {
+      dropdown.style.display = "none";
+      dropdown.classList.remove("show");
+      loginBtn.blur();
+    };
 
-    const clickedInside =
-      lb.contains(e.target) || dropdown.contains(e.target);
+    document.addEventListener("click", (e) => {
+      if (!userMenu.contains(e.target)) {
+        closeDropdown();
+      }
+    }, true);
 
-    if (!clickedInside) closeDropdown();
-  };
-
-  document.addEventListener("click", outsideHandler, true);
-  document.addEventListener("touchstart", outsideHandler, true);
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeDropdown();
-  });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeDropdown();
+    });
+  }
 });
