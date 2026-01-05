@@ -368,3 +368,24 @@
 
 }
 
+@media (max-width: 768px) {
+
+  /* Dropdown menu pre výber kategórie */
+  .category-select select,
+  .category-select .dropdown-menu,
+  .category-select .select-dropdown {
+    margin-left: 12px !important; /* ⬅️ zarovnanie s bielym boxom */
+    width: calc(100% - 12px) !important;
+  }
+
+}
+@media (max-width: 768px) {
+
+  /* Modrý box – len horizontálne centrovanie textu */
+  .upload-box,
+  .image-upload,
+  .upload-images {
+    text-align: center !important;
+  }
+
+}
