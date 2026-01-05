@@ -392,3 +392,21 @@ max-width: 240px !important;
   }
 }
 
+@media (max-width: 768px) {
+
+  /* ===== ZJEDNOTENIE VEĽKOSTI NADPISOV NA MOBILE ===== */
+
+  /* Príspevky používateľa (už máš, len pre istotu) */
+  .page-user-posts #recent-content h3 {
+    font-size: 1.15rem !important;
+    line-height: 1.25 !important;
+  }
+
+  /* Výsledky vyhľadávania */
+  #search-results #search-title,
+  #search-results .no-results {
+    font-size: 1.15rem !important;
+    line-height: 1.25 !important;
+  }
+}
+
