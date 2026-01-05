@@ -369,13 +369,21 @@
 }
 @media (max-width: 768px) {
 
-  /* Filter kategórie pri "Nedávno pridané" – rovnaký tvar ako hore */
+  /* Filter kategórie pri "Nedávno pridané" – menšia výška */
   #recent-content h3 #category-filter {
-    border-radius: 8px !important;   /* ❌ žiadny vajcový tvar */
-    height: 44px !important;         /* rovnaká výška ako ostatné selecty */
-    line-height: 44px !important;
+    height: 38px !important;        /* 🔽 späť na menšiu výšku */
+    line-height: 38px !important;
 
-    padding: 0 12px !important;      /* rovnaký vnútorný spacing */
+    border-radius: 8px !important; /* rovnaký tvar ako hore */
+    padding: 0 10px !important;    /* primeraný vnútorný spacing */
+  }
+
+}
+@media (max-width: 768px) {
+
+  /* Výber kategórie pri pridávaní príspevku – jemne doľava */
+  #content form select#category {
+    padding-left: 10px !important;  /* zjednotenie s inputmi */
   }
 
 }
