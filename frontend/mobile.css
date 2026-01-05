@@ -490,10 +490,36 @@ max-width: 240px !important;
     font-size: 0.95rem !important;
   }
 
+   /* IBA tlačidlo "Pridať komentár" */
+  #comments-section #post-comment-btn {
+    padding: 6px 10px !important;   /* 🔥 zmenší výšku */
+    font-size: 0.9rem !important;   /* menší text */
+    line-height: 1.1 !important;
+    margin-top: 6px !important;
+    border-radius: 8px !important;
+  }
+
     /* tlačidlo Odoslať */
   #comments-section button[type="submit"] {
     margin-top: 8px !important;
     padding: 8px 12px !important;
     font-size: 0.95rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+
+  /* Nadpis KOMENTÁRE – väčší text + ikona */
+  #comments-section h3 {
+    font-size: 1.25rem !important;   /* väčšie písmo */
+    line-height: 1.3 !important;
+    font-weight: 600 !important;
+  }
+
+  /* ikona v nadpise (ak je <i> alebo <span>) */
+  #comments-section h3 i,
+  #comments-section h3 span {
+    font-size: 1.3rem !important;    /* ikona mierne väčšia než text */
+    vertical-align: middle;
   }
 }
