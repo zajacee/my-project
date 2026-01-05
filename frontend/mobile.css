@@ -12,16 +12,16 @@
     overflow-x: hidden;
   }
 
-  /* ===== HEADER (fix prekryvania) ===== */
+  /* ===== HEADER (bez prekrývania) ===== */
   header {
     height: auto !important;
     padding: 15px !important;
-    padding-top: 55px !important; /* priestor pre hamburger */
+    padding-top: 55px !important; /* miesto pre hamburger */
     text-align: center;
     position: relative;
   }
 
-  .top-bar{
+  .top-bar {
     display: flex !important;
     flex-direction: column !important;
     align-items: stretch !important;
@@ -39,13 +39,14 @@
     text-align: center !important;
   }
 
-  /* Search bar */
   #search-bar {
     position: static !important;
     transform: none !important;
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
+    height: 42px;
+    font-size: 16px;
   }
 
   /* ===== HAMBURGER BUTTON ===== */
@@ -69,30 +70,51 @@
     cursor: pointer;
   }
 
-  /* ===== USER MENU (login + notifikácie) ===== */
+  /* ===== USER MENU: notifikácie + login v 1 riadku ===== */
   .user-menu {
     width: 100% !important;
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: row !important;
     align-items: center !important;
-    gap: 10px !important;
+    justify-content: center !important;
+    gap: 12px !important;
     margin: 0 !important;
   }
 
-  #login-button,
+  /* prebij inline absolute štýly */
   #notification-container {
     position: static !important;
     top: auto !important;
     right: auto !important;
     left: auto !important;
     transform: none !important;
-    margin: 0 auto !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    font-size: 1.5rem !important;
   }
 
-  #login-button{
-    width: 100% !important;
-    max-width: 340px !important;
-    height: 44px !important;
+  /* notifikačný popup nech sa zmestí na mobile */
+  #notification-popup{
+    right: auto !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    max-width: 92vw !important;
+  }
+
+  #login-button {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    left: auto !important;
+    transform: none !important;
+
+    width: auto !important;
+    max-width: none !important;
+    height: 40px !important;
+    padding: 8px 14px !important;
+    margin: 0 !important;
+    border-radius: 999px !important;
   }
 
   /* ===== OVERLAY ===== */
@@ -103,10 +125,7 @@
     background: rgba(0,0,0,0.45);
     z-index: 1100;
   }
-
-  #overlay.show {
-    display: block;
-  }
+  #overlay.show { display: block; }
 
   /* ===== SIDEBAR – HAMBURGER MODE ===== */
   #sidebar {
@@ -126,14 +145,9 @@
 
     z-index: 1200;
   }
+  #sidebar.open { transform: translateX(0); }
 
-  #sidebar.open {
-    transform: translateX(0);
-  }
-
-  #sidebar h2 {
-    margin-top: 50px !important;
-  }
+  #sidebar h2 { margin-top: 50px !important; }
 
   /* ===== CONTENT ===== */
   #content {
@@ -156,26 +170,37 @@
     margin-left: 0 !important;
   }
 
-  textarea {
-    min-height: 160px;
+  textarea { min-height: 160px; }
+
+  /* ===== EMOJI: už žiadne prekrývanie s textarea =====
+     Na desktope máš .emoji-wrap margin-top:-40px — na mobile to vypneme */
+  .comment-input-wrap { position: relative !important; }
+
+  .emoji-wrap{
+    margin-top: 8px !important;      /* ZRUŠ -40px */
+    margin-bottom: 10px !important;
+    justify-content: flex-end !important; /* doprava */
   }
 
-  /* Prebiť globálny button štýl (týka sa submitu) */
-  button {
-    width: 100%;
-    margin: 25px 0 0 0;
-  }
-
-  /* ===== EMOJI "klikacie okno" len na šírku 3 emoji =====
-     (panel s emoji nemeníme) */
   #emoji-toggle-write{
-    width: fit-content !important;
+    width: fit-content !important;   /* len na 3 emoji */
     display: inline-flex !important;
+    margin: 0 !important;
     padding: 6px 10px !important;
-    margin: 8px 0 0 0 !important;
   }
 
-  /* ===== FIX: aby bolo vidieť "Čítať viac" ===== */
+  /* panel s emoji nech ostane pod tlačidlom a zmestí sa */
+  .emoji-panel{
+    width: min(100%, 92vw) !important;
+  }
+
+  /* ===== SUBMIT button: len submit na 100%, nie hamburger/login/emoji ===== */
+  #content-form button[type="submit"]{
+    width: 100% !important;
+    margin: 25px 0 0 0 !important;
+  }
+
+  /* ===== FIX: aby bolo vidieť "Čítať viac" na mobile ===== */
   #recent-content .content-item p{
     max-height: none !important;
     overflow: visible !important;
@@ -191,9 +216,7 @@
   }
 
   /* ===== RECENT CONTENT ===== */
-  #recent-content {
-    padding: 15px;
-  }
+  #recent-content { padding: 15px; }
 
   #recent-content h3 {
     flex-direction: column;
@@ -201,7 +224,6 @@
     gap: 10px;
   }
 
-  /* ===== CONTENT ITEMS ===== */
   .content-item {
     flex-direction: column;
     gap: 12px;
@@ -212,7 +234,5 @@
     height: 180px !important;
   }
 
-  .thumbnail {
-    object-fit: contain;
-  }
+  .thumbnail { object-fit: contain; }
 }
