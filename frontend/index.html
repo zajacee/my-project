@@ -71,6 +71,37 @@ header h1 {
             transform: translateY(-50%);
         }
 
+        .search-wrapper {
+  position: absolute;
+  right: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+}
+
+#search-bar {
+  padding: 0.5rem 2.2rem 0.5rem 0.5rem; /* miesto pre lupu */
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+}
+
+#search-button {
+  position: absolute;
+  right: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+#search-button:hover {
+  color: #000;
+}
+
         .top-bar {
     display: flex;
     justify-content: space-between;
@@ -669,7 +700,10 @@ footer {
         <div class="top-bar">
             <button id="hamburger" aria-label="Menu">☰</button>
             <h1><a href="index.html" style="text-decoration: none; color: inherit;">DajToVon</a></h1>
-            <input type="text" id="search-bar" placeholder="Hľadať...">
+            <div class="search-wrapper">
+  <input type="text" id="search-bar" placeholder="Hľadať...">
+  <button id="search-button" aria-label="Hľadať">🔍</button>
+</div>
 
             <div class="user-menu">
       <!-- 🔔 Notification Bell inside user-menu -->
@@ -1110,16 +1144,28 @@ if (savedDraft) {
     }
 }
 
-// --- Handle search via Enter key ---
-searchBar.addEventListener('keypress', (event) => {
+// --- Handle search via Enter key + click on magnifier ---
+const searchButton = document.getElementById('search-button');
+
+function performSearch() {
+    const query = searchBar.value.trim();
+    if (query !== '') {
+        window.location.href = `search-results.html?q=${encodeURIComponent(query)}`;
+    }
+}
+
+// Enter v inpute
+searchBar.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
         event.preventDefault();
-        const query = searchBar.value.trim();
-        if (query !== '') {
-            window.location.href = `search-results.html?q=${encodeURIComponent(query)}`;
-        }
+        performSearch();
     }
 });
+
+// Klik na lupu (ak existuje)
+if (searchButton) {
+    searchButton.addEventListener('click', performSearch);
+}
 
     // Load initial content
     loadRecentContent();
