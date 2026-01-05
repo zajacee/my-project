@@ -327,7 +327,7 @@
 
   /* ✅ a select „Kategória“ iba jemne doprava (bez width/position hackov) */
   #content form select#category{
-    margin-left: 6px !important;   /* len pár px doprava */
+    margin-left: 0px !important;   /* len pár px doprava */
   }
 
   /* ✅ „Nahrať obrázky“: nič necentrujeme, len text posun doprava */
@@ -378,10 +378,4 @@
     padding: 0 10px !important;    /* primeraný vnútorný spacing */
   }
 
-}
-@media (max-width: 768px) {
-  #content form select#category {
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-  }
 }
