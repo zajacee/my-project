@@ -12,7 +12,7 @@
     overflow-x: hidden;
   }
 
-  /* ===== HEADER (nepresúvame user-menu, len doladíme hamburger + logo) ===== */
+  /* ===== HEADER ===== */
   header {
     height: auto !important;
     padding: 8px 12px 12px !important;
@@ -27,22 +27,20 @@
     justify-content: flex-start !important;
     gap: 10px !important;
     width: 100% !important;
-    position: relative !important; /* kotva pre hamburger */
+    position: relative !important;
   }
 
-  /* ===== LOGO/TITLE ===== */
   header h1 {
     position: static !important;
     transform: none !important;
     margin: 0 !important;
 
-    padding: 0 52px !important;       /* miesto pre hamburger */
+    padding: 0 52px !important;
     line-height: 40px !important;
     font-size: 1.8rem !important;
     text-align: center !important;
   }
 
-  /* ===== SEARCH BAR ===== */
   #search-bar {
     position: static !important;
     transform: none !important;
@@ -60,7 +58,7 @@
     justify-content: center !important;
 
     position: absolute !important;
-    left: 0px !important;  /* nechávaš tak, ako máš teraz */
+    left: 0px !important;
     top: 0px !important;
 
     z-index: 1101 !important;
@@ -75,7 +73,7 @@
     padding: 0 !important;
 
     background: transparent !important;
-    border: 2px solid rgba(255,255,255,0.9) !important; /* ✅ rámik */
+    border: 2px solid rgba(255,255,255,0.9) !important;
     border-radius: 10px !important;
     box-sizing: border-box !important;
 
@@ -83,7 +81,7 @@
     cursor: pointer !important;
   }
 
-  /* ===== USER MENU: notifikácie + login ===== */
+  /* ===== USER MENU ===== */
   .user-menu {
     width: 100% !important;
     display: flex !important;
@@ -108,13 +106,12 @@
     font-size: 1.5rem !important;
   }
 
-  /* notifikačný popup – centrovaný + horná hrana ako login dropdown */
   #notification-popup{
     right: auto !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     max-width: 92vw !important;
-    top: calc(100% + 10px) !important; /* ✅ rovnaké odsadenie ako login dropdown */
+    top: calc(100% + 10px) !important; /* rovnaké ako login dropdown */
   }
 
   #login-button {
@@ -190,7 +187,7 @@
     box-shadow: none !important;
   }
 
-  /* ===== OVERLAY (sidebar) ===== */
+  /* ===== OVERLAY ===== */
   #overlay {
     display: none;
     position: fixed;
@@ -204,7 +201,7 @@
     pointer-events: auto;
   }
 
-  /* ===== SIDEBAR – HAMBURGER MODE ===== */
+  /* ===== SIDEBAR ===== */
   #sidebar {
     position: fixed !important;
     top: 0;
@@ -275,7 +272,25 @@
     margin: 25px 0 0 0 !important;
   }
 
-  /* ===== FIX: aby bolo vidieť "Čítať viac" ===== */
+  /* ===== RECENT CONTENT ===== */
+  #recent-content { padding: 15px; }
+
+  /* ✅ Nedávno pridané: natvrdo vľavo (má inline flex v HTML) */
+  #recent-content h3{
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    text-align: left !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+
+  /* aby select filter neodtlačil nadpis do stredu */
+  #recent-content h3 #category-filter{
+    margin-left: 12px !important;
+  }
+
+  /* ===== FIX: "Čítať viac" ===== */
   #recent-content .content-item p{
     max-height: none !important;
     overflow: visible !important;
@@ -290,18 +305,6 @@
     font-weight: bold;
   }
 
-  /* ===== RECENT CONTENT ===== */
-  #recent-content { padding: 15px; }
-
-  /* Nadpis „Nedávno pridané“ – vľavo */
-  #recent-content h3 {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    text-align: left !important;
-    justify-content: flex-start !important;
-  }
-
   .content-item {
     flex-direction: column;
     gap: 12px;
@@ -314,51 +317,22 @@
 
   .thumbnail { object-fit: contain; }
 
-  /* ===== Nadpis / label „Výber kategórie“ – vľavo ===== */
-  #content form label,
-  .category-select label,
-  .category-select h3 {
+  /* ✅ „Výber kategórie“ (label Kategória) vľavo */
+  #content form label[for="category"]{
     text-align: left !important;
-    align-items: flex-start !important;
-    justify-content: flex-start !important;
+    display: block !important;
+    width: 100% !important;
     margin-left: 0 !important;
-    padding-left: 0 !important;
   }
 
-  /* ===================================================
-     ✅ KATEGÓRIA DROPDOWN – NEROBIŤ margin na SELECT!
-     Aby “nevyskakoval hore”:
-     posúvame len WRAPPER (biely box os), nie samotný select/menu.
-  =================================================== */
-  .category-select {
-    margin-left: 12px !important;                 /* jemne doprava */
-    width: calc(100% - 12px) !important;
+  /* ✅ a select „Kategória“ iba jemne doprava (bez width/position hackov) */
+  #content form select#category{
+    margin-left: 6px !important;   /* len pár px doprava */
   }
 
-  /* ===================================================
-     ✅ NAHRAŤ OBRÁZKY – vrátiť pôvodné správanie
-     a len posunúť text pár px doprava
-  =================================================== */
-
-  /* nedávame text-align center – nechá sa pôvodné */
-  .upload-box,
-  .image-upload,
-  .upload-images {
-    text-align: inherit !important;
-  }
-
-  /* posun samotného textu (funguje na button/label/span) */
-  .upload-box span,
-  .upload-box label,
-  .upload-box p,
-  .image-upload span,
-  .image-upload label,
-  .image-upload p,
-  .upload-images span,
-  .upload-images label,
-  .upload-images p {
-    display: inline-block !important;
-    padding-left: 6px !important;   /* ✅ len pár px doprava */
+  /* ✅ „Nahrať obrázky“: nič necentrujeme, len text posun doprava */
+  .file-upload .file-button span:first-child{
+    margin-left: 6px !important;   /* posun textu doprava */
   }
 
 }
