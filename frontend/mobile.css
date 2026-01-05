@@ -70,18 +70,20 @@
     cursor: pointer;
   }
 
-  /* ===== USER MENU: notifikácie + login v 1 riadku (DOPRAVA) ===== */
+  /* ===== USER MENU: notifikácie + login doprava ===== */
   .user-menu {
     width: 100% !important;
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: flex-end !important; /* DOPRAVA */
+    justify-content: flex-end !important; /* doprava */
     gap: 12px !important;
     margin: 0 !important;
+
+    position: relative !important; /* dôležité: dropdown sa bude kotviť sem */
   }
 
-  /* prebij inline absolute štýly */
+  /* prebij inline absolute štýly notifikácií */
   #notification-container {
     position: static !important;
     top: auto !important;
@@ -95,8 +97,8 @@
     font-size: 1.5rem !important;
   }
 
-  /* notifikačný popup nech sa zmestí na mobile */
-  #notification-popup{
+  /* notifikačný popup nech je pod zvončekom a v strede obrazovky */
+  #notification-popup {
     right: auto !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
@@ -120,14 +122,25 @@
     border-radius: 10px !important; /* obdĺžnik */
   }
 
-  /* dropdown menu nech sa otvára POD loginom */
-  .dropdown-menu,
-  .user-dropdown,
-  #user-dropdown {
-    top: 100% !important;
+  /* ===== DROPDOWN: vždy POD loginom (tvoj element je .dropdown#logout-dropdown) ===== */
+  #logout-dropdown.dropdown {
+    position: absolute !important;
+    top: calc(100% + 8px) !important;  /* pod user-menu riadkom */
+    right: 0 !important;              /* zarovnať doprava */
+    left: auto !important;
     bottom: auto !important;
     transform: none !important;
-    margin-top: 8px !important;
+    z-index: 2000 !important;
+
+    /* nech sa zmestí na mobil */
+    width: min(260px, 92vw) !important;
+  }
+
+  /* aby tlačidlá v dropdowne neboli obrovské (globálne button rule) */
+  #logout-dropdown button {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 10px 12px !important;
   }
 
   /* ===== OVERLAY ===== */
@@ -185,36 +198,34 @@
 
   textarea { min-height: 160px; }
 
-  /* ===== EMOJI: bez prekrývania + DOĽAVA =====
-     Na desktope máš .emoji-wrap margin-top:-40px — na mobile to vypneme */
+  /* ===== EMOJI: bez prekrývania + DOĽAVA ===== */
   .comment-input-wrap { position: relative !important; }
 
-  .emoji-wrap{
-    margin-top: 8px !important;      /* ZRUŠ -40px */
+  .emoji-wrap {
+    margin-top: 8px !important;      /* zruší desktop -40px */
     margin-bottom: 10px !important;
-    justify-content: flex-start !important; /* DOĽAVA */
+    justify-content: flex-start !important; /* doľava */
   }
 
-  #emoji-toggle-write{
+  #emoji-toggle-write {
     width: fit-content !important;   /* len na 3 emoji */
     display: inline-flex !important;
     margin: 0 !important;
     padding: 6px 10px !important;
   }
 
-  /* panel s emoji nech ostane pod tlačidlom a zmestí sa */
-  .emoji-panel{
+  .emoji-panel {
     width: min(100%, 92vw) !important;
   }
 
-  /* ===== SUBMIT button: len submit na 100%, nie hamburger/login/emoji ===== */
-  #content-form button[type="submit"]{
+  /* ===== SUBMIT button: len submit na 100% ===== */
+  #content-form button[type="submit"] {
     width: 100% !important;
     margin: 25px 0 0 0 !important;
   }
 
-  /* ===== FIX: aby bolo vidieť "Čítať viac" na mobile ===== */
-  #recent-content .content-item p{
+  /* ===== FIX: aby bolo vidieť "Čítať viac" ===== */
+  #recent-content .content-item p {
     max-height: none !important;
     overflow: visible !important;
     display: block !important;
@@ -222,7 +233,7 @@
     -webkit-box-orient: initial !important;
   }
 
-  .read-more{
+  .read-more {
     display: inline-block !important;
     margin-left: 6px;
     font-weight: bold;
