@@ -70,13 +70,13 @@
     cursor: pointer;
   }
 
-  /* ===== USER MENU: notifikácie + login v 1 riadku ===== */
+  /* ===== USER MENU: notifikácie + login v 1 riadku (DOPRAVA) ===== */
   .user-menu {
     width: 100% !important;
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: center !important;
+    justify-content: flex-end !important; /* DOPRAVA */
     gap: 12px !important;
     margin: 0 !important;
   }
@@ -89,6 +89,7 @@
     left: auto !important;
     transform: none !important;
     margin: 0 !important;
+
     display: flex !important;
     align-items: center !important;
     font-size: 1.5rem !important;
@@ -102,6 +103,7 @@
     max-width: 92vw !important;
   }
 
+  /* login ako zaoblený obdĺžnik (nie vajce) */
   #login-button {
     position: static !important;
     top: auto !important;
@@ -114,7 +116,18 @@
     height: 40px !important;
     padding: 8px 14px !important;
     margin: 0 !important;
-    border-radius: 999px !important;
+
+    border-radius: 10px !important; /* obdĺžnik */
+  }
+
+  /* dropdown menu nech sa otvára POD loginom */
+  .dropdown-menu,
+  .user-dropdown,
+  #user-dropdown {
+    top: 100% !important;
+    bottom: auto !important;
+    transform: none !important;
+    margin-top: 8px !important;
   }
 
   /* ===== OVERLAY ===== */
@@ -172,14 +185,14 @@
 
   textarea { min-height: 160px; }
 
-  /* ===== EMOJI: už žiadne prekrývanie s textarea =====
+  /* ===== EMOJI: bez prekrývania + DOĽAVA =====
      Na desktope máš .emoji-wrap margin-top:-40px — na mobile to vypneme */
   .comment-input-wrap { position: relative !important; }
 
   .emoji-wrap{
     margin-top: 8px !important;      /* ZRUŠ -40px */
     margin-bottom: 10px !important;
-    justify-content: flex-end !important; /* doprava */
+    justify-content: flex-start !important; /* DOĽAVA */
   }
 
   #emoji-toggle-write{
