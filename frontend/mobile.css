@@ -33,14 +33,14 @@
 
   header h1 {
     position: static !important;
-    transform: none !important;
+    transform: none !important;            /* dôležité: odstráni hack transformy */
     margin: 0 !important;
     padding: 6px 0 2px 0 !important;       /* menší vertikálny padding */
     font-size: 1.8rem !important;
     line-height: 1.05 !important;
     text-align: center !important;
 
-    transform: translateY(-6px) !important; /* OPTICKY VYŠŠIE k hamburgeru */
+    margin-top: -4px !important;           /* ✅ opticky vyššie k hamburgeru */
   }
 
   #search-bar {
@@ -53,12 +53,12 @@
     font-size: 16px;
   }
 
-  /* ===== HAMBURGER BUTTON (pekne naľavo, v rovnakej výške) ===== */
+  /* ===== HAMBURGER BUTTON (vyššie, zarovnaný s logom) ===== */
   #hamburger {
     display: block;
     position: absolute;
     left: 12px;
-    top: 18px;                    /* bližšie k logu */
+    top: 12px !important;                  /* ✅ bolo 18px */
     z-index: 1101;
 
     font-size: 28px;
@@ -72,6 +72,12 @@
     border: none !important;
     color: #fff;
     cursor: pointer;
+  }
+
+  /* voliteľne: lepšie vertikálne centrovanie ikonky */
+  #hamburger {
+    display: flex;
+    align-items: center;
   }
 
   /* ===== USER MENU: notifikácie + login doprava ===== */
@@ -142,6 +148,7 @@
     min-width: 180px !important;
   }
 
+  /* ✅ FIX: centrovanie textu v dropdown menu */
   #logout-dropdown a,
   #logout-dropdown button {
     width: 100% !important;
@@ -153,15 +160,22 @@
     gap: 10px !important;
     text-align: center !important;
 
-    padding: 12px 14px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+
+    padding: 14px 16px !important;
     margin: 0 !important;
     border-radius: 8px !important;
   }
 
+  /* ✅ ikony rovnaká veľkosť */
   #logout-dropdown img,
   #logout-dropdown svg,
   #logout-dropdown i {
     flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
   }
 
   /* ===== OVERLAY ===== */
@@ -171,8 +185,12 @@
     inset: 0;
     background: rgba(0,0,0,0.45);
     z-index: 1100;
+    pointer-events: none; /* ✅ aby overlay neblokoval keď je hidden */
   }
-  #overlay.show { display: block; }
+  #overlay.show {
+    display: block;
+    pointer-events: auto; /* ✅ kliknutie zavrie menu */
+  }
 
   /* ===== SIDEBAR – HAMBURGER MODE ===== */
   #sidebar {
