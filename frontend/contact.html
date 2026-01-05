@@ -405,33 +405,17 @@ footer {
     margin: 0;
     }
 
-
-        /* Media Queries for Scaling */
-        @media screen and (max-width: 768px) {
-            html {
-                font-size: 14px; /* Scale down on small screens */
-            }
-
-            #sidebar {
-                width: 200px; /* Reduce sidebar width on small screens */
-            }
-
-            #content {
-                margin-left: 200px; /* Adjust content area margin */
-                padding: 15px;
-            }
-
-            button {
-                padding: 15px 30px;
-            }
-        }
     </style>
+
+    <link rel="stylesheet" href="mobile.css">
+
      <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="notifications.js" defer></script>
 </head>
 <body>
     <header>
         <div class="top-bar">
+          <button id="hamburger" aria-label="Menu">☰</button>
             <h1><a href="index.html" style="text-decoration: none; color: inherit;">DajToVon</a></h1>
             <input type="text" id="search-bar" placeholder="Hľadať...">
             <div class="user-menu">
@@ -781,5 +765,6 @@ searchBar.addEventListener('keypress', (event) => {
     initializeNotifications();
   });
 </script>
+<script src="mobile-menu.js"></script>
 </body>
 </html>
