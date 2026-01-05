@@ -318,3 +318,17 @@
 
   .thumbnail { object-fit: contain; }
 }
+
+@media (max-width: 768px) {
+
+  #hamburger {
+    border: 2px solid rgba(255,255,255,0.9) !important;
+    border-radius: 10px !important;
+
+    background: transparent !important;
+
+    /* aby rámik nebol „natlačený“ */
+    box-sizing: border-box !important;
+  }
+
+}
