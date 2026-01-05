@@ -450,8 +450,29 @@ max-width: 240px !important;
 @media (max-width: 768px) {
 
   .emoji-wrap {
-    margin-top: -60px !important;   /* bolo -30px */
+    margin-top: -30px !important;   /* bolo -30px */
     gap: 6px !important;
   }
 
+}
+
+@media (max-width: 768px) {
+
+  /* Content detail – textarea pre komentár (nižšia výška) */
+  #comments-section textarea,
+  #comment-input {
+    min-height: 90px !important;   /* bolo 160px */
+    height: auto !important;
+    line-height: 1.35 !important;
+  }
+
+  /* ešte kompaktnejší box */
+  #comments-section {
+    padding: 12px !important;      /* bolo 20px */
+  }
+
+  /* emoji + submit bližšie k textarea */
+  #comments-section .emoji-wrap {
+    margin-top: 4px !important;
+  }
 }
