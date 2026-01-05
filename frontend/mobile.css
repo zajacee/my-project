@@ -371,8 +371,8 @@
 
   /* Filter kategórie pri "Nedávno pridané" – menšia výška */
   #recent-content h3 #category-filter {
-    height: 30px !important;        /* 🔽 späť na menšiu výšku */
-    line-height: 30px !important;
+    height: 32px !important;        /* 🔽 späť na menšiu výšku */
+    line-height: 32px !important;
 
     border-radius: 8px !important; /* rovnaký tvar ako hore */
     padding: 0 10px !important;    /* primeraný vnútorný spacing */
@@ -383,7 +383,7 @@
 
   /* Výber kategórie pri pridávaní príspevku – jemne doľava */
   #content form select#category {
-    padding-left: 8px !important;  /* zjednotenie s inputmi */
+    padding-left: 0px !important;  /* zjednotenie s inputmi */
   }
 
 }
