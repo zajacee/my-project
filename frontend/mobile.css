@@ -410,3 +410,19 @@ max-width: 240px !important;
   }
 }
 
+@media (max-width: 768px) {
+
+  /* nech je dot ukotvený k zvončeku, nie “niekam” doprava */
+  #notification-container{
+    position: relative !important;   /* 🔥 kľúčové */
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  #bell-dot{
+    position: absolute !important;
+    top: 2px !important;
+    right: 2px !important;
+  }
+}
+
