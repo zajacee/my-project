@@ -336,8 +336,8 @@
 
   /* ===== NEDÁVNO PRIDANÉ – stack pod seba ===== */
 #recent-content h3 #filter-options{
-  margin-left: auto;
-  width: 180px; /* ak chceš stále rovnako */
+ margin-left: 0 !important;           /* ❌ žiadne odsúvanie doprava */
+max-width: 240px !important; 
 }
 
   #recent-content h3 {
