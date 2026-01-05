@@ -61,7 +61,7 @@
 
     position: absolute !important;
     left: 12px !important;
-    top: 2px !important;              /* ✅ vyššie (bolo 12px) */
+    top: 0px !important;              /* ✅ vyššie (bolo 12px) */
 
     z-index: 1101 !important;
 
