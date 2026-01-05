@@ -330,10 +330,6 @@
     margin-left: 6px !important;   /* posun textu doprava */
   }
 
-}
-
-@media (max-width: 768px) {
-
   /* ===== NEDÁVNO PRIDANÉ – stack pod seba ===== */
 #recent-content h3 #filter-options{
  margin-left: 0 !important;           /* ❌ žiadne odsúvanie doprava */
@@ -353,11 +349,6 @@ max-width: 240px !important;
     margin-left: 0 !important;           /* ❌ žiadne odsúvanie doprava */
     max-width: 240px !important;         /* nech nie je príliš široký */
   }
-
-}
-
-
-@media (max-width: 768px) {
 
   /* IBA stránky: Príspevky používateľa */
   .page-user-posts #recent-content h3 {
@@ -390,9 +381,6 @@ max-width: 240px !important;
     width: 180px !important;
     max-width: 100% !important;
   }
-}
-
-@media (max-width: 768px) {
 
   /* ===== ZJEDNOTENIE VEĽKOSTI NADPISOV NA MOBILE ===== */
 
@@ -408,9 +396,7 @@ max-width: 240px !important;
     font-size: 1.15rem !important;
     line-height: 1.25 !important;
   }
-}
 
-@media (max-width: 768px) {
 
   /* nech je dot ukotvený k zvončeku, nie “niekam” doprava */
   #notification-container{
@@ -424,9 +410,6 @@ max-width: 240px !important;
     top: 2px !important;
     right: 2px !important;
   }
-}
-
-@media (max-width: 768px) {
 
   /* Userprofile: akcie nebudú absolute, pôjdu pod meta */
   .page-user-posts .content-actions{
@@ -445,18 +428,11 @@ max-width: 240px !important;
   .page-user-posts .content-meta{
     margin-bottom: 8px !important;
   }
-}
 
-@media (max-width: 768px) {
-
-  .emoji-wrap {
-    margin-top: -30px !important;   /* bolo -30px */
+ #comments-section .emoji-wrap {
+    margin-top: -50px !important;
     gap: 6px !important;
   }
-
-}
-
-@media (max-width: 768px) {
 
   /* Content detail – textarea pre komentár (nižšia výška) */
   #comments-section textarea,
@@ -474,5 +450,21 @@ max-width: 240px !important;
   /* emoji + submit bližšie k textarea */
   #comments-section .emoji-wrap {
     margin-top: 4px !important;
+  }
+
+  /* Content detail: 2 obrázky vedľa seba */
+  #content-detail .content-images{
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  /* nech obrázky vyplnia bunku (zruší max-width:200px z .thumbnail) */
+  #content-detail .content-images img.thumbnail{
+    width: 100% !important;
+    max-width: 100% !important;   /* prepíše max-width:200px */
+    height: auto !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
   }
 }
