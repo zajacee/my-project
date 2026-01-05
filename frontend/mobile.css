@@ -355,3 +355,29 @@ max-width: 240px !important;
   }
 
 }
+
+
+@media (max-width: 768px) {
+
+  /* IBA stránky: Príspevky používateľa */
+  .page-user-posts #recent-content h3 {
+    display: flex !important;
+    flex-direction: column !important;   /* ⬇️ pod seba */
+    align-items: flex-start !important;
+    gap: 6px !important;
+  }
+
+  /* NADPIS: jeden riadok */
+  .page-user-posts #user-label,
+  .page-user-posts #user-username {
+    white-space: nowrap !important;
+  }
+
+  /* FILTER vždy POD nadpisom */
+  .page-user-posts #filter-options {
+    margin-left: 0 !important;
+    margin-top: 6px !important;
+    width: 180px !important;
+    max-width: 100% !important;
+  }
+}
