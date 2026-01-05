@@ -15,7 +15,7 @@
   /* ===== HEADER (nepresúvame user-menu, len doladíme hamburger + logo) ===== */
   header {
     height: auto !important;
-    padding: 8px 12px 12px !important; /* ✅ menší padding hore = všetko vyššie */
+    padding: 8px 12px 12px !important;
     text-align: center;
     position: relative !important;
   }
@@ -30,14 +30,14 @@
     position: relative !important; /* kotva pre hamburger */
   }
 
-  /* ===== LOGO/TITLE (opticky vyššie + priestor pre hamburger) ===== */
+  /* ===== LOGO/TITLE ===== */
   header h1 {
     position: static !important;
     transform: none !important;
     margin: 0 !important;
 
     padding: 0 52px !important;       /* miesto pre hamburger */
-    line-height: 40px !important;     /* ✅ nižšia line-height = title vyššie */
+    line-height: 40px !important;
     font-size: 1.8rem !important;
     text-align: center !important;
   }
@@ -53,15 +53,15 @@
     font-size: 16px !important;
   }
 
-  /* ===== HAMBURGER (vyššie) ===== */
+  /* ===== HAMBURGER ===== */
   #hamburger {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
 
     position: absolute !important;
-    left: 0px !important;
-    top: 0px !important;              /* ✅ vyššie (bolo 12px) */
+    left: 0px !important;  /* nechávaš tak, ako máš teraz */
+    top: 0px !important;
 
     z-index: 1101 !important;
 
@@ -75,12 +75,15 @@
     padding: 0 !important;
 
     background: transparent !important;
-    border: none !important;
+    border: 2px solid rgba(255,255,255,0.9) !important; /* ✅ rámik */
+    border-radius: 10px !important;
+    box-sizing: border-box !important;
+
     color: #fff !important;
     cursor: pointer !important;
   }
 
-  /* ===== USER MENU: notifikácie + login (NEHÝBEME) ===== */
+  /* ===== USER MENU: notifikácie + login ===== */
   .user-menu {
     width: 100% !important;
     display: flex !important;
@@ -89,7 +92,7 @@
     justify-content: flex-end !important;
     gap: 12px !important;
     margin: 0 !important;
-    position: relative !important; /* ✅ NEW: kotva pre dropdown */
+    position: relative !important; /* kotva pre dropdown */
   }
 
   #notification-container {
@@ -105,11 +108,13 @@
     font-size: 1.5rem !important;
   }
 
+  /* notifikačný popup – centrovaný + horná hrana ako login dropdown */
   #notification-popup{
     right: auto !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     max-width: 92vw !important;
+    top: calc(100% + 10px) !important; /* ✅ rovnaké odsadenie ako login dropdown */
   }
 
   #login-button {
@@ -134,39 +139,29 @@
     box-shadow: none !important;
   }
 
-  /* =========================
-     ✅ DROPDOWN FIX (tvoja štruktúra)
-     - odstráni margin-top z desktopu
-     - zruší fixnú výšku dropdownu
-     - vycentruje text aj ikonku
-     - ✅ NEW: zarovná doprava pod login + odsadenie dole
-  ========================= */
-
-  /* dropdown box */
+  /* ===== LOGIN DROPDOWN ===== */
   #logout-dropdown.dropdown,
   #logout-dropdown {
-    /* ✅ NEW: presne pod loginom, doprava */
     position: absolute !important;
-    top: calc(100% + 10px) !important;  /* ✅ NEW: odsadenie dole od login */
-    right: 0 !important;                 /* ✅ NEW: zarovnať doprava s login */
+    top: calc(100% + 10px) !important;
+    right: 0 !important;
     left: auto !important;
     transform: none !important;
 
     z-index: 3000 !important;
 
-    height: auto !important;             /* ✅ zruší 80px fix */
-    padding: 6px 0 !important;           /* jemný padding */
+    height: auto !important;
+    padding: 6px 0 !important;
     width: 240px !important;
-    max-width: 90vw !important;          /* ✅ NEW: aby sa zmestil */
+    max-width: 90vw !important;
     border-radius: 10px !important;
   }
 
-  /* tlačidlá v dropdown */
   #logout-dropdown.dropdown button,
   #logout-dropdown button {
-    margin-top: 0 !important;         /* ✅ ruší desktop margin-top: 5px */
-    padding: 0 14px !important;       /* ✅ ruší desktop padding: 2px 0 */
-    height: 50px !important;          /* ✅ stabilná výška riadku */
+    margin-top: 0 !important;
+    padding: 0 14px !important;
+    height: 50px !important;
     width: 100% !important;
 
     display: flex !important;
@@ -179,16 +174,14 @@
     white-space: nowrap !important;
   }
 
-  /* prvé tlačidlo bez ikonky nech je v strede */
   #logout-dropdown #my-content {
     justify-content: center !important;
   }
 
-  /* druhé tlačidlo s ikonou – ikonku mierne hore (aby “Odhlásiť” nepadalo) */
   #logout-dropdown #logout-option img {
     display: block !important;
     margin-right: 8px !important;
-    transform: translateY(-3px) !important; /* ✅ NEW: o kúsok viac hore */
+    transform: translateY(-3px) !important;
   }
 
   #logout-dropdown button:focus,
@@ -282,7 +275,7 @@
     margin: 25px 0 0 0 !important;
   }
 
-  /* ===== FIX: "Čítať viac" ===== */
+  /* ===== FIX: aby bolo vidieť "Čítať viac" ===== */
   #recent-content .content-item p{
     max-height: none !important;
     overflow: visible !important;
@@ -300,10 +293,13 @@
   /* ===== RECENT CONTENT ===== */
   #recent-content { padding: 15px; }
 
+  /* Nadpis „Nedávno pridané“ – vľavo */
   #recent-content h3 {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
+    text-align: left !important;
+    justify-content: flex-start !important;
   }
 
   .content-item {
@@ -317,75 +313,52 @@
   }
 
   .thumbnail { object-fit: contain; }
-}
 
-@media (max-width: 768px) {
-
-  #hamburger {
-    border: 2px solid rgba(255,255,255,0.9) !important;
-    border-radius: 10px !important;
-
-    background: transparent !important;
-
-    /* aby rámik nebol „natlačený“ */
-    box-sizing: border-box !important;
-  }
-
-}
-
-@media (max-width: 768px) {
-
-  /* NOTIFIKÁCIE – zarovnať hornú hranu s login dropdownom */
-  #notification-popup {
-    top: calc(100% + 10px) !important; /* ⬇️ rovnaké odsadenie ako login dropdown */
-  }
-
-}
-
-@media (max-width: 768px) {
-
-  /* Nadpis „Nedávno pridané“ – zarovnať vľavo ako formulár */
-  #recent-content h3 {
-    text-align: left !important;
-    justify-content: flex-start !important;
-    align-items: flex-start !important;
-  }
-
-}
-@media (max-width: 768px) {
-
-  /* Nadpis / label „Výber kategórie“ */
+  /* ===== Nadpis / label „Výber kategórie“ – vľavo ===== */
   #content form label,
   .category-select label,
   .category-select h3 {
     text-align: left !important;
     align-items: flex-start !important;
     justify-content: flex-start !important;
-
     margin-left: 0 !important;
     padding-left: 0 !important;
   }
 
-}
-
-@media (max-width: 768px) {
-
-  /* Dropdown menu pre výber kategórie */
-  .category-select select,
-  .category-select .dropdown-menu,
-  .category-select .select-dropdown {
-    margin-left: 12px !important; /* ⬅️ zarovnanie s bielym boxom */
+  /* ===================================================
+     ✅ KATEGÓRIA DROPDOWN – NEROBIŤ margin na SELECT!
+     Aby “nevyskakoval hore”:
+     posúvame len WRAPPER (biely box os), nie samotný select/menu.
+  =================================================== */
+  .category-select {
+    margin-left: 12px !important;                 /* jemne doprava */
     width: calc(100% - 12px) !important;
   }
 
-}
-@media (max-width: 768px) {
+  /* ===================================================
+     ✅ NAHRAŤ OBRÁZKY – vrátiť pôvodné správanie
+     a len posunúť text pár px doprava
+  =================================================== */
 
-  /* Modrý box – len horizontálne centrovanie textu */
+  /* nedávame text-align center – nechá sa pôvodné */
   .upload-box,
   .image-upload,
   .upload-images {
-    text-align: center !important;
+    text-align: inherit !important;
+  }
+
+  /* posun samotného textu (funguje na button/label/span) */
+  .upload-box span,
+  .upload-box label,
+  .upload-box p,
+  .image-upload span,
+  .image-upload label,
+  .image-upload p,
+  .upload-images span,
+  .upload-images label,
+  .upload-images p {
+    display: inline-block !important;
+    padding-left: 6px !important;   /* ✅ len pár px doprava */
   }
 
 }
