@@ -285,11 +285,6 @@
     gap: 10px !important;
   }
 
-  /* aby select filter neodtlačil nadpis do stredu */
-  #recent-content h3 #category-filter{
-    margin-left: 12px !important;
-  }
-
   /* ===== FIX: "Čítať viac" ===== */
   #recent-content .content-item p{
     max-height: none !important;
@@ -351,19 +346,7 @@
   /* filter kategórie POD nadpisom */
   #recent-content h3 #category-filter {
     margin-left: 0 !important;           /* ❌ žiadne odsúvanie doprava */
-    width: 100% !important;              /* mobil-friendly */
     max-width: 240px !important;         /* nech nie je príliš široký */
-  }
-
-}
-
-@media (max-width: 768px) {
-
-  /* Filter kategórie pri "Nedávno pridané" – na celú šírku */
-  #recent-content h3 #category-filter {
-    width: 100% !important;
-    max-width: none !important;
-    margin-left: 0 !important;
   }
 
 }
