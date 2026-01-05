@@ -336,3 +336,23 @@
   }
 
 }
+
+@media (max-width: 768px) {
+
+  /* ===== NEDÁVNO PRIDANÉ – stack pod seba ===== */
+  #recent-content h3 {
+    display: flex !important;
+    flex-direction: column !important;   /* ⬇️ POD SEBA */
+    align-items: flex-start !important;  /* ⬅️ vľavo */
+    text-align: left !important;
+    gap: 8px !important;
+  }
+
+  /* filter kategórie POD nadpisom */
+  #recent-content h3 #category-filter {
+    margin-left: 0 !important;           /* ❌ žiadne odsúvanie doprava */
+    width: 100% !important;              /* mobil-friendly */
+    max-width: 240px !important;         /* nech nie je príliš široký */
+  }
+
+}
