@@ -4,63 +4,59 @@ document.addEventListener("DOMContentLoaded", () => {
      HAMBURGER / SIDEBAR MENU
   ===================================================== */
 
-  const hamburger = document.getElementById("hamburger");
+  const btn = document.getElementById("hamburger");
   const sidebar = document.getElementById("sidebar");
   const overlay = document.getElementById("overlay");
 
+  // ak na stránke niečo chýba, nič nerob
+  const hasSidebarParts = !!(btn && sidebar && overlay);
+
   const isSidebarOpen = () => sidebar?.classList.contains("open");
 
-  const openSidebar = () => {
-    if (!sidebar || !overlay) return;
-
+  const openMenu = () => {
+    if (!hasSidebarParts) return;
     sidebar.classList.add("open");
     overlay.classList.add("show");
-
-    // zamkni scroll (mobile safe)
     document.body.style.overflow = "hidden";
   };
 
-  const closeSidebar = () => {
-    if (!sidebar || !overlay) return;
-
+  const closeMenu = () => {
+    if (!hasSidebarParts) return;
     sidebar.classList.remove("open");
     overlay.classList.remove("show");
-
     document.body.style.overflow = "";
   };
 
-  if (hamburger && sidebar && overlay) {
-    hamburger.addEventListener("click", (e) => {
+  if (hasSidebarParts) {
+    // toggle klikom na hamburger
+    btn.addEventListener("click", (e) => {
       e.preventDefault();
-      isSidebarOpen() ? closeSidebar() : openSidebar();
+      isSidebarOpen() ? closeMenu() : openMenu();
     });
 
-    // klik na overlay zavrie menu
-    overlay.addEventListener("click", closeSidebar);
+    // klik mimo (overlay) zatvorí menu
+    overlay.addEventListener("click", closeMenu);
 
-    // klik na link v sidebari zavrie menu
+    // klik na link / button v menu zatvorí menu
     sidebar.addEventListener("click", (e) => {
-      const link = e.target.closest("a, button");
-      if (link) closeSidebar();
+      const hit = e.target.closest("a, button");
+      if (hit) closeMenu();
     });
 
-    // ESC zavrie sidebar
+    // ESC zatvorí menu
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && isSidebarOpen()) {
-        closeSidebar();
-      }
+      if (e.key === "Escape" && isSidebarOpen()) closeMenu();
     });
 
-    // pri resize späť na desktop zavri
+    // ak otočí mobil / zväčší okno na desktop, zavri menu
     window.addEventListener("resize", () => {
-      if (window.innerWidth > 768 && isSidebarOpen()) {
-        closeSidebar();
-      }
+      if (window.innerWidth > 768 && isSidebarOpen()) closeMenu();
     });
   }
 
   /* =====================================================
-     LOGIN / USER DROPDOWN (Juro)
+     USER DROPDOWN (Juro) – zavrie klikom mimo + zruší active
+     (bez rozbíjania tvojho pôvodného dropdown správania)
   ===================================================== */
 
   const userMenu = document.querySelector(".user-menu");
@@ -69,33 +65,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (userMenu && loginBtn && dropdown) {
 
-    const isDropdownOpen = () =>
-      dropdown.classList.contains("show") || dropdown.style.display === "block";
-
-    const openDropdown = () => {
-      dropdown.classList.add("show");
-      dropdown.style.display = "block";
-      loginBtn.setAttribute("aria-expanded", "true");
-    };
-
     const closeDropdown = () => {
       dropdown.classList.remove("show");
       dropdown.style.display = "none";
-      loginBtn.setAttribute("aria-expanded", "false");
-
-      // ✅ zruší „stále aktívny“ stav
-      loginBtn.blur();
+      loginBtn.blur(); // ✅ aby nezostal “aktívny”
     };
 
-    // toggle klikom na login button
-    loginBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      isDropdownOpen() ? closeDropdown() : openDropdown();
-    });
-
-    // klik mimo = zavri dropdown
+    // klik mimo user-menu zavrie dropdown
     document.addEventListener("click", (e) => {
       if (!userMenu.contains(e.target)) {
         closeDropdown();
@@ -104,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ESC zavrie dropdown
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && isDropdownOpen()) {
+      if (e.key === "Escape") {
         closeDropdown();
       }
     });

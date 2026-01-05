@@ -12,51 +12,69 @@
     overflow-x: hidden;
   }
 
-  /* =========================
-     HEADER LAYOUT (robustné)
-     - funguje aj keď .top-bar nie je wrapper
-  ========================= */
-
+  /* ===== HEADER (NEPRESÚVAME user-menu, len doladíme hamburger + logo) ===== */
   header {
-    position: relative !important;
     height: auto !important;
-
     padding: 12px 12px 14px !important;
     text-align: center;
-
-    /* ✅ header ako grid kontajner */
-    display: grid !important;
-    grid-template-columns: 52px 1fr auto !important;
-    grid-template-rows: auto auto !important;
-    align-items: center !important;
-    column-gap: 8px !important;
-    row-gap: 10px !important;
+    position: relative !important;
   }
 
-  /* ak existuje .top-bar, nech neruší layout */
+  /* nechaj top-bar tak ako máš (žiadny grid) */
   .top-bar {
-    display: contents !important; /* ✅ “prepustí” deti do header gridu */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    width: 100% !important;
+    position: relative !important; /* kotva pre hamburger */
   }
 
-  /* ===== HAMBURGER ===== */
-  #hamburger {
-    grid-column: 1 !important;
-    grid-row: 1 !important;
-
+  /* ===== LOGO/TITLE (vyššie + priestor pre hamburger) ===== */
+  header h1 {
     position: static !important;
-    z-index: 1101;
-
-    width: 44px !important;
-    height: 44px !important;
+    transform: none !important;
     margin: 0 !important;
-    padding: 0 !important;
 
+    /* dôležité: nech je opticky vycentrované aj s hamburgerom vľavo */
+    padding: 0 52px !important;          /* priestor pre hamburger (aj trochu vpravo pre symetriu) */
+    line-height: 44px !important;        /* rovnaká výška ako hamburger button */
+    font-size: 1.8rem !important;
+    text-align: center !important;
+  }
+
+  /* ===== SEARCH BAR ===== */
+  #search-bar {
+    position: static !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    height: 42px !important;
+    font-size: 16px !important;
+  }
+
+  /* ===== HAMBURGER BUTTON (vyššie, zarovnaný s logom) ===== */
+  #hamburger {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
 
+    position: absolute !important;
+    left: 12px !important;
+    top: 12px !important;
+
+    z-index: 1101 !important;
+
+    width: 44px !important;
+    height: 44px !important;
+
     font-size: 28px !important;
     line-height: 1 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
 
     background: transparent !important;
     border: none !important;
@@ -64,143 +82,100 @@
     cursor: pointer !important;
   }
 
-  /* ===== LOGO / TITLE ===== */
-  header h1 {
-    grid-column: 2 !important;
-    grid-row: 1 !important;
-
-    position: static !important;
-    transform: none !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    font-size: 1.8rem !important;
-    line-height: 1.05 !important;
-    text-align: center !important;
-  }
-
-  /* ===== USER MENU (bell + login) ===== */
+  /* ===== USER MENU: notifikácie + login (NEHÝBEME pozíciu) ===== */
   .user-menu {
-    grid-column: 3 !important;
-    grid-row: 1 !important;
-
-    width: auto !important;
-    display: inline-flex !important;
+    width: 100% !important;
+    display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
     justify-content: flex-end !important;
     gap: 12px !important;
-
     margin: 0 !important;
     position: relative !important; /* kotva pre dropdown */
   }
 
+  /* prebij inline absolute štýly */
   #notification-container {
     position: static !important;
+    top: auto !important;
+    right: auto !important;
+    left: auto !important;
     transform: none !important;
     margin: 0 !important;
 
-    display: inline-flex !important;
+    display: flex !important;
     align-items: center !important;
     font-size: 1.5rem !important;
   }
 
-  #notification-popup {
+  /* notifikačný popup nech sa zmestí na mobile */
+  #notification-popup{
     right: auto !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     max-width: 92vw !important;
   }
 
-  /* ===== SEARCH ===== */
-  #search-bar {
-    grid-column: 1 / -1 !important;
-    grid-row: 2 !important;
-
-    position: static !important;
-    transform: none !important;
-
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
-
-    height: 42px !important;
-    font-size: 16px !important;
-  }
-
-  /* ===== LOGIN BUTTON ===== */
+  /* login ako zaoblený obdĺžnik */
   #login-button {
     position: static !important;
+    top: auto !important;
+    right: auto !important;
+    left: auto !important;
     transform: none !important;
 
     width: auto !important;
     max-width: none !important;
     height: 40px !important;
-
     padding: 8px 14px !important;
     margin: 0 !important;
 
     border-radius: 10px !important;
   }
 
-  /* ✅ FIX: aby “nezostal aktívny” (focus/active) */
+  /* zruš “sticky focus” na mobile */
   #login-button:focus,
   #login-button:active {
     outline: none !important;
     box-shadow: none !important;
   }
 
-  /* ===== LOGIN DROPDOWN ===== */
+  /* ===== LOGIN DROPDOWN: pod loginom ===== */
   #logout-dropdown,
   #logout-dropdown.dropdown {
     position: absolute !important;
     top: calc(100% + 8px) !important;
     right: 0 !important;
     left: auto !important;
+    bottom: auto !important;
+    transform: none !important;
 
     z-index: 3000 !important;
 
-    width: 240px !important;
-    max-width: 86vw !important;
+    width: 220px !important;
+    max-width: 80vw !important;
     min-width: 180px !important;
   }
 
-  /* ✅ text opticky v strede + ikona vľavo */
+  /* ✅ DROPDOWN: nech je ako predtým OK (flex centrovanie) */
   #logout-dropdown a,
   #logout-dropdown button {
     width: 100% !important;
-    position: relative !important;
 
-    display: block !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 10px !important;
     text-align: center !important;
 
-    padding: 14px 18px 14px 54px !important; /* miesto pre ikonu */
+    padding: 12px 14px !important;
     margin: 0 !important;
+    border-radius: 8px !important;
 
-    border-radius: 10px !important;
-
-    font-size: 16px !important;
-    font-weight: 700 !important;
     line-height: 1.2 !important;
   }
 
-  #logout-dropdown a > img,
-  #logout-dropdown a > svg,
-  #logout-dropdown a > i,
-  #logout-dropdown button > img,
-  #logout-dropdown button > svg,
-  #logout-dropdown button > i {
-    position: absolute !important;
-    left: 18px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-
-    width: 18px !important;
-    height: 18px !important;
-  }
-
-  /* ✅ odstráň “sticky focus” aj na položkách */
   #logout-dropdown a:focus,
   #logout-dropdown button:focus,
   #logout-dropdown a:active,
@@ -209,14 +184,13 @@
     box-shadow: none !important;
   }
 
-  /* ===== OVERLAY (sidebar) ===== */
+  /* ===== OVERLAY ===== */
   #overlay {
     display: none;
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.45);
     z-index: 1100;
-
     pointer-events: none;
   }
   #overlay.show {
@@ -269,13 +243,13 @@
 
   textarea { min-height: 160px; }
 
-  /* ===== EMOJI ===== */
+  /* ===== EMOJI: bez prekrývania + DOĽAVA ===== */
   .comment-input-wrap { position: relative !important; }
 
   .emoji-wrap{
     margin-top: 8px !important;
     margin-bottom: 10px !important;
-    justify-content: flex-start !important;
+    justify-content: flex-start !important; /* doľava */
   }
 
   #emoji-toggle-write{
@@ -289,13 +263,13 @@
     width: min(100%, 92vw) !important;
   }
 
-  /* ===== SUBMIT button ===== */
+  /* ===== SUBMIT button: len submit na 100% ===== */
   #content-form button[type="submit"]{
     width: 100% !important;
     margin: 25px 0 0 0 !important;
   }
 
-  /* ===== FIX: "Čítať viac" ===== */
+  /* ===== FIX: aby bolo vidieť "Čítať viac" ===== */
   #recent-content .content-item p{
     max-height: none !important;
     overflow: visible !important;
