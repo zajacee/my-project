@@ -357,14 +357,3 @@
 
 }
 
-@media (max-width: 768px) {
-
-  /* Upload obrázkov – celý klikateľný box mierne doprava */
-  .file-upload,
-  .image-upload,
-  .upload-images {
-    margin-left: 12px !important;              /* ⬅️ rovnaký gutter ako obsah */
-    width: calc(100% - 12px) !important;
-  }
-
-}
