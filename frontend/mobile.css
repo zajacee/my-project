@@ -335,6 +335,11 @@
 @media (max-width: 768px) {
 
   /* ===== NEDÁVNO PRIDANÉ – stack pod seba ===== */
+#recent-content h3 #filter-options{
+  margin-left: auto;
+  width: 180px; /* ak chceš stále rovnako */
+}
+
   #recent-content h3 {
     display: flex !important;
     flex-direction: column !important;   /* ⬇️ POD SEBA */
@@ -349,16 +354,4 @@
     max-width: 240px !important;         /* nech nie je príliš široký */
   }
 
-}
-
-/* Nadpis + filter: filter vždy doprava */
-#recent-content h3{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-#recent-content h3 #filter-options{
-  margin-left: auto;
-  width: 180px; /* ak chceš stále rovnako */
 }
