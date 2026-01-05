@@ -450,7 +450,7 @@ max-width: 240px !important;
 @media (max-width: 768px) {
 
   .emoji-wrap {
-    margin-top: 6px !important;   /* bolo -30px */
+    margin-top: -60px !important;   /* bolo -30px */
     gap: 6px !important;
   }
 
