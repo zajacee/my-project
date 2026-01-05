@@ -430,7 +430,7 @@ max-width: 240px !important;
   }
 
  #comments-section .emoji-wrap {
-    margin-top: -50px !important;
+    margin-top: -30px !important;
     gap: 6px !important;
   }
 
@@ -470,13 +470,13 @@ max-width: 240px !important;
 
   /* celý box */
   #comments-section {
-    padding: 12px !important;      /* bolo cca 20px */
+    padding: 8px !important;      /* bolo cca 20px */
   }
 
   /* modrý horný bar / nadpis */
   #comments-section h3,
   #comments-section .comment-header {
-    padding: 8px 12px !important;  /* zmenši výšku baru */
+    padding: 6px 10px !important;  /* zmenši výšku baru */
     font-size: 1rem !important;    /* menší text */
     line-height: 1.2 !important;
     margin-bottom: 8px !important;
@@ -490,12 +490,7 @@ max-width: 240px !important;
     font-size: 0.95rem !important;
   }
 
-  /* emoji bližšie k textarea (už máš scope) */
-  #comments-section .emoji-wrap {
-    margin-top: -50px !important;  /* nechávame, ako chceš */
-  }
-
-  /* tlačidlo Odoslať */
+    /* tlačidlo Odoslať */
   #comments-section button[type="submit"] {
     margin-top: 8px !important;
     padding: 8px 12px !important;
