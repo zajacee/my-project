@@ -462,9 +462,6 @@ max-width: 240px !important;
     object-fit: cover !important;
     border-radius: 8px !important;
   }
-}
-
-@media (max-width: 768px) {
 
   /* ===== PRIDAŤ KOMENTÁR – KOMPAKTNEJŠIE NA MOBILE ===== */
 
@@ -498,9 +495,6 @@ max-width: 240px !important;
     margin-top: 2px !important;
     border-radius: 8px !important;
   }
-}
-
-@media (max-width: 768px) {
 
   /* Nadpis KOMENTÁRE – väčší text + ikona */
   #comments-section h3 {
@@ -515,4 +509,15 @@ max-width: 240px !important;
     font-size: 1.3rem !important;    /* ikona mierne väčšia než text */
     vertical-align: middle;
   }
+
+
+
+  /* IBA tlačidlo "Odoslať správu" */
+  #contact-section #send-contact-btn {
+    padding: 10px 16px !important;   /* menšia výška */
+    font-size: 1rem !important;   /* menší text */
+    line-height: 1.1 !important;
+    margin-top: 6px !important;
+    border-radius: 8px !important;
+}
 }
