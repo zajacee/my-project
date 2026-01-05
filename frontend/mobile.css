@@ -12,15 +12,14 @@
     overflow-x: hidden;
   }
 
-  /* ===== HEADER (NEPRESÚVAME user-menu, len doladíme hamburger + logo) ===== */
+  /* ===== HEADER (nepresúvame user-menu, len doladíme hamburger + logo) ===== */
   header {
     height: auto !important;
-    padding: 12px 12px 14px !important;
+    padding: 8px 12px 12px !important; /* ✅ menší padding hore = všetko vyššie */
     text-align: center;
     position: relative !important;
   }
 
-  /* nechaj top-bar tak ako máš (žiadny grid) */
   .top-bar {
     display: flex !important;
     flex-direction: column !important;
@@ -31,15 +30,14 @@
     position: relative !important; /* kotva pre hamburger */
   }
 
-  /* ===== LOGO/TITLE (vyššie + priestor pre hamburger) ===== */
+  /* ===== LOGO/TITLE (opticky vyššie + priestor pre hamburger) ===== */
   header h1 {
     position: static !important;
     transform: none !important;
     margin: 0 !important;
 
-    /* dôležité: nech je opticky vycentrované aj s hamburgerom vľavo */
-    padding: 0 52px !important;          /* priestor pre hamburger (aj trochu vpravo pre symetriu) */
-    line-height: 44px !important;        /* rovnaká výška ako hamburger button */
+    padding: 0 52px !important;       /* miesto pre hamburger */
+    line-height: 40px !important;     /* ✅ nižšia line-height = title vyššie */
     font-size: 1.8rem !important;
     text-align: center !important;
   }
@@ -55,7 +53,7 @@
     font-size: 16px !important;
   }
 
-  /* ===== HAMBURGER BUTTON (vyššie, zarovnaný s logom) ===== */
+  /* ===== HAMBURGER (vyššie) ===== */
   #hamburger {
     display: inline-flex !important;
     align-items: center !important;
@@ -63,7 +61,7 @@
 
     position: absolute !important;
     left: 12px !important;
-    top: 12px !important;
+    top: 4px !important;              /* ✅ vyššie (bolo 12px) */
 
     z-index: 1101 !important;
 
@@ -82,7 +80,7 @@
     cursor: pointer !important;
   }
 
-  /* ===== USER MENU: notifikácie + login (NEHÝBEME pozíciu) ===== */
+  /* ===== USER MENU: notifikácie + login (NEHÝBEME) ===== */
   .user-menu {
     width: 100% !important;
     display: flex !important;
@@ -94,7 +92,6 @@
     position: relative !important; /* kotva pre dropdown */
   }
 
-  /* prebij inline absolute štýly */
   #notification-container {
     position: static !important;
     top: auto !important;
@@ -108,7 +105,6 @@
     font-size: 1.5rem !important;
   }
 
-  /* notifikačný popup nech sa zmestí na mobile */
   #notification-popup{
     right: auto !important;
     left: 50% !important;
@@ -116,7 +112,6 @@
     max-width: 92vw !important;
   }
 
-  /* login ako zaoblený obdĺžnik */
   #login-button {
     position: static !important;
     top: auto !important;
@@ -133,33 +128,35 @@
     border-radius: 10px !important;
   }
 
-  /* zruš “sticky focus” na mobile */
   #login-button:focus,
   #login-button:active {
     outline: none !important;
     box-shadow: none !important;
   }
 
-  /* ===== LOGIN DROPDOWN: pod loginom ===== */
-  #logout-dropdown,
-  #logout-dropdown.dropdown {
-    position: absolute !important;
-    top: calc(100% + 8px) !important;
-    right: 0 !important;
-    left: auto !important;
-    bottom: auto !important;
-    transform: none !important;
+  /* =========================
+     ✅ DROPDOWN FIX (tvoja štruktúra)
+     - odstráni margin-top z desktopu
+     - zruší fixnú výšku dropdownu
+     - vycentruje text aj ikonku
+  ========================= */
 
-    z-index: 3000 !important;
-
-    width: 220px !important;
-    max-width: 80vw !important;
-    min-width: 180px !important;
+  /* dropdown box */
+  #logout-dropdown.dropdown,
+  #logout-dropdown {
+    height: auto !important;          /* ✅ zruší 80px fix */
+    padding: 6px 0 !important;       /* jemný padding */
+    width: 240px !important;
+    max-width: 86vw !important;
+    border-radius: 10px !important;
   }
 
-  /* ✅ DROPDOWN: nech je ako predtým OK (flex centrovanie) */
-  #logout-dropdown a,
+  /* tlačidlá v dropdown */
+  #logout-dropdown.dropdown button,
   #logout-dropdown button {
+    margin-top: 0 !important;         /* ✅ ruší desktop margin-top: 5px */
+    padding: 0 14px !important;       /* ✅ ruší desktop padding: 2px 0 */
+    height: 50px !important;          /* ✅ stabilná výška riadku */
     width: 100% !important;
 
     display: flex !important;
@@ -167,24 +164,30 @@
     justify-content: center !important;
 
     gap: 10px !important;
-    text-align: center !important;
-
-    padding: 12px 14px !important;
-    margin: 0 !important;
-    border-radius: 8px !important;
-
-    line-height: 1.2 !important;
+    font-size: 1rem !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
   }
 
-  #logout-dropdown a:focus,
+  /* prvé tlačidlo bez ikonky nech je v strede */
+  #logout-dropdown #my-content {
+    justify-content: center !important;
+  }
+
+  /* druhé tlačidlo s ikonou – ikonku mierne hore (aby “Odhlásiť” nepadalo) */
+  #logout-dropdown #logout-option img {
+    display: block !important;
+    margin-right: 8px !important;     /* necháš, ale je stabilné */
+    transform: translateY(-2px) !important; /* ✅ posunie vizuálne vyššie */
+  }
+
   #logout-dropdown button:focus,
-  #logout-dropdown a:active,
   #logout-dropdown button:active {
     outline: none !important;
     box-shadow: none !important;
   }
 
-  /* ===== OVERLAY ===== */
+  /* ===== OVERLAY (sidebar) ===== */
   #overlay {
     display: none;
     position: fixed;
@@ -243,13 +246,13 @@
 
   textarea { min-height: 160px; }
 
-  /* ===== EMOJI: bez prekrývania + DOĽAVA ===== */
+  /* ===== EMOJI ===== */
   .comment-input-wrap { position: relative !important; }
 
   .emoji-wrap{
     margin-top: 8px !important;
     margin-bottom: 10px !important;
-    justify-content: flex-start !important; /* doľava */
+    justify-content: flex-start !important;
   }
 
   #emoji-toggle-write{
@@ -263,13 +266,13 @@
     width: min(100%, 92vw) !important;
   }
 
-  /* ===== SUBMIT button: len submit na 100% ===== */
+  /* ===== SUBMIT button ===== */
   #content-form button[type="submit"]{
     width: 100% !important;
     margin: 25px 0 0 0 !important;
   }
 
-  /* ===== FIX: aby bolo vidieť "Čítať viac" ===== */
+  /* ===== FIX: "Čítať viac" ===== */
   #recent-content .content-item p{
     max-height: none !important;
     overflow: visible !important;
