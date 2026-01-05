@@ -357,3 +357,13 @@
 
 }
 
+@media (max-width: 768px) {
+
+  /* Filter kategórie pri "Nedávno pridané" – na celú šírku */
+  #recent-content h3 #category-filter {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+  }
+
+}
