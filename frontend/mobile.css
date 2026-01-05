@@ -380,10 +380,8 @@
 
 }
 @media (max-width: 768px) {
-
-  /* Výber kategórie pri pridávaní príspevku – jemne doľava */
   #content form select#category {
-    padding-left: 0px !important;  /* zjednotenie s inputmi */
+    padding-left: 10px !important;
+    padding-right: 10px !important;
   }
-
 }
