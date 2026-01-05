@@ -12,18 +12,31 @@
     overflow-x: hidden;
   }
 
-  /* ===== HEADER ===== */
+  /* ===== HEADER (fix prekryvania) ===== */
   header {
     height: auto !important;
     padding: 15px !important;
+    padding-top: 55px !important; /* priestor pre hamburger */
     text-align: center;
     position: relative;
+  }
+
+  .top-bar{
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    width: 100% !important;
   }
 
   header h1 {
     position: static !important;
     transform: none !important;
-    margin: 0 0 10px 0;
+    margin: 0 !important;
+    font-size: 1.8rem !important;
+    line-height: 1.1 !important;
+    text-align: center !important;
   }
 
   /* Search bar */
@@ -32,7 +45,7 @@
     transform: none !important;
     width: 100% !important;
     max-width: none !important;
-    margin: 10px 0 0 0 !important;
+    margin: 0 !important;
   }
 
   /* ===== HAMBURGER BUTTON ===== */
@@ -58,12 +71,12 @@
 
   /* ===== USER MENU (login + notifikácie) ===== */
   .user-menu {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    margin-top: 10px;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 0 !important;
   }
 
   #login-button,
@@ -73,8 +86,13 @@
     right: auto !important;
     left: auto !important;
     transform: none !important;
+    margin: 0 auto !important;
+  }
 
-    margin: 10px auto 0 !important;
+  #login-button{
+    width: 100% !important;
+    max-width: 340px !important;
+    height: 44px !important;
   }
 
   /* ===== OVERLAY ===== */
@@ -142,10 +160,34 @@
     min-height: 160px;
   }
 
-  /* Prebiť globálny button štýl */
+  /* Prebiť globálny button štýl (týka sa submitu) */
   button {
     width: 100%;
     margin: 25px 0 0 0;
+  }
+
+  /* ===== EMOJI "klikacie okno" len na šírku 3 emoji =====
+     (panel s emoji nemeníme) */
+  #emoji-toggle-write{
+    width: fit-content !important;
+    display: inline-flex !important;
+    padding: 6px 10px !important;
+    margin: 8px 0 0 0 !important;
+  }
+
+  /* ===== FIX: aby bolo vidieť "Čítať viac" ===== */
+  #recent-content .content-item p{
+    max-height: none !important;
+    overflow: visible !important;
+    display: block !important;
+    -webkit-line-clamp: unset !important;
+    -webkit-box-orient: initial !important;
+  }
+
+  .read-more{
+    display: inline-block !important;
+    margin-left: 6px;
+    font-weight: bold;
   }
 
   /* ===== RECENT CONTENT ===== */
