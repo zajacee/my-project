@@ -6,19 +6,23 @@
 @media (max-width: 768px) {
 
   /* ===== BASIC RESET ===== */
-  body {
-    padding: 0 !important;
-    padding-top: 0 !important;
+  html, body {
     overflow-x: hidden;
   }
 
-  /* ===== HEADER (bez prekrývania, logo vyššie) ===== */
+  body {
+    padding: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  /* ===== HEADER ===== */
   header {
     height: auto !important;
-    padding: 15px !important;
-    padding-top: 15px !important;          /* zruší veľkú medzeru hore */
-    text-align: center;
-    position: relative;
+    text-align: center !important;
+    position: relative !important;
+
+    /* ✅ kompaktnejšie + rešpekt pre iPhone notch */
+    padding: calc(10px + env(safe-area-inset-top)) 15px 12px !important;
   }
 
   .top-bar {
@@ -26,58 +30,60 @@
     flex-direction: column !important;
     align-items: stretch !important;
     justify-content: flex-start !important;
-    gap: 10px !important;
+    gap: 8px !important;
     width: 100% !important;
-    position: relative !important;         /* kotva pre hamburger */
+    position: relative !important; /* kotva pre hamburger */
   }
 
   header h1 {
     position: static !important;
-    transform: none !important;            /* dôležité: odstráni hack transformy */
+    transform: none !important;
     margin: 0 !important;
-    padding: 6px 0 2px 0 !important;       /* menší vertikálny padding */
-    font-size: 1.8rem !important;
+    padding: 0 !important;
+
+    font-size: 1.85rem !important;
     line-height: 1.05 !important;
     text-align: center !important;
-
-    margin-top: -4px !important;           /* ✅ opticky vyššie k hamburgeru */
   }
 
   #search-bar {
     position: static !important;
     transform: none !important;
+
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
-    height: 42px;
-    font-size: 16px;
+
+    height: 42px !important;
+    font-size: 16px !important;
   }
 
-  /* ===== HAMBURGER BUTTON (vyššie, zarovnaný s logom) ===== */
+  /* ===== HAMBURGER (rovnaká výška ako DajToVon) ===== */
   #hamburger {
-    display: block;
-    position: absolute;
-    left: 12px;
-    top: 12px !important;                  /* ✅ bolo 18px */
-    z-index: 1101;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 
-    font-size: 28px;
-    line-height: 1;
+    position: absolute !important;
+    left: 12px !important;
 
-    width: auto !important;
+    /* ✅ presne podľa padding-top v headeri */
+    top: calc(10px + env(safe-area-inset-top)) !important;
+
+    z-index: 1101 !important;
+
+    width: 42px !important;
+    height: 42px !important;
+    padding: 0 !important;
     margin: 0 !important;
-    padding: 6px 10px !important;
+
+    font-size: 26px !important;
+    line-height: 1 !important;
 
     background: transparent !important;
     border: none !important;
-    color: #fff;
-    cursor: pointer;
-  }
-
-  /* voliteľne: lepšie vertikálne centrovanie ikonky */
-  #hamburger {
-    display: flex;
-    align-items: center;
+    color: #fff !important;
+    cursor: pointer !important;
   }
 
   /* ===== USER MENU: notifikácie + login doprava ===== */
@@ -107,7 +113,7 @@
   }
 
   /* notifikačný popup nech sa zmestí na mobile */
-  #notification-popup{
+  #notification-popup {
     right: auto !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
@@ -131,7 +137,7 @@
     border-radius: 10px !important;
   }
 
-  /* ===== LOGIN DROPDOWN: pod loginom, užší + centrovaný ===== */
+  /* ===== LOGIN DROPDOWN: auto výška + nič nevypadne ===== */
   #logout-dropdown,
   #logout-dropdown.dropdown {
     position: absolute !important;
@@ -143,12 +149,26 @@
 
     z-index: 3000 !important;
 
-    width: 220px !important;
-    max-width: 80vw !important;
-    min-width: 180px !important;
+    width: 230px !important;
+    max-width: 88vw !important;
+    min-width: 190px !important;
+
+    /* ✅ kľúč: nech sa prispôsobí obsahu */
+    height: auto !important;
+    min-height: unset !important;
+    overflow: visible !important;
+
+    /* ✅ pekná vnútorná výplň */
+    padding: 10px !important;
+    box-sizing: border-box !important;
+
+    /* ✅ kontrolovaná medzera medzi položkami */
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
   }
 
-  /* ✅ FIX: centrovanie textu v dropdown menu */
+  /* položky: natvrdo zrušiť marginy z desktopu */
   #logout-dropdown a,
   #logout-dropdown button {
     width: 100% !important;
@@ -159,23 +179,33 @@
 
     gap: 10px !important;
     text-align: center !important;
+    white-space: nowrap !important;
+
+    margin: 0 !important;              /* ✅ zabije margin-top/bottom */
+    min-height: 44px !important;
+    padding: 12px 14px !important;
 
     font-size: 16px !important;
-    font-weight: 600 !important;
-    line-height: 1.2 !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
 
-    padding: 14px 16px !important;
-    margin: 0 !important;
-    border-radius: 8px !important;
+    border-radius: 10px !important;
   }
 
-  /* ✅ ikony rovnaká veľkosť */
+  /* ikony: nech sú v toku a rovnaká veľkosť */
   #logout-dropdown img,
   #logout-dropdown svg,
   #logout-dropdown i {
-    flex: 0 0 auto;
-    width: 18px;
-    height: 18px;
+    position: static !important;
+    transform: none !important;
+
+    width: 18px !important;
+    height: 18px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    flex: 0 0 auto !important;
   }
 
   /* ===== OVERLAY ===== */
@@ -185,11 +215,12 @@
     inset: 0;
     background: rgba(0,0,0,0.45);
     z-index: 1100;
-    pointer-events: none; /* ✅ aby overlay neblokoval keď je hidden */
+    pointer-events: none;
   }
+
   #overlay.show {
     display: block;
-    pointer-events: auto; /* ✅ kliknutie zavrie menu */
+    pointer-events: auto;
   }
 
   /* ===== SIDEBAR – HAMBURGER MODE ===== */
@@ -210,9 +241,14 @@
 
     z-index: 1200;
   }
-  #sidebar.open { transform: translateX(0); }
 
-  #sidebar h2 { margin-top: 50px !important; }
+  #sidebar.open {
+    transform: translateX(0);
+  }
+
+  #sidebar h2 {
+    margin-top: 50px !important;
+  }
 
   /* ===== CONTENT ===== */
   #content {
@@ -235,36 +271,40 @@
     margin-left: 0 !important;
   }
 
-  textarea { min-height: 160px; }
-
-  /* ===== EMOJI: bez prekrývania + DOĽAVA ===== */
-  .comment-input-wrap { position: relative !important; }
-
-  .emoji-wrap{
-    margin-top: 8px !important;
-    margin-bottom: 10px !important;
-    justify-content: flex-start !important; /* doľava */
+  textarea {
+    min-height: 160px;
   }
 
-  #emoji-toggle-write{
+  /* ===== EMOJI: bez prekrývania + DOĽAVA ===== */
+  .comment-input-wrap {
+    position: relative !important;
+  }
+
+  .emoji-wrap {
+    margin-top: 8px !important;
+    margin-bottom: 10px !important;
+    justify-content: flex-start !important;
+  }
+
+  #emoji-toggle-write {
     width: fit-content !important;
     display: inline-flex !important;
     margin: 0 !important;
     padding: 6px 10px !important;
   }
 
-  .emoji-panel{
+  .emoji-panel {
     width: min(100%, 92vw) !important;
   }
 
   /* ===== SUBMIT button: len submit na 100% ===== */
-  #content-form button[type="submit"]{
+  #content-form button[type="submit"] {
     width: 100% !important;
     margin: 25px 0 0 0 !important;
   }
 
   /* ===== FIX: aby bolo vidieť "Čítať viac" ===== */
-  #recent-content .content-item p{
+  #recent-content .content-item p {
     max-height: none !important;
     overflow: visible !important;
     display: block !important;
@@ -272,14 +312,16 @@
     -webkit-box-orient: initial !important;
   }
 
-  .read-more{
+  .read-more {
     display: inline-block !important;
     margin-left: 6px;
     font-weight: bold;
   }
 
   /* ===== RECENT CONTENT ===== */
-  #recent-content { padding: 15px; }
+  #recent-content {
+    padding: 15px;
+  }
 
   #recent-content h3 {
     flex-direction: column;
@@ -297,5 +339,7 @@
     height: 180px !important;
   }
 
-  .thumbnail { object-fit: contain; }
+  .thumbnail {
+    object-fit: contain;
+  }
 }
