@@ -492,10 +492,10 @@ max-width: 240px !important;
 
    /* IBA tlačidlo "Pridať komentár" */
   #comments-section #post-comment-btn {
-    padding: 8px 14px !important;   /* 🔥 zmenší výšku */
+    padding: 10px 16px !important;   /* 🔥 zmenší výšku */
     font-size: 1rem !important;   /* menší text */
     line-height: 1.1 !important;
-    margin-top: 6px !important;
+    margin-top: 2px !important;
     border-radius: 8px !important;
   }
 }
