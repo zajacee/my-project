@@ -332,3 +332,12 @@
   }
 
 }
+
+@media (max-width: 768px) {
+
+  /* NOTIFIKÁCIE – zarovnať hornú hranu s login dropdownom */
+  #notification-popup {
+    top: calc(100% + 10px) !important; /* ⬇️ rovnaké odsadenie ako login dropdown */
+  }
+
+}
