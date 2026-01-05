@@ -374,8 +374,9 @@
     height: 32px !important;        /* 🔽 späť na menšiu výšku */
     line-height: 32px !important;
 
-    border-radius: 8px !important; /* rovnaký tvar ako hore */
+    border-radius: 6px !important; /* rovnaký tvar ako hore */
     padding: 0 10px !important;    /* primeraný vnútorný spacing */
+    border: 1px solid #333 !important;
   }
 
 }
