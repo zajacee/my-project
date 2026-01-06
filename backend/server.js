@@ -453,7 +453,7 @@ app.post('/register', async (req, res) => {
       toAddress: newUser.email,
       subject: "Overenie e-mailu – DajToVon",
       html: `
-        <p>Ďakujeme za registráciu na <a href="https://dajtovon.sk">DajToVon.sk</a>.</p>
+        <p>Ďakujeme za registráciu na stránkach <a href="https://dajtovon.sk">DajToVon.sk</a>.</p>
         <p>Pre aktiváciu účtu prosím kliknite na overovací odkaz nižšie (platný 24 hodín):</p>
         <p><a href="${verifyUrl}">${verifyUrl}</a></p>
         <hr>
@@ -464,7 +464,7 @@ DajToVon.sk</p>
     });
 
     return res.status(201).json({
-      message: "Registrácia prebehla úspešne! Poslali sme overovací e-mail."
+      message: "Registrácia prebehla úspešne! Poslali sme Vám overovací e-mail."
     });
   } catch (err) {
     console.error(err);
@@ -492,7 +492,7 @@ app.get('/verify-email', async (req, res) => {
     user.emailVerifiedAt = new Date();
     await user.save();
 
-    return res.json({ message: "E-mail bol úspešne overený. Teraz sa môžete prihlásiť." });
+    return res.json({ message: "Váš e-mail bol úspešne overený. Teraz sa môžete prihlásiť." });
   } catch (err) {
     console.error("❌ verify-email:", err);
     return res.status(500).json({ message: "Chyba servera. Skúste neskôr." });
