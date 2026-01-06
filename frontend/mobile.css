@@ -157,7 +157,7 @@
   #logout-dropdown.dropdown button,
   #logout-dropdown button {
     margin-top: 0 !important;
-    padding: 0 14px !important;
+    padding: 0 12px !important;
     height: 50px !important;
     width: 100% !important;
 
@@ -167,7 +167,7 @@
 
     gap: 10px !important;
     font-size: 1rem !important;
-    line-height: 0.8 !important;
+    line-height: 1 !important;
     white-space: nowrap !important;
   }
 
