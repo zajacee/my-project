@@ -449,9 +449,9 @@ app.post('/api/content', authenticateUser, (req, res) => {
     if (err) {
       if (err.name === 'MulterError') {
         if (err.code === 'LIMIT_FILE_SIZE') {
-          return res.status(413).json({ message: 'Súbor je príliš veľký. Max 5 MB.' });
+          return res.status(413).json({ message: 'Maximálna povolená veľkosť obrázku je 5 MB.' });
         }
-        return res.status(400).json({ message: `Chyba pri nahrávaní súboru: ${err.code}` });
+        return res.status(400).json({ message: 'Chyba pri nahrávaní obrázkov. Maximálny povolený počet súborov je 6.' });
       }
       // napr. txt súbor -> "Iba obrazové súbory sú povolené"
       return res.status(400).json({ message: err.message || 'Neplatný súbor.' });
@@ -1219,9 +1219,9 @@ app.put('/edit-content/:id', authenticateUser, (req, res) => {
     if (err) {
       if (err.name === 'MulterError') {
         if (err.code === 'LIMIT_FILE_SIZE') {
-          return res.status(413).json({ message: 'Súbor je príliš veľký. Max 5 MB.' });
+          return res.status(413).json({ message: 'Maximálna povolená veľkosť obrázku je 5 MB.' });
         }
-        return res.status(400).json({ message: `Chyba pri nahrávaní súboru: ${err.code}` });
+        return res.status(400).json({ message: 'Chyba pri nahrávaní obrázkov. Maximálny povolený počet súborov je 6.' });
       }
       return res.status(400).json({
         message: err.message || 'Nahraný súbor má nepodporovaný formát.'
@@ -1304,7 +1304,7 @@ await Promise.all(
 
 const contactPageLimiter = makeRateLimiter({
   windowMs: 30 * 60_000, // 30 minút
-  max: 3,                // max 5 správ za okno
+  max: 3,                // max 3 správy za okno
   keyFn: (req) => `contactPage:${getClientIp(req)}`
 });
 
