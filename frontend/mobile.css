@@ -149,8 +149,8 @@
 
     height: auto !important;
     padding: 6px 0 !important;
-    width: 240px !important;
-    max-width: 90vw !important;
+    width: 200px !important;
+    max-width: 85vw !important;
     border-radius: 10px !important;
   }
 
@@ -520,4 +520,11 @@ max-width: 240px !important;
     margin-top: 6px !important;
     border-radius: 8px !important;
 }
+
+.thumbnail-link{
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
 }
