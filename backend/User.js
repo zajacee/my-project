@@ -58,6 +58,10 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
 
+    emailVerified: { type: Boolean, default: false },
+emailVerifiedAt: { type: Date },
+emailVerifySentAt: { type: Date },
+
     content: { type: [contentSchema], default: [] },
 
     notifications: { type: [notificationSchema], default: [] }

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="sk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Overenie e-mailu</title>
+</head>
+<body style="font-family: Arial; padding: 30px; text-align:center;">
+  <h2 id="title">Overujem e-mail…</h2>
+  <p id="msg"></p>
+
+  <script>
+    const API_BASE =
+      (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+        ? "http://localhost:3000"
+        : "https://api.dajtovon.sk";
+
+    const token = new URLSearchParams(location.search).get("token");
+    const title = document.getElementById("title");
+    const msg = document.getElementById("msg");
+
+    if (!token) {
+      title.textContent = "Chýba token";
+      msg.textContent = "Overovací odkaz je neplatný.";
+    } else {
+      fetch(`${API_BASE}/verify-email?token=${encodeURIComponent(token)}`)
+        .then(r => r.json().catch(() => ({})).then(d => ({ ok: r.ok, d })))
+        .then(({ ok, d }) => {
+          title.textContent = ok ? "E-mail overený ✅" : "Overenie zlyhalo ❌";
+          msg.textContent = d.message || (ok ? "Teraz sa môžete prihlásiť." : "Skúste si vyžiadať nový overovací e-mail.");
+        })
+        .catch(() => {
+          title.textContent = "Chyba";
+          msg.textContent = "Nepodarilo sa spojiť so serverom.";
+        });
+    }
+  </script>
+</body>
+</html>

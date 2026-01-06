@@ -89,10 +89,12 @@ if (!PASSWORD_RESET_SECRET) {
   throw new Error("Missing PASSWORD_RESET_SECRET env variable");
 }
 
-function base64url(buf) {
-  return Buffer.from(buf).toString('base64')
+function base64url(input) {
+  return Buffer.from(input, 'utf8')
+    .toString('base64')
     .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
 }
+
 
 function signResetToken(payloadObj) {
   const payload = base64url(JSON.stringify(payloadObj));
@@ -122,6 +124,44 @@ function verifyResetToken(token) {
 
   return json;
 }
+
+// ================= EMAIL VERIFY TOKEN =================
+const EMAIL_VERIFY_SECRET = process.env.EMAIL_VERIFY_SECRET;
+if (!EMAIL_VERIFY_SECRET) {
+  throw new Error("Missing EMAIL_VERIFY_SECRET env variable");
+}
+
+function signEmailVerifyToken(payloadObj) {
+  const payload = base64url(JSON.stringify(payloadObj));
+  const sig = base64url(
+    crypto.createHmac('sha256', EMAIL_VERIFY_SECRET).update(payload).digest()
+  );
+  return `${payload}.${sig}`;
+}
+
+function verifyEmailVerifyToken(token) {
+  const [payload, sig] = String(token || '').split('.');
+  if (!payload || !sig) return null;
+
+  const expected = base64url(
+    crypto.createHmac('sha256', EMAIL_VERIFY_SECRET).update(payload).digest()
+  );
+
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return null;
+  if (!crypto.timingSafeEqual(a, b)) return null;
+
+  const json = JSON.parse(
+    Buffer.from(payload.replace(/-/g,'+').replace(/_/g,'/'), 'base64').toString('utf8')
+  );
+
+  if (!json?.uid || !json?.exp) return null;
+  if (Date.now() > json.exp) return null;
+
+  return json;
+}
+
 
 
 // ✅ Behind Render proxy
@@ -233,8 +273,11 @@ app.post('/forgot-password', async (req, res) => {
         <p>Pre obnovenie hesla prosím kliknite na odkaz nižšie (platný 30 minút):</p>
         <p><a href="${resetUrl}">${resetUrl}</a></p>
         <hr>
-        <p>Ak ste o obnovenie hesla nepožiadali vy, tento e-mail prosím ignorujte.
-Z bezpečnostných dôvodov sa v tomto prípade na Vašom účte nevykonajú žiadne zmeny.</p>
+        <p>Ak ste o obnovenie hesla nepožiadali vy, prosím, NEKLIKAJTE na odkaz a tento e-mail ignorujte.
+</p>
+<p>S pozdravom,<br>
+DajToVon.sk
+</p>
       `
     });
 
@@ -371,40 +414,91 @@ app.get('/protected-route', authenticateUser, (req, res) => {
 
 // ✅ **User Registration**
 app.post('/register', async (req, res) => {
-    const { username, email, password } = req.body;
+  const { username, email, password } = req.body;
 
-    // Validate input
-    if (!username || !email || !password) {
-        return res.status(400).json({ message: "Prosím, vyplňte všetky polia" });
+  if (!username || !email || !password) {
+    return res.status(400).json({ message: "Prosím, vyplňte všetky polia" });
+  }
+
+  try {
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+      return res.status(400).json({ message: "Zadané používateľské meno alebo e-mail už existuje" });
     }
 
-    try {
-        // Check if the user already exists in the database
-        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-        if (existingUser) {
-            return res.status(400).json({ message: "Zadané používateľské meno alebo e-mail už existuje" });
-        }
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Hash the password before saving it to the database
-        const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({
+      username,
+      email: String(email).toLowerCase().trim(),
+      password: hashedPassword,
+      emailVerified: false,
+      emailVerifySentAt: new Date(),
+      content: []
+    });
 
-        // Create a new user instance
-        const newUser = new User({
-            username,
-            email,
-            password: hashedPassword,
-            content: []  // Empty content field for the new user
-        });
+    await newUser.save();
 
-        // Save the user to the database
-        await newUser.save();
+    // ✅ vytvor overovací link
+    const token = signEmailVerifyToken({
+      uid: String(newUser._id),
+      exp: Date.now() + 24 * 60 * 60 * 1000 // 24 hodín
+    });
 
-        res.status(201).json({ message: "Registrácia prebehla úspešne!" });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Chyba servera, skúste to prosím neskôr" });
-    }
+    const base = (process.env.PUBLIC_FRONTEND_URL || 'https://dajtovon.sk').replace(/\/+$/, '');
+    const verifyUrl = `${base}/verify-email.html?token=${encodeURIComponent(token)}`;
+
+    // ✅ pošli email
+    await sendZohoMail({
+      toAddress: newUser.email,
+      subject: "Overenie e-mailu – DajToVon",
+      html: `
+        <p>Ďakujeme za registráciu na <a href="https://dajtovon.sk">DajToVon.sk</a>.</p>
+        <p>Pre aktiváciu účtu prosím kliknite na overovací odkaz nižšie (platný 24 hodín):</p>
+        <p><a href="${verifyUrl}">${verifyUrl}</a></p>
+        <hr>
+        <p>Ak ste o registráciu nežiadali vy, tento e-mail prosím ignorujte.</p>
+        <p>S pozdravom,<br>
+DajToVon.sk</p>
+      `
+    });
+
+    return res.status(201).json({
+      message: "Registrácia prebehla úspešne! Poslali sme overovací e-mail."
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Chyba servera, skúste to prosím neskôr" });
+  }
 });
+
+app.get('/verify-email', async (req, res) => {
+  try {
+    const token = req.query.token;
+    const payload = verifyEmailVerifyToken(token);
+
+    if (!payload) {
+      return res.status(400).json({ message: "Overovací odkaz je neplatný alebo expirovaný." });
+    }
+
+    const user = await User.findById(payload.uid);
+    if (!user) return res.status(400).json({ message: "Neplatný odkaz." });
+
+    if (user.emailVerified) {
+      return res.json({ message: "E-mail je už overený." });
+    }
+
+    user.emailVerified = true;
+    user.emailVerifiedAt = new Date();
+    await user.save();
+
+    return res.json({ message: "E-mail bol úspešne overený. Teraz sa môžete prihlásiť." });
+  } catch (err) {
+    console.error("❌ verify-email:", err);
+    return res.status(500).json({ message: "Chyba servera. Skúste neskôr." });
+  }
+});
+
 
 // ✅ **User Login**
 app.post('/login', async (req, res) => {
@@ -418,6 +512,12 @@ app.post('/login', async (req, res) => {
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).json({ message: "Neplatné prihlasovacie údaje" });
         }
+
+        if (!user.emailVerified) {
+  return res.status(403).json({
+    message: "Najprv si overte e-mail. Skontrolujte schránku (aj SPAM)."
+  });
+}
 
         // Create a JWT token with the user's details
         const token = jwt.sign({ username: user.username, email: user.email }, SECRET_KEY, { expiresIn: '1h' });

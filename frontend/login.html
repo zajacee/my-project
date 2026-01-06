@@ -410,12 +410,17 @@
         });
 
         const data = await response.json().catch(() => ({}));
-        showAlert(data.message || "Registrácia prebehla.");
 
-        if (response.ok) {
-          document.querySelector('.login-container').style.display = 'block';
-          document.getElementById('register-form').style.display = 'none';
-        }
+if (response.ok) {
+  showAlert(
+    "Registrácia prebehla úspešne.\nNa váš e-mail sme poslali overovací odkaz. Najprv potvrďte účet a potom sa prihláste."
+  );
+
+  document.querySelector('.login-container').style.display = 'block';
+  document.getElementById('register-form').style.display = 'none';
+} else {
+  showAlert(data.message || "Registrácia sa nepodarila.");
+}
       } catch (error) {
         showAlert("Nastala chyba. Skúste to znova.");
       }
