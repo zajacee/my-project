@@ -12,6 +12,10 @@ const API_BASE_URL = window.API_BASE || (
 
 const apiFetchUrl = window.api || ((path) => `${API_BASE_URL}${path}`);
 
+if (!sessionStorage.getItem("api_warm")) {
+  sessionStorage.setItem("api_warm", "1");
+  fetch(apiFetchUrl("/health"), { cache: "no-store" }).catch(() => {});
+}
 
 function timeAgo(timestamp) {
   const now = new Date();
