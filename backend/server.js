@@ -515,7 +515,7 @@ app.post('/login', async (req, res) => {
 
         if (!user.emailVerified) {
   return res.status(403).json({
-    message: "Najprv si overte e-mail. Skontrolujte schránku (aj SPAM)."
+    message: "Najprv overte Váš e-mail. Skontrolujte prosím zadanú e-mailovu schránku (aj SPAM)."
   });
 }
 
