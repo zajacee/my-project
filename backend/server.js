@@ -1385,7 +1385,7 @@ const publicUrl =
   try {
     await sendZohoMail({
   toAddress: owner.email,      // autor príspevku
-  replyTo: process.env.ZOHO_FROM_ADDRESS, // overená Zoho adresa     
+  replyTo: senderEmail, // ✅ sem daj email prihláseného používateľa     
   subject: `Správa k Vášmu príspevku: ${item.topic}`,
   html: `
   <p>
