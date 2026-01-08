@@ -1149,12 +1149,16 @@ function updateReactionStyles() {
 }).join('');
 
 
-    const formattedContent = item.content
-  .split('\n') // rozdelí každé nové zalomenie
-  .map(line => escapeHtml(line.trim()))  // ✅ escape here
-  .filter(line => line.length > 0) // ignoruj prázdne riadky
-  .map(line => `<p>${line}</p>`)
+ const formattedContent = item.content
+  .split(/\n\s*\n/) // odseky: prázdny riadok = nový odsek
+  .map(block => block.trim())
+  .filter(Boolean)
+  .map(block => {
+    const lines = block.split('\n').map(l => escapeHtml(l));
+    return `<p>${lines.join('<br>')}</p>`;
+  })
   .join('');
+
 
   document.getElementById('content-detail').innerHTML = `
   <h2>${escapeHtml(item.topic)}</h2>
