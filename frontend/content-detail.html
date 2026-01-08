@@ -1149,15 +1149,12 @@ function updateReactionStyles() {
 }).join('');
 
 
- const formattedContent = item.content
-  .split(/\n\s*\n/) // odseky: prázdny riadok = nový odsek
-  .map(block => block.trim())
-  .filter(Boolean)
-  .map(block => {
-    const lines = block.split('\n').map(l => escapeHtml(l));
-    return `<p>${lines.join('<br>')}</p>`;
-  })
+const formattedContent = escapeHtml(item.content)
+  .trim()
+  .split(/\n\s*\n+/)                 // odsek = prázdny riadok
+  .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)  // riadok v odseku = <br>
   .join('');
+
 
 
   document.getElementById('content-detail').innerHTML = `
