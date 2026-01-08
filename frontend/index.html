@@ -78,21 +78,6 @@ header h1 {
     width: 100%;
 }
 
-.page-intro{
-  max-width: 900px;
-  margin: 0 auto 18px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-
-  color: #555;
-  font-size: 1rem;
-  line-height: 1.65;
-}
-
-
-
 /* Basic styling for the cookie banner */
 .cookie-banner {
     display: none; /* Hide it by default */
@@ -528,6 +513,7 @@ header h1 {
             cursor: pointer;
             font-size: 18px;
             width: auto;
+            min-width: 220px;
             display: block;
             margin-left: auto;
             margin-top: 30px;
@@ -782,14 +768,7 @@ footer {
      <div id="overlay"></div>
 
     <div id="content">
-
-  <p class="page-intro">
-    Vitajte na DajToVon.sk, platforme určenej na zdieľanie informácií, skúseností a predmetov.
-    Naším cieľom je prinášať vecný a prehľadný obsah s praktickým prínosom.
-    Pridaním príspevku môžete prispieť k výmene poznatkov a nových podnetov.
-  </p>
-
-  <h2>Pridať príspevok</h2>
+        <h2>Pridať príspevok</h2>
         <form id="content-form">
             <label for="title" class="bold-text">Téma</label>
             <input type="text" id="title" placeholder="Názov témy" required
