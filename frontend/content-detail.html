@@ -4,7 +4,26 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Content Detail</title>
+    <meta property="og:image" content="https://dajtovon.sk/logo.png" />
+<meta name="twitter:image" content="https://dajtovon.sk/logo.png" />
+    <title>DajToVon – príspevok</title>
+
+    <meta name="description" content="Príspevok na DajToVon.sk." />
+<link rel="canonical" href="https://dajtovon.sk/content-detail.html" />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="DajToVon" />
+<meta property="og:title" content="DajToVon" />
+<meta property="og:description" content="Príspevok na DajToVon.sk." />
+<meta property="og:url" content="https://dajtovon.sk/content-detail.html" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="DajToVon" />
+<meta name="twitter:description" content="Príspevok na DajToVon.sk." />
+
+<!-- sem doplníme JSON-LD cez JS -->
+<script type="application/ld+json" id="ld-json">{}</script>
+
     <link rel="stylesheet" href="style.css">
     <style>
         /* Reset styles */
@@ -357,7 +376,7 @@ header h1 {
             margin-bottom: 20px;
         }
 
-        #content-detail h2 {
+        #content-detail h1 {
     white-space: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -656,6 +675,37 @@ const api = (path) => `${API_BASE}${path}`;
             ine: "Iné"
         };
 
+    function setMeta(name, content, isProperty = false) {
+  const attr = isProperty ? 'property' : 'name';
+  let tag = document.querySelector(`meta[${attr}="${name}"]`);
+  if (!tag) {
+    tag = document.createElement('meta');
+    tag.setAttribute(attr, name);
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute('content', content);
+}
+
+function setCanonical(url) {
+  let link = document.querySelector('link[rel="canonical"]');
+  if (!link) {
+    link = document.createElement('link');
+    link.rel = 'canonical';
+    document.head.appendChild(link);
+  }
+  link.href = url;
+}
+
+function toPlainText(s) {
+  return String(s ?? '').replace(/\s+/g, ' ').trim();
+}
+
+function truncate(s, n=160) {
+  s = toPlainText(s);
+  return s.length > n ? s.slice(0, n-1) + '…' : s;
+}
+
+
         // ✅ Relative time helper
 function timeAgo(timestamp) {
   const now = new Date();
@@ -874,6 +924,58 @@ function escapeHtml(unsafe) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+// 1) URL stránky (canonical)
+const pageUrl = `https://dajtovon.sk/content-detail.html?contentId=${encodeURIComponent(contentId)}`;
+setCanonical(pageUrl);
+
+// 2) Title + description
+const topic = toPlainText(item.topic);
+const desc  = truncate(item.content, 160);
+
+document.title = `${topic} | DajToVon`;
+setMeta('description', desc);
+
+// 3) OG + Twitter
+setMeta('og:title', topic, true);
+setMeta('og:description', desc, true);
+setMeta('og:url', pageUrl, true);
+
+setMeta('twitter:title', topic);
+setMeta('twitter:description', desc);
+
+// 4) OG image (ak máš aspoň 1 obrázok)
+const firstImg = (item.images && item.images.length) ? imageToUrl(item.images[0]) : 'https://dajtovon.sk/logo.png';
+if (firstImg) {
+  setMeta('og:image', firstImg, true);
+  setMeta('twitter:image', firstImg);
+}
+
+// 5) JSON-LD (Article)
+const ld = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": topic,
+  "datePublished": item.date,
+  "dateModified": item.date,
+  "author": {
+    "@type": "Person",
+    "name": entry.username
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "DajToVon",
+    "url": "https://dajtovon.sk/"
+  },
+  "mainEntityOfPage": pageUrl,
+  "url": pageUrl
+};
+
+if (firstImg) ld.image = [firstImg];
+
+const ldTag = document.getElementById('ld-json');
+if (ldTag) ldTag.textContent = JSON.stringify(ld);
+
 
 let allComments = [];
 let commentsIndex = 0;
@@ -1160,7 +1262,7 @@ const formattedContent = escapeHtml(item.content)
 
 
   document.getElementById('content-detail').innerHTML = `
-  <h2>${escapeHtml(item.topic)}</h2>
+  <h1>${escapeHtml(item.topic)}</h1>
   ${formattedContent}
   <div style="margin-bottom: 20px;"></div>
   <p class="category-line"><strong>Kategória:</strong> <a href="${item.category.toLowerCase()}.html" style="color: #517dcf;">${categoryMapping[item.category] || item.category}</a></p>
