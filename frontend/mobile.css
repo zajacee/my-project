@@ -527,4 +527,12 @@ max-width: 240px !important;
   height: 100% !important;
 }
 
+  .page-intro{
+    text-align: justify !important;
+    text-justify: inter-word;
+    hyphens: auto;
+    word-break: normal;
+    overflow-wrap: anywhere;
+  }
+
 }
