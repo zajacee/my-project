@@ -379,33 +379,29 @@ header h1 {
 
 /* link riadok vždy pod gridom, pekne v jednom rade */
 .share-link-row{
-  display:grid;
-  grid-template-columns: 1fr auto;
+  display:flex;
   gap: 10px;
   margin-top: 10px;
-  align-items: stretch; /* aby boli rovnako vysoké */
+  align-items: center;          /* ✅ zarovnanie do jednej línie */
 }
 
 #share-link{
-  width: 100%;
+  flex: 1;
+  height: 44px;
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid #ddd;
   font-size: 1rem;
 }
 
-/* Kopírovať môže byť trošku kratšie */
-.share-copy{ padding: 10px 14px; }
-
-#share-link{
+#share-copy-2{
   height: 44px;
-  padding: 10px 12px;
-}
-
-.share-chip.share-copy{
-  height: 44px;          /* rovnaká výška ako input */
-  padding: 0 14px;       /* bez vertikálneho nafúknutia */
+  padding: 0 14px;
   white-space: nowrap;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin: 0;                    /* ✅ istota */
 }
 
     
@@ -1423,7 +1419,7 @@ const formattedContent = escapeHtml(item.content)
 
 </div>
 
- <div id="comments-section" style="margin-top: 40px; background-color: #fefefe; border: 1px solid #ddd; border-radius: 8px; padding: 20px;">
+ <div id="comments-section" style="margin-top: 20px; background-color: #fefefe; border: 1px solid #ddd; border-radius: 8px; padding: 20px;">
   <div class="comment-input-wrap">
     <textarea id="comment-input" rows="3" placeholder="Sem napíšte komentár..."></textarea>
 
