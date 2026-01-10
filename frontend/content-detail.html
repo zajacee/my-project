@@ -333,57 +333,68 @@ header h1 {
   user-select: none;
 }
 
-.share-panel {
-  display: none;
-  margin-top: 10px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 10px;
+.share-panel{
+  display:none;
+  margin-top: 6px;
+  background:#fff;
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:12px;
   max-width: 520px;
 }
 
-.share-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 tlačidlá v rade */
-  gap: 8px;
-  margin-bottom: 8px;
+.share-grid{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
 }
 
-.share-chip {
-  display: inline-flex;
-  align-items: center;
+.share-chip{
+  width: 100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   gap: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid #475569;
   border-radius: 999px;
-  padding: 8px 12px;
-  background: #3498db;
+  padding: 10px 12px;
+  background: #334155;
+  color: #fff;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 1rem;         /* rovnaké ako obsah */
 }
 
-.share-chip:hover { background: #eef2f7; }
+.share-chip span{ color:#fff; }
 
-.share-chip img {
+.share-chip:hover{
+  background:#1e293b;
+}
+
+.share-chip img{
   width: 18px;
   height: 18px;
+  filter: brightness(0) invert(1);
 }
 
-.share-link-row {
-  display: grid;
+/* link riadok vždy pod gridom, pekne v jednom rade */
+.share-link-row{
+  display:grid;
   grid-template-columns: 1fr auto;
-  gap: 8px;
-  align-items: center;
-  margin-top: 6px;
+  gap: 10px;
+  margin-top: 10px;
+  align-items:center;
 }
 
-#share-link {
-  flex: 1;
-  padding: 8px;
-  border-radius: 8px;
+#share-link{
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
   border: 1px solid #ddd;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
+
+/* Kopírovať môže byť trošku kratšie */
+.share-copy{ padding: 10px 14px; }
 
     
         /* Sidebar Styling */
@@ -1369,40 +1380,34 @@ const formattedContent = escapeHtml(item.content)
   </div>
 
   <!-- 2. riadok -->
-  <div id="share-row" style="margin-top: 6px;">
+  <div id="share-row" style="margin-top: 4px;">
     <span id="share-btn" title="Zdieľať" style="cursor:pointer;">📤 Zdieľať</span>
 
-    <div id="share-panel" class="share-panel">
-      <div class="share-grid">
-        <button type="button" class="share-chip" id="share-native" title="Zdieľať cez zariadenie">
-          📲 <span>Zdieľať</span>
-        </button>
+<div id="share-panel" class="share-panel">
+  <div class="share-grid">
+    <button type="button" class="share-chip" id="share-native" title="Zdieľať cez zariadenie">📲 <span>Zdieľať</span></button>
+    <button type="button" class="share-chip" id="share-linkedin" title="Zdieľať na LinkedIn">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg" alt="LinkedIn">
+      <span>LinkedIn</span>
+    </button>
+    <button type="button" class="share-chip" id="share-facebook" title="Zdieľať na Facebook">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook">
+      <span>Facebook</span>
+    </button>
+    <button type="button" class="share-chip" id="share-x" title="Zdieľať na X">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X">
+      <span>X</span>
+    </button>
 
-        <button type="button" class="share-chip" id="share-linkedin" title="Zdieľať na LinkedIn">
-          <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg" alt="LinkedIn">
-          <span>LinkedIn</span>
-        </button>
-
-        <button type="button" class="share-chip" id="share-facebook" title="Zdieľať na Facebook">
-          <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook">
-          <span>Facebook</span>
-        </button>
-
-        <button type="button" class="share-chip" id="share-x" title="Zdieľať na X">
-          <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X">
-          <span>X</span>
-        </button>
-
-        <button type="button" class="share-chip" id="share-email" title="Poslať e-mailom">
-          ✉️ <span>E-mail</span>
-        </button>
-
-        <div class="share-link-row">
-        <input id="share-link" type="text" readonly>
-        <button type="button" class="share-chip" id="share-copy-2" title="Skopírovať odkaz">📋 Kopírovať</button>
-      </div>
-    </div>
+    <button type="button" class="share-chip" id="share-email" title="Poslať e-mailom">✉️ <span>E-mail</span></button>
   </div>
+
+  <div class="share-link-row">
+    <input id="share-link" type="text" readonly>
+    <button type="button" class="share-chip share-copy" id="share-copy-2" title="Skopírovať odkaz">📋 <span>Kopírovať</span></button>
+  </div>
+</div>
+
 
 </div>
 
@@ -1543,7 +1548,7 @@ if (shareBtn) {
 document.addEventListener('click', (e) => {
   if (!sharePanel) return;
   if (sharePanel.style.display !== 'block') return;
-  if (sharePanel.contains(e.target) || e.target === shareBtn) return;
+  if (sharePanel.contains(e.target) || shareBtn.contains(e.target)) return;
   closeSharePanel();
 });
 
