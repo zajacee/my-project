@@ -794,7 +794,7 @@ function loadRecentContent(sortOption = 'date', filter = '') {
 
       // ak nič nie je
       if (allFilteredContent.length === 0) {
-        container.innerHTML = `<p style="color:#666; font-style:italic;">Zatiaľ nemáte žiadne obľúbené.</p>`;
+        container.innerHTML = `<p style="color:#666; font-style:italic;">Zatiaľ nemáte žiadne obľúbené príspevky.</p>`;
         const loadMoreButton = document.getElementById('load-more-button');
         if (loadMoreButton) loadMoreButton.style.display = 'none';
         return;
