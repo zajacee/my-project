@@ -1562,18 +1562,19 @@ const btnCopy2    = document.getElementById('share-copy-2');
 
 function openSharePanel() {
   if (!sharePanel) return;
-  sharePanel.style.display = 'block';
+  sharePanel.classList.add('open');
 }
 
 function toggleSharePanel() {
   if (!sharePanel) return;
-  sharePanel.style.display = (sharePanel.style.display === 'block') ? 'none' : 'block';
+  sharePanel.classList.toggle('open');
 }
 
 function closeSharePanel() {
   if (!sharePanel) return;
-  sharePanel.style.display = 'none';
+  sharePanel.classList.remove('open');
 }
+
 
 if (shareLinkInput) shareLinkInput.value = pageUrl;
 
@@ -1584,13 +1585,13 @@ if (shareBtn) {
   });
 }
 
-// klik mimo zatvorí panel
 document.addEventListener('click', (e) => {
   if (!sharePanel) return;
-  if (sharePanel.style.display !== 'block') return;
+  if (!sharePanel.classList.contains('open')) return;
   if (sharePanel.contains(e.target) || shareBtn.contains(e.target)) return;
   closeSharePanel();
 });
+
 
 // Native share (mobil)
 if (btnNative) {

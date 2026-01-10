@@ -549,6 +549,10 @@ max-width: 240px !important;
     justify-content: flex-start !important;
   }
 
+  #share-panel.open{
+  display: block !important;
+}
+
   /* panel na celú šírku mobilu */
   #share-panel.share-panel{
     max-width: 100% !important;
