@@ -544,7 +544,7 @@ max-width: 240px !important;
 
   /* share panel nesmie centrovať obsah */
   #share-panel{
-    display: block !important;
+    display: none !important;
     align-items: flex-start !important;
     justify-content: flex-start !important;
   }
@@ -601,5 +601,17 @@ max-width: 240px !important;
     font-size: 0.95rem !important;
     white-space: nowrap !important;
   }
+
+  /* aby input vedel zmenšiť šírku v flexe */
+#share-panel .share-link-row #share-link{
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+/* copy tlačidlo nesmie byť 100% */
+#share-panel .share-link-row #share-copy-2{
+  width: auto !important;
+  flex: 0 0 auto !important;
+}
 
 }
