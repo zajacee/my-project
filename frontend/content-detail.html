@@ -286,6 +286,49 @@ header h1 {
   font-weight: bold;
 }
 
+/* Interaction sekcia – všetko zarovnať naľavo */
+#interaction-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;  /* ✅ nalavo */
+  gap: 8px;                 /* medzera medzi riadkami */
+}
+
+/* Riadky v interaction sekcii */
+#stats-row,
+#share-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* ✅ nalavo */
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.95rem;          /* ✅ menšie, konzistentné */
+  color: #555;
+}
+
+/* Samotné tlačidlo Zdieľať */
+#share-btn {
+  font-size: 0.95rem;  /* ✅ rovnaké ako riadok */
+  margin-left: 0;      /* ✅ odstráni odsadenie */
+}
+
+/* Panel nech tiež sedí naľavo pod "Zdieľať" */
+#share-panel {
+  margin-left: 0;
+  max-width: 520px;
+}
+
+/* Čipy trochu menšie (aby to nelietalo veľkosťou) */
+.share-chip {
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
+
+.share-link-row #share-link {
+  font-size: 0.9rem;
+}
+
     .alert-box {
       background-color: white;
       margin: 0 auto;
@@ -1395,14 +1438,9 @@ const formattedContent = escapeHtml(item.content)
           ✉️ <span>E-mail</span>
         </button>
 
-        <button type="button" class="share-chip" id="share-copy" title="Skopírovať odkaz">
-          📋 <span>Kopírovať</span>
-        </button>
-      </div>
-
-      <div class="share-link-row">
+        <div class="share-link-row">
         <input id="share-link" type="text" readonly>
-        <button type="button" class="share-chip" id="share-copy-2">📋 Kopírovať</button>
+        <button type="button" class="share-chip" id="share-copy-2" title="Skopírovať odkaz">📋 Kopírovať</button>
       </div>
     </div>
   </div>
@@ -1554,25 +1592,18 @@ document.addEventListener('click', (e) => {
 if (btnNative) {
   if (!navigator.share) {
     btnNative.style.opacity = '0.5';
+    btnNative.style.pointerEvents = 'none';
     btnNative.title = 'Zdieľanie cez zariadenie nie je podporované';
+  } else {
+    btnNative.addEventListener('click', async () => {
+      try {
+        await navigator.share({ title: topic, text: desc, url: pageUrl });
+        closeSharePanel();
+      } catch (err) {}
+    });
   }
-  btnNative.addEventListener('click', async () => {
-    try {
-      if (!navigator.share) {
-        showAlert("Zdieľanie cez zariadenie nie je dostupné. Použite ikony LinkedIn/Facebook alebo kopírovať odkaz.");
-        return;
-      }
-      await navigator.share({
-        title: topic,
-        text: desc,
-        url: pageUrl
-      });
-      closeSharePanel();
-    } catch (err) {
-      // user cancel = ok
-    }
-  });
 }
+
 
 function popup(url) {
   window.open(url, '_blank', 'noopener,noreferrer');
@@ -1650,11 +1681,6 @@ if (shareLinkInput) {
     shareLinkInput.select();
   });
 }
-
-// pri renderi môže byť panel schovaný, ale link je pripravený
-openSharePanel();
-closeSharePanel();
-
 
 const commentsLoadMoreBtn = document.getElementById('comments-load-more-button');
 if (commentsLoadMoreBtn) {
