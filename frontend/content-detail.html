@@ -344,10 +344,10 @@ header h1 {
 }
 
 .share-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 tlačidlá v rade */
   gap: 8px;
-  align-items: center;
+  margin-bottom: 8px;
 }
 
 .share-chip {
@@ -370,10 +370,11 @@ header h1 {
 }
 
 .share-link-row {
-  margin-top: 10px;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto;
   gap: 8px;
   align-items: center;
+  margin-top: 6px;
 }
 
 #share-link {
@@ -1368,7 +1369,7 @@ const formattedContent = escapeHtml(item.content)
   </div>
 
   <!-- 2. riadok -->
-  <div id="share-row" style="margin-top: 10px;">
+  <div id="share-row" style="margin-top: 6px;">
     <span id="share-btn" title="Zdieľať" style="cursor:pointer;">📤 Zdieľať</span>
 
     <div id="share-panel" class="share-panel">
