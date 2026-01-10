@@ -336,11 +336,11 @@ header h1 {
 #share-row { margin-top: 2px !important; }
 .share-panel{
   display:none;
-  margin-top: 4px;
   background:#fff;
   border:1px solid #ddd;
   border-radius:10px;
-  padding: 8px 10px;
+  padding: 6px 10px !important;
+  margin-top: 4px !important;
   max-width:520px;
 }
 
@@ -348,7 +348,7 @@ header h1 {
   display:grid;
   margin-top: 0;    
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+  gap: 6px !important; 
 }
 
 .share-chip{
@@ -359,7 +359,7 @@ header h1 {
   gap: 8px;
   border: 1px solid #475569;
   border-radius: 999px;
-  padding: 10px 12px;
+  padding: 6px 12px !important;
   background: #2980b9;
   color: #fff;
   cursor: pointer;
@@ -381,23 +381,23 @@ header h1 {
 /* link riadok vždy pod gridom, pekne v jednom rade */
 .share-link-row{
   display:flex;
-  gap: 10px;
-  margin-top: 6px;
+  margin-top: 6px !important;
+  gap: 10px !important;
   align-items: center;          /* ✅ zarovnanie do jednej línie */
 }
 
 #share-link{
   flex: 1;
-  height: 44px;
-  padding: 10px 12px;
+  height: 36px !important;
+  padding: 6px 12px !important;
   border-radius: 10px;
   border: 1px solid #ddd;
   font-size: 1rem;
 }
 
 #share-copy-2{
-  height: 44px;
-  padding: 0 14px;
+  height: 36px !important;
+  padding: 0 14px !important; 
   white-space: nowrap;
   display:flex;
   align-items:center;

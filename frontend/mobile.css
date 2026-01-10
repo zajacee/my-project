@@ -534,5 +534,68 @@ max-width: 240px !important;
     word-break: normal;
     overflow-wrap: anywhere;
   }
+  /* SHARE: nech je pod stats a zarovno */
+  #share-row{
+    margin-top: 0 !important;
+  }
+
+  /* panel na celú šírku mobilu */
+  #share-panel.share-panel{
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 10px !important;
+    border-radius: 12px !important;
+  }
+
+  /* GRID: 2 stĺpce (na mobile 4 stĺpce vyzerá zle) */
+  #share-panel .share-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    margin-top: 0 !important;
+  }
+
+  /* chipy nižšie a kompaktnejšie */
+  #share-panel .share-chip{
+    min-height: 36px !important;
+    padding: 6px 10px !important;
+    font-size: 0.95rem !important;
+    line-height: 1 !important;
+    border-radius: 999px !important;
+  }
+
+  /* ikonky trošku menšie */
+  #share-panel .share-chip img{
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* link riadok: input + copy pekne v jednom rade */
+  #share-panel .share-link-row{
+    display: flex !important;
+    gap: 8px !important;
+    margin-top: 10px !important;
+    align-items: center !important;
+  }
+
+  #share-link{
+    height: 36px !important;
+    padding: 6px 10px !important;
+    font-size: 0.95rem !important;
+    border-radius: 10px !important;
+  }
+
+  #share-copy-2{
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 12px !important;
+    font-size: 0.95rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* ak by sa ešte niekde držal "X" chip príliš široký */
+  #share-panel .share-chip span{
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
 
 }
