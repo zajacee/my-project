@@ -333,14 +333,15 @@ header h1 {
   user-select: none;
 }
 
+#share-row { margin-top: 2px !important; }
 .share-panel{
   display:none;
-  margin-top: 6px;
+  margin-top: 4px;
   background:#fff;
   border:1px solid #ddd;
   border-radius:10px;
-  padding:12px;
-  max-width: 520px;
+  padding:10px;
+  max-width:520px;
 }
 
 .share-grid{
@@ -358,7 +359,7 @@ header h1 {
   border: 1px solid #475569;
   border-radius: 999px;
   padding: 10px 12px;
-  background: #334155;
+  background: #2980b9;
   color: #fff;
   cursor: pointer;
   font-size: 1rem;         /* rovnaké ako obsah */
@@ -382,7 +383,7 @@ header h1 {
   grid-template-columns: 1fr auto;
   gap: 10px;
   margin-top: 10px;
-  align-items:center;
+  align-items: stretch; /* aby boli rovnako vysoké */
 }
 
 #share-link{
@@ -395,6 +396,17 @@ header h1 {
 
 /* Kopírovať môže byť trošku kratšie */
 .share-copy{ padding: 10px 14px; }
+
+#share-link{
+  height: 44px;
+  padding: 10px 12px;
+}
+
+.share-chip.share-copy{
+  height: 44px;          /* rovnaká výška ako input */
+  padding: 0 14px;       /* bez vertikálneho nafúknutia */
+  white-space: nowrap;
+}
 
     
         /* Sidebar Styling */
@@ -1369,7 +1381,7 @@ const formattedContent = escapeHtml(item.content)
 
   <div class="content-images">${imagesHTML}</div>
 
-<div id="interaction-section" style="margin-top: 20px; font-size: 1rem; color: #555;">
+<div id="interaction-section" style="margin-top: 8px; font-size: 1rem; color: #555;">
   
   <!-- 1. riadok -->
   <div id="stats-row">
@@ -1380,7 +1392,7 @@ const formattedContent = escapeHtml(item.content)
   </div>
 
   <!-- 2. riadok -->
-  <div id="share-row" style="margin-top: 4px;">
+  <div id="share-row">
     <span id="share-btn" title="Zdieľať" style="cursor:pointer;">📤 Zdieľať</span>
 
 <div id="share-panel" class="share-panel">
