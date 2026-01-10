@@ -321,6 +321,68 @@ header h1 {
   transform: scale(1.2);
 }
 
+/* ===== SHARE ===== */
+#share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  margin-left: 10px;
+  font-size: 1.2rem;
+  user-select: none;
+}
+
+.share-panel {
+  display: none;
+  margin-top: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px;
+  max-width: 520px;
+}
+
+.share-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.share-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #ddd;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: #f7fafc;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.share-chip:hover { background: #eef2f7; }
+
+.share-chip img {
+  width: 18px;
+  height: 18px;
+}
+
+.share-link-row {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#share-link {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+}
+
     
         /* Sidebar Styling */
         #sidebar {
@@ -1295,12 +1357,56 @@ const formattedContent = escapeHtml(item.content)
   <div class="content-images">${imagesHTML}</div>
 
 <div id="interaction-section" style="margin-top: 20px; font-size: 1rem; color: #555;">
-  <span id="stats-text">
+  
+  <!-- 1. riadok -->
+  <div id="stats-row">
     👁️ <span id="views-count">0</span> |
     <span id="like-btn" style="cursor: pointer;">👍</span> <span id="like-count">0</span> |
     <span id="dislike-btn" style="cursor: pointer;">👎</span> <span id="dislike-count">0</span> |
     <span id="fav-btn" title="Pridať medzi obľúbené" style="cursor:pointer;">⭐</span>
-  </span>
+  </div>
+
+  <!-- 2. riadok -->
+  <div id="share-row" style="margin-top: 10px;">
+    <span id="share-btn" title="Zdieľať" style="cursor:pointer;">📤 Zdieľať</span>
+
+    <div id="share-panel" class="share-panel">
+      <div class="share-grid">
+        <button type="button" class="share-chip" id="share-native" title="Zdieľať cez zariadenie">
+          📲 <span>Zdieľať</span>
+        </button>
+
+        <button type="button" class="share-chip" id="share-linkedin" title="Zdieľať na LinkedIn">
+          <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg" alt="LinkedIn">
+          <span>LinkedIn</span>
+        </button>
+
+        <button type="button" class="share-chip" id="share-facebook" title="Zdieľať na Facebook">
+          <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook">
+          <span>Facebook</span>
+        </button>
+
+        <button type="button" class="share-chip" id="share-x" title="Zdieľať na X">
+          <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X">
+          <span>X</span>
+        </button>
+
+        <button type="button" class="share-chip" id="share-email" title="Poslať e-mailom">
+          ✉️ <span>E-mail</span>
+        </button>
+
+        <button type="button" class="share-chip" id="share-copy" title="Skopírovať odkaz">
+          📋 <span>Kopírovať</span>
+        </button>
+      </div>
+
+      <div class="share-link-row">
+        <input id="share-link" type="text" readonly>
+        <button type="button" class="share-chip" id="share-copy-2">📋 Kopírovať</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
  <div id="comments-section" style="margin-top: 40px; background-color: #fefefe; border: 1px solid #ddd; border-radius: 8px; padding: 20px;">
@@ -1398,6 +1504,156 @@ if (favBtn) {
 
 // inicializuj stav
 if (window.loadFavoriteState) window.loadFavoriteState();
+
+// ================= SHARE (📤) =================
+const shareBtn = document.getElementById('share-btn');
+const sharePanel = document.getElementById('share-panel');
+const shareLinkInput = document.getElementById('share-link');
+
+const btnNative   = document.getElementById('share-native');
+const btnLinkedIn = document.getElementById('share-linkedin');
+const btnFacebook = document.getElementById('share-facebook');
+const btnX        = document.getElementById('share-x');
+const btnEmail    = document.getElementById('share-email');
+const btnCopy     = document.getElementById('share-copy');
+const btnCopy2    = document.getElementById('share-copy-2');
+
+function openSharePanel() {
+  if (!sharePanel) return;
+  sharePanel.style.display = 'block';
+}
+
+function toggleSharePanel() {
+  if (!sharePanel) return;
+  sharePanel.style.display = (sharePanel.style.display === 'block') ? 'none' : 'block';
+}
+
+function closeSharePanel() {
+  if (!sharePanel) return;
+  sharePanel.style.display = 'none';
+}
+
+if (shareLinkInput) shareLinkInput.value = pageUrl;
+
+if (shareBtn) {
+  shareBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleSharePanel();
+  });
+}
+
+// klik mimo zatvorí panel
+document.addEventListener('click', (e) => {
+  if (!sharePanel) return;
+  if (sharePanel.style.display !== 'block') return;
+  if (sharePanel.contains(e.target) || e.target === shareBtn) return;
+  closeSharePanel();
+});
+
+// Native share (mobil)
+if (btnNative) {
+  if (!navigator.share) {
+    btnNative.style.opacity = '0.5';
+    btnNative.title = 'Zdieľanie cez zariadenie nie je podporované';
+  }
+  btnNative.addEventListener('click', async () => {
+    try {
+      if (!navigator.share) {
+        showAlert("Zdieľanie cez zariadenie nie je dostupné. Použite ikony LinkedIn/Facebook alebo kopírovať odkaz.");
+        return;
+      }
+      await navigator.share({
+        title: topic,
+        text: desc,
+        url: pageUrl
+      });
+      closeSharePanel();
+    } catch (err) {
+      // user cancel = ok
+    }
+  });
+}
+
+function popup(url) {
+  window.open(url, '_blank', 'noopener,noreferrer');
+  closeSharePanel();
+}
+
+// LinkedIn
+if (btnLinkedIn) {
+  btnLinkedIn.addEventListener('click', () => {
+    const u = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(pageUrl)}`;
+    popup(u);
+  });
+}
+
+// Facebook
+if (btnFacebook) {
+  btnFacebook.addEventListener('click', () => {
+    const u = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`;
+    popup(u);
+  });
+}
+
+// X / Twitter
+if (btnX) {
+  btnX.addEventListener('click', () => {
+    const text = `${topic} – DajToVon`;
+    const u = `https://twitter.com/intent/tweet?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(text)}`;
+    popup(u);
+  });
+}
+
+// Email
+if (btnEmail) {
+  btnEmail.addEventListener('click', () => {
+    const subject = `DajToVon – ${topic}`;
+    const body = `${topic}\n\n${pageUrl}`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    closeSharePanel();
+  });
+}
+
+// Copy link (clipboard + fallback)
+async function copyShareLink() {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(pageUrl);
+      showAlert("Odkaz bol skopírovaný.");
+      return;
+    }
+    // fallback
+    if (shareLinkInput) {
+      shareLinkInput.focus();
+      shareLinkInput.select();
+      document.execCommand('copy');
+      showAlert("Odkaz bol skopírovaný.");
+      return;
+    }
+    showAlert("Nepodarilo sa skopírovať odkaz.");
+  } catch (e) {
+    // fallback 2
+    if (shareLinkInput) {
+      shareLinkInput.focus();
+      shareLinkInput.select();
+    }
+    showAlert("Skopírovanie zlyhalo. Označil som odkaz – skopírujte ho ručne.");
+  }
+}
+
+if (btnCopy)  btnCopy.addEventListener('click', copyShareLink);
+if (btnCopy2) btnCopy2.addEventListener('click', copyShareLink);
+
+// ak user klikne do inputu, nech sa označí celý link
+if (shareLinkInput) {
+  shareLinkInput.addEventListener('click', () => {
+    shareLinkInput.select();
+  });
+}
+
+// pri renderi môže byť panel schovaný, ale link je pripravený
+openSharePanel();
+closeSharePanel();
 
 
 const commentsLoadMoreBtn = document.getElementById('comments-load-more-button');
