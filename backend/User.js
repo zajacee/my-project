@@ -64,12 +64,16 @@ emailVerifySentAt: { type: Date },
 
     content: { type: [contentSchema], default: [] },
 
+    favorites: { type: [String], default: [] },
+
+
     notifications: { type: [notificationSchema], default: [] }
   },
   { versionKey: false }
 );
    
 userSchema.index({ "content.id": 1 });
+userSchema.index({ favorites: 1 });
 
 const User = mongoose.model('User', userSchema);
 

@@ -144,7 +144,7 @@ header h1 {
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     width: 150px;  /* Fixed width */
-    height: 80px;  /* Auto height to fit content */
+    height: auto;  /* Auto height to fit content */
     text-align: center;
     z-index: 1000;
     padding: 5px 0; /* Adjust padding inside the dropdown */
@@ -309,6 +309,17 @@ header h1 {
     .alert-box button:hover {
       background-color: #2980b9;
     }
+
+    #fav-btn {
+  display: inline-block;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: transform 0.2s ease;
+}
+#fav-btn.favorited {
+  transform: scale(1.5);
+}
+
     
         /* Sidebar Styling */
         #sidebar {
@@ -605,6 +616,7 @@ header h1 {
       </button>
       <div class="dropdown" id="logout-dropdown">
         <button id="my-content" onclick="window.location.href='userprofile.html'">Moje príspevky</button>
+        <button id="my-favorites" onclick="window.location.href='favorites.html'">Obľúbené</button>
         <button id="logout-option">
           <img src="logout-icon.png" alt="Logout Icon" style="width: 20px; height: 20px; margin-right: 8px;">
           Odhlásiť
@@ -747,6 +759,8 @@ function getTokenFromCookie() {
 
 let currentUser = null;
 
+window.loadFavoriteState = null;
+
     // --- Check if logged in ---
     fetch(api('/api/me'), {
         method: 'GET',
@@ -759,9 +773,10 @@ let currentUser = null;
 
    .then(data => {
     if (data.username) {
-        currentUser = data.username;
-
-      
+        currentUser = data.username;    
+        
+        // ✅ po logine znovu načítaj stav hviezdy (ak už je obsah vyrenderovaný)
+if (window.loadFavoriteState) window.loadFavoriteState();
 
             loginText.textContent = data.username;
 
@@ -782,11 +797,12 @@ let currentUser = null;
     });
 
     // --- Hide dropdown on click outside ---
-    document.addEventListener("click", (event) => {
-        if (!loginButton.contains(event.target) && !logoutDropdown.contains(event.target)) {
-            logoutDropdown.style.display = "none";
-        }
-    });
+document.addEventListener("click", (event) => {
+  const lb = document.getElementById('login-button');
+  if (lb && !lb.contains(event.target) && !logoutDropdown.contains(event.target)) {
+    logoutDropdown.style.display = "none";
+  }
+});
 
     // --- Logout ---
     logoutOption.addEventListener("click", () => {
@@ -1277,11 +1293,12 @@ const formattedContent = escapeHtml(item.content)
 
   <div class="content-images">${imagesHTML}</div>
 
- <div id="interaction-section" style="margin-top: 20px; font-size: 1rem; color: #555;">
+<div id="interaction-section" style="margin-top: 20px; font-size: 1rem; color: #555;">
   <span id="stats-text">
     👁️ <span id="views-count">0</span> |
     <span id="like-btn" style="cursor: pointer;">👍</span> <span id="like-count">0</span> |
-    <span id="dislike-btn" style="cursor: pointer;">👎</span> <span id="dislike-count">0</span>
+    <span id="dislike-btn" style="cursor: pointer;">👎</span> <span id="dislike-count">0</span> |
+    <span id="fav-btn" title="Pridať medzi obľúbené" style="cursor:pointer;">⭐</span>
   </span>
 </div>
 
@@ -1318,6 +1335,69 @@ const formattedContent = escapeHtml(item.content)
     <button id="send-contact-btn" style="margin-top: 5px;">Odoslať správu</button>
     </div>
 `;
+
+// ================= FAVORITES UI (⭐) =================
+const favBtn = document.getElementById('fav-btn');
+
+function setFavUi(isFav) {
+  if (!favBtn) return;
+  favBtn.classList.toggle('favorited', !!isFav);
+  favBtn.textContent = isFav ? '⭐' : '☆'; // plná vs prázdna hviezda
+  favBtn.title = isFav ? 'Odstrániť z obľúbených' : 'Pridať medzi obľúbené';
+}
+
+// zisti stav po načítaní (len ak je user prihlásený)
+window.loadFavoriteState = function loadFavoriteState() {
+  if (!favBtn) return;
+
+  if (!currentUser) {
+    // neprihlásený – zobraz prázdnu hviezdu
+    setFavUi(false);
+    return;
+  }
+
+  fetch(api(`/api/favorites/is-favorite/${encodeURIComponent(contentId)}`), {
+    method: 'GET',
+    credentials: 'include'
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('is-favorite failed');
+    return res.json();
+  })
+  .then(data => setFavUi(!!data.favorited))
+  .catch(err => {
+    console.warn("Favorite state error:", err);
+    setFavUi(false);
+  });
+};
+
+// klik = toggle
+if (favBtn) {
+  favBtn.addEventListener('click', () => {
+    if (!currentUser) {
+      showAlert("Pre pridanie do obľúbených musíte byť prihlásený.");
+      return;
+    }
+
+    fetch(api(`/api/favorites/toggle/${encodeURIComponent(contentId)}`), {
+      method: 'POST',
+      credentials: 'include'
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('toggle failed');
+      return res.json();
+    })
+    .then(data => setFavUi(!!data.favorited))
+    .catch(err => {
+      console.error("Favorite toggle error:", err);
+      showAlert("Chyba servera pri ukladaní obľúbených.");
+    });
+  });
+}
+
+// inicializuj stav
+if (window.loadFavoriteState) window.loadFavoriteState();
+
 
 const commentsLoadMoreBtn = document.getElementById('comments-load-more-button');
 if (commentsLoadMoreBtn) {

@@ -411,6 +411,106 @@ app.get('/protected-route', authenticateUser, (req, res) => {
   });
 });
 
+// ================= FAVORITES (Obľúbené) =================
+
+// Toggle favorite: ak tam je -> odstráni, ak tam nie je -> pridá
+app.post('/api/favorites/toggle/:id', authenticateUser, async (req, res) => {
+  try {
+    const contentId = String(req.params.id || '').trim();
+    if (!contentId) return res.status(400).json({ message: "Chýba contentId." });
+
+    const username = req.user.username;
+
+    // najprv zistíme, či už je v obľúbených
+    const user = await User.findOne({ username }).select('favorites');
+    if (!user) return res.status(404).json({ message: "Používateľ nenájdený." });
+
+    const favorites = Array.isArray(user.favorites) ? user.favorites : [];
+    const isFav = favorites.includes(contentId);
+
+    if (isFav) {
+      await User.updateOne(
+        { username },
+        { $pull: { favorites: contentId } }
+      );
+      return res.json({ favorited: false });
+    } else {
+      await User.updateOne(
+        { username },
+        { $addToSet: { favorites: contentId } } // ✅ bez duplicít
+      );
+      return res.json({ favorited: true });
+    }
+  } catch (err) {
+    console.error("❌ favorites toggle:", err);
+    return res.status(500).json({ message: "Chyba servera." });
+  }
+});
+
+// Zisti stav: je tento príspevok v obľúbených?
+app.get('/api/favorites/is-favorite/:id', authenticateUser, async (req, res) => {
+  try {
+    const contentId = String(req.params.id || '').trim();
+    if (!contentId) return res.status(400).json({ message: "Chýba contentId." });
+
+    const username = req.user.username;
+
+    const user = await User.findOne({ username }).select('favorites');
+    if (!user) return res.status(404).json({ message: "Používateľ nenájdený." });
+
+    const isFav = (user.favorites || []).includes(contentId);
+    return res.json({ favorited: isFav });
+  } catch (err) {
+    console.error("❌ favorites is-favorite:", err);
+    return res.status(500).json({ message: "Chyba servera." });
+  }
+});
+
+// Zoznam obľúbených (vráti rovno príspevky ako na /all-content, len filtrované)
+app.get('/api/favorites', authenticateUser, async (req, res) => {
+  try {
+    const username = req.user.username;
+
+    const me = await User.findOne({ username }).select('favorites');
+    if (!me) return res.status(404).json({ message: "Používateľ nenájdený." });
+
+    const favIds = (me.favorites || []).map(String);
+    if (favIds.length === 0) return res.json({ favorites: [] });
+
+    // nájdeme všetkých userov, ktorí majú content s id v favIds
+    const owners = await User.find({ "content.id": { $in: favIds } })
+      .select('username content');
+
+    // poskladáme výsledok do rovnakého formátu ako all-content (username + content)
+    const items = [];
+    for (const owner of owners) {
+      for (const c of (owner.content || [])) {
+        if (favIds.includes(String(c.id))) {
+          items.push({
+            username: owner.username,
+            content: {
+              ...c.toObject(),
+              views: c.views || 0,
+              likesCount: c.likes?.length || 0,
+              dislikesCount: c.dislikes?.length || 0,
+              commentsCount: c.comments?.length || 0
+            }
+          });
+        }
+      }
+    }
+
+    // zachovaj poradie podľa favIds (tak, ako si user uložil)
+    const byId = new Map(items.map(x => [String(x.content.id), x]));
+    const ordered = favIds.map(id => byId.get(String(id))).filter(Boolean);
+
+    return res.json({ favorites: ordered });
+  } catch (err) {
+    console.error("❌ favorites list:", err);
+    return res.status(500).json({ message: "Chyba servera." });
+  }
+});
+
 
 // ✅ **User Registration**
 app.post('/register', async (req, res) => {
@@ -434,8 +534,10 @@ app.post('/register', async (req, res) => {
       password: hashedPassword,
       emailVerified: false,
       emailVerifySentAt: new Date(),
-      content: []
-    });
+      content: [],
+  favorites: [],          // ✅ doplň
+  notifications: []       // ✅ doplň (ak chceš mať explicitne)
+});
 
     await newUser.save();
 
