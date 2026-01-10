@@ -286,48 +286,6 @@ header h1 {
   font-weight: bold;
 }
 
-/* Interaction sekcia – všetko zarovnať naľavo */
-#interaction-section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;  /* ✅ nalavo */
-  gap: 8px;                 /* medzera medzi riadkami */
-}
-
-/* Riadky v interaction sekcii */
-#stats-row,
-#share-row {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start; /* ✅ nalavo */
-  flex-wrap: wrap;
-  gap: 6px;
-  font-size: 0.95rem;          /* ✅ menšie, konzistentné */
-  color: #555;
-}
-
-/* Samotné tlačidlo Zdieľať */
-#share-btn {
-  font-size: 0.95rem;  /* ✅ rovnaké ako riadok */
-  margin-left: 0;      /* ✅ odstráni odsadenie */
-}
-
-/* Panel nech tiež sedí naľavo pod "Zdieľať" */
-#share-panel {
-  margin-left: 0;
-  max-width: 520px;
-}
-
-/* Čipy trochu menšie (aby to nelietalo veľkosťou) */
-.share-chip {
-  padding: 6px 10px;
-  font-size: 0.9rem;
-}
-
-.share-link-row #share-link {
-  font-size: 0.9rem;
-}
 
     .alert-box {
       background-color: white;
