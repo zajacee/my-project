@@ -148,7 +148,7 @@ function renderNotification(notification) {
   if (!notification.read) dot.style.display = "block";
 
   const li = document.createElement("li");
-  li.style.padding = "6px 10px";
+  li.style.padding = "4px 10px";
   li.style.borderBottom = "1px solid #eee";
   li.dataset.read = String(notification.read);
 
