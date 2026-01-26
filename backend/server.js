@@ -1782,16 +1782,22 @@ io.on('connection', (socket) => {
     socket.emit('username-registered', username);
   });
 
-  socket.on('disconnect', () => {
-    for (const [username, sockets] of Object.entries(connectedUsers)) {
-      if (sockets.has(socket.id)) {
-        sockets.delete(socket.id);
-        console.log(`🔴 Socket disconnected: ${socket.id} for user ${username}`);
-        if (sockets.size === 0) delete connectedUsers[username];
-        break;
+socket.on('disconnect', () => {
+  for (const [username, sockets] of Object.entries(connectedUsers)) {
+    if (sockets.has(socket.id)) {
+      sockets.delete(socket.id);
+      console.log(`🔴 Socket disconnected: ${socket.id} for user ${username}`);
+
+      if (sockets.size === 0) {
+        delete connectedUsers[username];
+
+        // ✅ user je práve offline -> naplánuj digest
+        scheduleNotificationEmail(username);
       }
+      break;
     }
-  });
+  }
+});
 });
 
 
