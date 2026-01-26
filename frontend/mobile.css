@@ -101,7 +101,7 @@
     transform: none !important;
     margin: 0 !important;
 
-    display: flex !important;
+    display: none !important;
     align-items: center !important;
     font-size: 1.5rem !important;
   }
@@ -401,7 +401,6 @@ max-width: 240px !important;
   /* nech je dot ukotvený k zvončeku, nie “niekam” doprava */
   #notification-container{
     position: relative !important;   /* 🔥 kľúčové */
-    display: inline-flex !important;
     align-items: center !important;
   }
 
