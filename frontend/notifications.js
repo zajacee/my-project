@@ -201,7 +201,7 @@ function renderNotification(notification) {
 const small = document.createElement("small");
 small.style.color = "#888";
 small.style.display = "block";
-small.style.marginTop = "1px";
+small.style.marginTop = "2px";
 small.style.lineHeight = "1.1";
 small.textContent = timeText;
 
