@@ -198,15 +198,15 @@ function renderNotification(notification) {
   titleStrong.textContent = `„${titleText}“`;
   line.appendChild(titleStrong);
 
-  const br = document.createElement("br");
-  const small = document.createElement("small");
-  small.style.color = "#888";
-  small.style.marginTop = "2px"; 
-  small.textContent = timeText;
+const small = document.createElement("small");
+small.style.color = "#888";
+small.style.display = "block";
+small.style.marginTop = "1px";
+small.style.lineHeight = "1.1";
+small.textContent = timeText;
 
-  a.appendChild(line);
-  a.appendChild(br);
-  a.appendChild(small);
+a.appendChild(line);
+a.appendChild(small);
 
   a.addEventListener("click", (e) => {
     e.preventDefault();
