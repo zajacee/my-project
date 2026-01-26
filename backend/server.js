@@ -958,7 +958,7 @@ if (sockets && sockets.size > 0) {
   console.warn(`⚠️ No active sockets found for ${latestNotification.to}`);
 scheduleNotificationEmail(latestNotification.to);
 }
-
+}
 
   await user.save();
   res.json({ success: true });
@@ -1028,6 +1028,7 @@ if (sockets && sockets.size > 0) {
 } else {
   console.warn(`⚠️ No active sockets found for ${latestNotification.to}`);
 scheduleNotificationEmail(latestNotification.to);
+ }
  }
 
   await user.save();
@@ -1108,6 +1109,7 @@ if (sockets && sockets.size > 0) {
   console.warn(`⚠️ No active sockets found for ${latestNotification.to}`);
 scheduleNotificationEmail(latestNotification.to);
  }
+ }
 
   await user.save();
   res.json({ success: true });
@@ -1179,7 +1181,7 @@ if (sockets && sockets.size > 0) {
   console.warn(`⚠️ No active sockets found for ${latestNotification.to}`);
   scheduleNotificationEmail(latestNotification.to);
 }
-
+}
   await user.save();
   res.json({ success: true });
 });
@@ -1248,6 +1250,7 @@ if (sockets && sockets.size > 0) {
 } else {
   console.warn(`⚠️ No active sockets found for ${latestNotification.to}`);
   scheduleNotificationEmail(latestNotification.to);
+}
 }
 
   await user.save();
