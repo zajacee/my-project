@@ -18,7 +18,6 @@ if (!sessionStorage.getItem("api_warm")) {
 }
 
 function timeAgo(timestamp) {
-  const now = new Date();
   const diff = Math.floor((Date.now() - new Date(timestamp)) / 1000);
   if (diff < 60) return "pred chvíľou";
   if (diff < 3600) return `pred ${Math.floor(diff / 60)} min`;
@@ -29,13 +28,14 @@ function timeAgo(timestamp) {
 function renderNotification(notification) {
   const list = document.getElementById("notification-list");
   const dot = document.getElementById("bell-dot");
+  if (!list || !dot) return;
 
   if (!notification.read) dot.style.display = "block";
 
   const li = document.createElement("li");
   li.style.padding = "6px 0";
   li.style.borderBottom = "1px solid #eee";
-  li.dataset.read = notification.read;
+  li.dataset.read = String(notification.read);
 
   if (!notification.read) li.style.backgroundColor = "#dbeeff";
 
@@ -64,6 +64,7 @@ function renderNotification(notification) {
 
   a.addEventListener("click", (e) => {
     e.preventDefault();
+
     fetch(apiFetchUrl(`/api/notifications/read/${notification._id}`), {
       method: "POST",
       credentials: "include",
@@ -86,7 +87,24 @@ function renderNotification(notification) {
 
 function renderNotificationList() {
   const list = document.getElementById("notification-list");
+  const dot = document.getElementById("bell-dot");
+  if (!list) return;
+
   list.innerHTML = "";
+
+  // ✅ Keď nie sú notifikácie, zobraz prázdny stav
+  if (!allNotifications || allNotifications.length === 0) {
+    const emptyLi = document.createElement("li");
+    emptyLi.textContent = "Zatiaľ nemáte žiadne upozornenia.";
+    emptyLi.style.textAlign = "center";
+    emptyLi.style.padding = "12px 0";
+    emptyLi.style.color = "#888";
+    emptyLi.style.fontSize = "14px";
+    list.appendChild(emptyLi);
+
+    if (dot) dot.style.display = "none";
+    return;
+  }
 
   const notificationsToShow = allNotifications.slice(0, currentlyVisible);
   notificationsToShow.forEach(renderNotification);
@@ -118,10 +136,20 @@ function checkUnreadDot() {
     }
   });
 
-  document.getElementById("bell-dot").style.display = hasUnread ? "block" : "none";
+  const dot = document.getElementById("bell-dot");
+  if (dot) dot.style.display = hasUnread ? "block" : "none";
 }
 
 window.initializeNotifications = function initializeNotifications() {
+  const container = document.getElementById("notification-container");
+  const popup = document.getElementById("notification-popup");
+  const dot = document.getElementById("bell-dot");
+
+  // ✅ default: skryť zvonček, kým nevieme či je user prihlásený
+  if (container) container.style.display = "none";
+  if (popup) popup.style.display = "none";
+  if (dot) dot.style.display = "none";
+
   // ✅ Socket.IO na správnu URL (https -> wss automaticky)
   const socket = io(API_BASE_URL, {
     withCredentials: true,
@@ -129,42 +157,55 @@ window.initializeNotifications = function initializeNotifications() {
   });
 
   socket.on("connect", () => {
-    if (currentUser) {
-      socket.emit("register-username", currentUser);
-    }
+    if (currentUser) socket.emit("register-username", currentUser);
   });
 
   socket.on("notification", (notification) => {
     if (!currentUser || notification.to !== currentUser) return;
 
     allNotifications.unshift(notification);
-    currentlyVisible = BATCH_SIZE; // reset visible to show first batch
+    currentlyVisible = BATCH_SIZE;
     renderNotificationList();
     checkUnreadDot();
   });
 
-  document.getElementById("notification-bell").addEventListener("click", () => {
-    const popup = document.getElementById("notification-popup");
-    const dot = document.getElementById("bell-dot");
-    popup.style.display = popup.style.display === "block" ? "none" : "block";
-    dot.style.display = "none";
-  });
+  const bell = document.getElementById("notification-bell");
+  if (bell) {
+    bell.addEventListener("click", () => {
+      const popupEl = document.getElementById("notification-popup");
+      const dotEl = document.getElementById("bell-dot");
+      if (!popupEl) return;
+
+      popupEl.style.display = popupEl.style.display === "block" ? "none" : "block";
+      if (dotEl) dotEl.style.display = "none";
+
+      // ✅ nech sa aj pri otvorení zobrazí prázdny stav
+      renderNotificationList();
+    });
+  }
 
   document.addEventListener("click", (event) => {
-    const bell = document.getElementById("notification-bell");
-    const popup = document.getElementById("notification-popup");
-    if (!bell.contains(event.target) && !popup.contains(event.target)) {
-      popup.style.display = "none";
+    const bellEl = document.getElementById("notification-bell");
+    const popupEl = document.getElementById("notification-popup");
+    if (!bellEl || !popupEl) return;
+
+    if (!bellEl.contains(event.target) && !popupEl.contains(event.target)) {
+      popupEl.style.display = "none";
     }
   });
 
-  // ✅ už nie localhost
   fetch(apiFetchUrl("/api/me"), { method: "GET", credentials: "include" })
     .then((res) => res.json())
     .then((data) => {
-      if (!data.username) return;
+      if (!data.username) {
+        if (container) container.style.display = "none";
+        return;
+      }
+
       currentUser = data.username;
-      document.getElementById("notification-container").style.display = "block";
+
+      // ✅ až teraz zobraz zvonček
+      if (container) container.style.display = "block";
       socket.emit("register-username", currentUser);
 
       fetch(apiFetchUrl("/api/notifications?limit=100"), {
@@ -173,15 +214,23 @@ window.initializeNotifications = function initializeNotifications() {
       })
         .then((res) => res.json())
         .then((notifications) => {
-          allNotifications = notifications.sort(
+          allNotifications = (notifications || []).sort(
             (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
           );
           currentlyVisible = BATCH_SIZE;
           renderNotificationList();
           checkUnreadDot();
+        })
+        .catch(() => {
+          // ak zlyhá načítanie notifikácií, ukáž prázdny stav
+          allNotifications = [];
+          currentlyVisible = BATCH_SIZE;
+          renderNotificationList();
+          if (dot) dot.style.display = "none";
         });
     })
     .catch(() => {
-      // ak nie je prihlásený, notifikácie len nenačítame
+      // neprihlásený -> zvonček ostáva skrytý
+      if (container) container.style.display = "none";
     });
-}
+};

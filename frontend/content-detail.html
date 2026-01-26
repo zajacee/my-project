@@ -1528,7 +1528,7 @@ window.loadFavoriteState = function loadFavoriteState() {
 if (favBtn) {
   favBtn.addEventListener('click', () => {
     if (!currentUser) {
-      showAlert("Pre pridanie do obľúbených musíte byť prihlásený.");
+      showAlert("Pre pridanie do obľúbených musíte byť prihlásený");
       return;
     }
 
@@ -1824,7 +1824,7 @@ fetch(api(`/comment/${contentId}`), {
   })
   .catch(err => {
     console.error(err);
-    showAlert("Pre pridávanie komentárov musíte byť prihlásený.");
+    showAlert("Pre pridávanie komentárov musíte byť prihlásený");
   });
 });
 
