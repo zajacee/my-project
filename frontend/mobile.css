@@ -106,6 +106,12 @@
     font-size: 1.5rem !important;
   }
 
+  /* zobraz zvonček iba keď je user prihlásený */
+body.logged-in #notification-container{
+  display: inline-flex !important;
+}
+
+
   #notification-popup{
     right: auto !important;
     left: 50% !important;

@@ -95,7 +95,7 @@ function renderNotificationList() {
   // ✅ Keď nie sú notifikácie, zobraz prázdny stav
   if (!allNotifications || allNotifications.length === 0) {
     const emptyLi = document.createElement("li");
-    emptyLi.textContent = "Zatiaľ nemáte žiadne upozornenia.";
+    emptyLi.textContent = "Zatiaľ nemáte žiadne upozornenia";
     emptyLi.style.textAlign = "center";
     emptyLi.style.padding = "12px 0";
     emptyLi.style.color = "#888";
@@ -198,11 +198,13 @@ window.initializeNotifications = function initializeNotifications() {
     .then((res) => res.json())
     .then((data) => {
       if (!data.username) {
-        if (container) container.style.display = "none";
-        return;
-      }
+  document.body.classList.remove("logged-in"); // ✅ doplniť
+  if (container) container.style.display = "none";
+  return;
+}
 
       currentUser = data.username;
+      document.body.classList.add("logged-in");   // ✅ TU
 
       // ✅ až teraz zobraz zvonček
       if (container) container.style.display = "block";
@@ -230,6 +232,7 @@ window.initializeNotifications = function initializeNotifications() {
         });
     })
     .catch(() => {
+      document.body.classList.remove("logged-in"); // ✅ TU
       // neprihlásený -> zvonček ostáva skrytý
       if (container) container.style.display = "none";
     });
