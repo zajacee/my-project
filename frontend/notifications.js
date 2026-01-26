@@ -58,7 +58,7 @@ left.style.textAlign = "left";
 
 const hint = document.createElement("span");
 hint.textContent = "Posielať notifikácie e-mailom v režime offline";
-hint.style.fontSize = "15px";
+hint.style.fontSize = "14px";
 hint.style.color = "#666";
 
 left.appendChild(hint);
