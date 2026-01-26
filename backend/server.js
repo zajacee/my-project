@@ -201,6 +201,88 @@ async function deleteFromCloudinary(publicId) {
 const mongoose = require('mongoose');
 const User = require('./User'); // Adjust the path accordingly
 
+const connectedUsers = {}; // username -> Set of socket IDs
+
+// ===== EMAIL DIGEST (non-blocking) =====
+const EMAIL_DIGEST_MS = 2 * 60 * 1000; // 2 min
+const emailTimers = new Map(); // username -> timeoutId
+
+function scheduleNotificationEmail(toUsername) {
+  if (!toUsername) return;
+
+  // ✅ ak je user online, neposielaj email (voliteľné, ale odporúčané)
+  const isOnline = connectedUsers?.[toUsername] && connectedUsers[toUsername].size > 0;
+  if (isOnline) return;
+
+  // už naplánované -> zhlukuj
+  if (emailTimers.has(toUsername)) return;
+
+  const t = setTimeout(async () => {
+    emailTimers.delete(toUsername);
+
+    try {
+      const user = await User.findOne({ username: toUsername })
+        .select("email emailVerified notifications emailNotificationsEnabled");
+
+
+      if (!user?.email || user.emailVerified === false) return;
+
+      if (user.emailNotificationsEnabled === false) return;
+
+      const pending = (user.notifications || [])
+        .filter(n => !n.read && !n.emailed)
+        .slice(0, 20);
+
+      if (pending.length === 0) return;
+
+      const base = (process.env.PUBLIC_FRONTEND_URL || "https://dajtovon.sk").replace(/\/+$/, "");
+      const esc = (s="") => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+      const itemsHtml = pending.map(n => {
+        const url = `${base}/content-detail.html?contentId=${encodeURIComponent(n.contentId)}`;
+        const who = esc(n.from || "Niekto");
+        const title = esc(n.contentTitle || "");
+        let line = "";
+
+        if (n.type === "comment") line = `💬 ${who} komentoval váš príspevok „${title}“`;
+        else if (n.type === "like") line = `👍 ${who} reagoval na ${n.targetType === "comment" ? "váš komentár" : "váš príspevok"} „${title}“`;
+        else if (n.type === "dislike") line = `👎 ${who} reagoval na ${n.targetType === "comment" ? "váš komentár" : "váš príspevok"} „${title}“`;
+        else line = `🔔 Nová aktivita pri „${title}“`;
+
+        return `<li style="margin:6px 0;"><a href="${url}">${line}</a></li>`;
+      }).join("");
+
+      await sendZohoMail({
+        toAddress: user.email,
+        subject: pending.length === 1
+          ? "Nová notifikácia – DajToVon"
+          : `Máte ${pending.length} nových notifikácií – DajToVon`,
+        html: `
+          <p>Ahoj,</p>
+          <p>máš nové upozornenia:</p>
+          <ul>${itemsHtml}</ul>
+          <hr>
+          <p>Detail nájdeš po prihlásení na <a href="${base}">DajToVon.sk</a>.</p>
+        `
+      });
+
+      // označ ako emailed=true
+      const ids = pending.map(n => n._id);
+      await User.updateOne(
+        { username: toUsername },
+        { $set: { "notifications.$[n].emailed": true } },
+        { arrayFilters: [{ "n._id": { $in: ids } }] }
+      );
+
+    } catch (e) {
+      console.error("❌ notification email digest error:", e);
+    }
+  }, EMAIL_DIGEST_MS);
+
+  emailTimers.set(toUsername, t);
+}
+
+
 // Multer config for Cloudinary (memory storage)
 const storage = multer.memoryStorage();
 
@@ -410,6 +492,51 @@ app.get('/protected-route', authenticateUser, (req, res) => {
     email: req.user.email   // pridali sme email
   });
 });
+
+// ================= SETTINGS (email notifications toggle) =================
+
+// get current settings
+app.get('/api/settings', authenticateUser, async (req, res) => {
+  try {
+    const username = req.user.username;
+    const user = await User.findOne({ username }).select("emailNotificationsEnabled");
+    if (!user) return res.status(404).json({ message: "Používateľ nenájdený." });
+
+    // default true, ak by pole neexistovalo na starých účtoch
+    const enabled = user.emailNotificationsEnabled !== false;
+
+    res.json({ emailNotificationsEnabled: enabled });
+  } catch (err) {
+    console.error("❌ /api/settings:", err);
+    res.status(500).json({ message: "Chyba servera." });
+  }
+});
+
+// update toggle
+app.post('/api/settings/email-notifications', authenticateUser, async (req, res) => {
+  try {
+    const username = req.user.username;
+    const enabled = req.body?.enabled;
+
+    if (typeof enabled !== "boolean") {
+      return res.status(400).json({ message: "Neplatná hodnota enabled (očakávam true/false)." });
+    }
+
+    const user = await User.findOneAndUpdate(
+      { username },
+      { $set: { emailNotificationsEnabled: enabled } },
+      { new: true, projection: { emailNotificationsEnabled: 1 } }
+    );
+
+    if (!user) return res.status(404).json({ message: "Používateľ nenájdený." });
+
+    res.json({ emailNotificationsEnabled: user.emailNotificationsEnabled !== false });
+  } catch (err) {
+    console.error("❌ /api/settings/email-notifications:", err);
+    res.status(500).json({ message: "Chyba servera." });
+  }
+});
+
 
 // ================= FAVORITES (Obľúbené) =================
 
@@ -823,15 +950,15 @@ console.log({
   notification: latestNotification
 });
 
-if (sockets) {
+if (sockets && sockets.size > 0) {
   for (const socketId of sockets) {
-    console.log(`📤 Emitting to socket ${socketId}`);
     io.to(socketId).emit('notification', latestNotification);
   }
 } else {
   console.warn(`⚠️ No active sockets found for ${latestNotification.to}`);
+scheduleNotificationEmail(latestNotification.to);
 }
-}
+
 
   await user.save();
   res.json({ success: true });
@@ -894,14 +1021,13 @@ console.log({
   notification: latestNotification
 });
 
-if (sockets) {
+if (sockets && sockets.size > 0) {
   for (const socketId of sockets) {
-    console.log(`📤 Emitting to socket ${socketId}`);
     io.to(socketId).emit('notification', latestNotification);
   }
 } else {
   console.warn(`⚠️ No active sockets found for ${latestNotification.to}`);
-}
+scheduleNotificationEmail(latestNotification.to);
  }
 
   await user.save();
@@ -974,16 +1100,14 @@ console.log({
   notification: latestNotification
 });
 
-if (sockets) {
+if (sockets && sockets.size > 0) {
   for (const socketId of sockets) {
-    console.log(`📤 Emitting to socket ${socketId}`);
     io.to(socketId).emit('notification', latestNotification);
   }
 } else {
   console.warn(`⚠️ No active sockets found for ${latestNotification.to}`);
-}
+scheduleNotificationEmail(latestNotification.to);
  }
-
 
   await user.save();
   res.json({ success: true });
@@ -1044,17 +1168,16 @@ app.post('/comment-like/:id/:commentId', authenticateUser, async (req, res) => {
   const updatedUser = await User.findOne({ username: comment.username });
   const latestNotification = { ...updatedUser.notifications[0].toObject(), to: comment.username };
 
-  const sockets = connectedUsers[comment.username];
+  const sockets = connectedUsers[latestNotification.to];
   console.log('📨 Attempting to send notification to comment author:', comment.username);
 
-  if (sockets) {
-    for (const socketId of sockets) {
-      console.log(`📤 Emitting to socket ${socketId}`);
-      io.to(socketId).emit('notification', latestNotification);
-    }
-  } else {
-    console.warn(`⚠️ No active sockets found for ${comment.username}`);
+if (sockets && sockets.size > 0) {
+  for (const socketId of sockets) {
+    io.to(socketId).emit('notification', latestNotification);
   }
+} else {
+  console.warn(`⚠️ No active sockets found for ${latestNotification.to}`);
+  scheduleNotificationEmail(latestNotification.to);
 }
 
   await user.save();
@@ -1115,17 +1238,16 @@ app.post('/comment-dislike/:id/:commentId', authenticateUser, async (req, res) =
   const updatedUser = await User.findOne({ username: comment.username });
   const latestNotification = { ...updatedUser.notifications[0].toObject(), to: comment.username };
 
-  const sockets = connectedUsers[comment.username];
+  const sockets = connectedUsers[latestNotification.to];
   console.log('📨 Attempting to send notification to comment author:', comment.username);
 
-  if (sockets) {
-    for (const socketId of sockets) {
-      console.log(`📤 Emitting to socket ${socketId}`);
-      io.to(socketId).emit('notification', latestNotification);
-    }
-  } else {
-    console.warn(`⚠️ No active sockets found for ${comment.username}`);
+if (sockets && sockets.size > 0) {
+  for (const socketId of sockets) {
+    io.to(socketId).emit('notification', latestNotification);
   }
+} else {
+  console.warn(`⚠️ No active sockets found for ${latestNotification.to}`);
+  scheduleNotificationEmail(latestNotification.to);
 }
 
   await user.save();
@@ -1634,8 +1756,6 @@ const io = new Server(server, {
   },
   transports: ['websocket', 'polling']
 });
-
-const connectedUsers = {}; // username -> Set of socket IDs
 
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

@@ -3,6 +3,8 @@ let allNotifications = [];
 let currentlyVisible = 5;
 const BATCH_SIZE = 5;
 
+let emailNotifsEnabled = true; // ✅ stav toggle (default ON)
+
 // nič s názvom API_BASE tu NEDEFINUJ
 const API_BASE_URL = window.API_BASE || (
   (location.hostname === "localhost" || location.hostname === "127.0.0.1")
@@ -25,6 +27,122 @@ function timeAgo(timestamp) {
   return `pred ${Math.floor(diff / 86400)} dňami`;
 }
 
+// ✅ vloží/prekreslí toggle priamo do popupu (nad listom)
+function renderEmailToggle() {
+  const popup = document.getElementById("notification-popup");
+  if (!popup) return;
+
+  let row = document.getElementById("email-toggle-row");
+
+  if (!row) {
+    row = document.createElement("div");
+    row.id = "email-toggle-row";
+    row.style.display = "flex";
+    row.style.alignItems = "center";
+    row.style.justifyContent = "space-between";
+    row.style.gap = "10px";
+    row.style.padding = "10px 10px";
+    row.style.borderBottom = "1px solid #eee";
+    row.style.background = "#fff";
+
+    // ✅ aby klik na toggle nezatváral popup (ak by bol mimo wrapperu)
+    row.addEventListener("click", (e) => e.stopPropagation());
+
+    const left = document.createElement("div");
+    left.style.display = "flex";
+    left.style.flexDirection = "column";
+    left.style.gap = "2px";
+
+    const label = document.createElement("span");
+    label.textContent = "E-mail notifikácie";
+    label.style.fontSize = "14px";
+    label.style.fontWeight = "600";
+
+    const hint = document.createElement("span");
+    hint.textContent = "Keď ste offline, môžeme posielať súhrn e-mailom.";
+    hint.style.fontSize = "12px";
+    hint.style.color = "#777";
+
+    left.appendChild(label);
+    left.appendChild(hint);
+
+    const right = document.createElement("div");
+    right.style.display = "flex";
+    right.style.alignItems = "center";
+    right.style.gap = "8px";
+
+    const status = document.createElement("span");
+    status.id = "email-toggle-status";
+    status.style.fontSize = "12px";
+    status.style.color = "#666";
+
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.id = "emailNotifsToggle";
+    input.style.transform = "scale(1.1)";
+    input.style.cursor = "pointer";
+
+    input.addEventListener("change", () => {
+      const enabled = input.checked;
+
+      // optimisticky nastav UI
+      const prev = emailNotifsEnabled;
+      emailNotifsEnabled = enabled;
+      updateEmailToggleStatus();
+
+      fetch(apiFetchUrl("/api/settings/email-notifications"), {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled }),
+      })
+        .then((r) => {
+          if (!r.ok) throw new Error("save_failed");
+          return r.json();
+        })
+        .then((data) => {
+          // backend je zdroj pravdy
+          emailNotifsEnabled = data?.emailNotificationsEnabled !== false;
+          input.checked = emailNotifsEnabled;
+          updateEmailToggleStatus();
+        })
+        .catch(() => {
+          // rollback
+          emailNotifsEnabled = prev;
+          input.checked = prev;
+          updateEmailToggleStatus();
+          alert("Nepodarilo sa uložiť nastavenie e-mail notifikácií.");
+        });
+    });
+
+    right.appendChild(status);
+    right.appendChild(input);
+
+    row.appendChild(left);
+    row.appendChild(right);
+
+    // ✅ vlož pred zoznam (ak existuje), inak navrch popupu
+    const list = document.getElementById("notification-list");
+    if (list && list.parentElement === popup) {
+      popup.insertBefore(row, list);
+    } else {
+      popup.insertBefore(row, popup.firstChild);
+    }
+  }
+
+  const toggle = document.getElementById("emailNotifsToggle");
+  if (toggle) toggle.checked = !!emailNotifsEnabled;
+
+  updateEmailToggleStatus();
+}
+
+function updateEmailToggleStatus() {
+  const status = document.getElementById("email-toggle-status");
+  if (!status) return;
+  status.textContent = emailNotifsEnabled ? "Zapnuté" : "Vypnuté";
+}
+
+// ✅ XSS-safe: žiadne innerHTML z dát (from/contentTitle/timestamp)
 function renderNotification(notification) {
   const list = document.getElementById("notification-list");
   const dot = document.getElementById("bell-dot");
@@ -33,34 +151,64 @@ function renderNotification(notification) {
   if (!notification.read) dot.style.display = "block";
 
   const li = document.createElement("li");
-  li.style.padding = "6px 0";
+  li.style.padding = "6px 10px";
   li.style.borderBottom = "1px solid #eee";
   li.dataset.read = String(notification.read);
 
   if (!notification.read) li.style.backgroundColor = "#dbeeff";
 
-  const username = `<span class="notification-username">${notification.from}</span>`;
-  const title = `<strong>„${notification.contentTitle}“</strong>`;
-  let text = "";
+  const fromText = String(notification.from || "Niekto");
+  const titleText = String(notification.contentTitle || "");
+  const timeText = timeAgo(notification.timestamp);
 
+  let prefix = "🔔";
+  let middleText = "";
   if (notification.type === "like") {
-    text = notification.targetType === "comment"
-      ? `👍 ${username} reagoval na váš komentár k príspevku ${title}`
-      : `👍 ${username} reagoval na váš príspevok ${title}`;
+    prefix = "👍";
+    middleText = notification.targetType === "comment"
+      ? " reagoval na váš komentár k príspevku "
+      : " reagoval na váš príspevok ";
   } else if (notification.type === "dislike") {
-    text = notification.targetType === "comment"
-      ? `👎 ${username} reagoval na váš komentár k príspevku ${title}`
-      : `👎 ${username} reagoval na váš príspevok ${title}`;
+    prefix = "👎";
+    middleText = notification.targetType === "comment"
+      ? " reagoval na váš komentár k príspevku "
+      : " reagoval na váš príspevok ";
   } else if (notification.type === "comment") {
-    text = `💬 ${username} komentoval váš príspevok ${title}`;
+    prefix = "💬";
+    middleText = " komentoval váš príspevok ";
+  } else {
+    middleText = " aktivita pri príspevku ";
   }
 
   const a = document.createElement("a");
-  a.href = `content-detail.html?contentId=${notification.contentId}`;
-  a.innerHTML = `${text}<br><small style="color:#888;">${timeAgo(notification.timestamp)}</small>`;
+  a.href = `content-detail.html?contentId=${encodeURIComponent(notification.contentId || "")}`;
   a.style.textDecoration = "none";
   a.style.color = "#333";
   a.style.display = "block";
+
+  const line = document.createElement("div");
+
+  line.appendChild(document.createTextNode(prefix + " "));
+
+  const usernameSpan = document.createElement("span");
+  usernameSpan.className = "notification-username";
+  usernameSpan.textContent = fromText;
+  line.appendChild(usernameSpan);
+
+  line.appendChild(document.createTextNode(middleText));
+
+  const titleStrong = document.createElement("strong");
+  titleStrong.textContent = `„${titleText}“`;
+  line.appendChild(titleStrong);
+
+  const br = document.createElement("br");
+  const small = document.createElement("small");
+  small.style.color = "#888";
+  small.textContent = timeText;
+
+  a.appendChild(line);
+  a.appendChild(br);
+  a.appendChild(small);
 
   a.addEventListener("click", (e) => {
     e.preventDefault();
@@ -92,12 +240,11 @@ function renderNotificationList() {
 
   list.innerHTML = "";
 
-  // ✅ Keď nie sú notifikácie, zobraz prázdny stav
   if (!allNotifications || allNotifications.length === 0) {
     const emptyLi = document.createElement("li");
     emptyLi.textContent = "Zatiaľ nemáte žiadne upozornenia";
     emptyLi.style.textAlign = "center";
-    emptyLi.style.padding = "12px 0";
+    emptyLi.style.padding = "12px 10px";
     emptyLi.style.color = "#888";
     emptyLi.style.fontSize = "14px";
     list.appendChild(emptyLi);
@@ -114,10 +261,10 @@ function renderNotificationList() {
     moreLi.textContent = `Zobraziť staršie (${allNotifications.length - currentlyVisible})`;
     moreLi.style.textAlign = "center";
     moreLi.style.cursor = "pointer";
-    moreLi.style.padding = "8px 0";
+    moreLi.style.padding = "10px 10px";
     moreLi.style.color = "#3498db";
     moreLi.addEventListener("click", (e) => {
-      e.stopPropagation(); // prevent popup from closing
+      e.stopPropagation();
       currentlyVisible += BATCH_SIZE;
       renderNotificationList();
     });
@@ -125,19 +272,13 @@ function renderNotificationList() {
   }
 }
 
+// ✅ lepšie: dot podľa dát, nie podľa DOM
 function checkUnreadDot() {
-  const items = document.querySelectorAll("#notification-list li");
-  let hasUnread = false;
-
-  items.forEach((item) => {
-    const isNotification = item.dataset.read !== undefined;
-    if (isNotification && item.dataset.read === "false") {
-      hasUnread = true;
-    }
-  });
-
   const dot = document.getElementById("bell-dot");
-  if (dot) dot.style.display = hasUnread ? "block" : "none";
+  if (!dot) return;
+
+  const hasUnread = (allNotifications || []).some(n => n && n.read === false);
+  dot.style.display = hasUnread ? "block" : "none";
 }
 
 window.initializeNotifications = function initializeNotifications() {
@@ -145,12 +286,10 @@ window.initializeNotifications = function initializeNotifications() {
   const popup = document.getElementById("notification-popup");
   const dot = document.getElementById("bell-dot");
 
-  // ✅ default: skryť zvonček, kým nevieme či je user prihlásený
   if (container) container.style.display = "none";
   if (popup) popup.style.display = "none";
   if (dot) dot.style.display = "none";
 
-  // ✅ Socket.IO na správnu URL (https -> wss automaticky)
   const socket = io(API_BASE_URL, {
     withCredentials: true,
     transports: ["websocket", "polling"],
@@ -179,7 +318,7 @@ window.initializeNotifications = function initializeNotifications() {
       popupEl.style.display = popupEl.style.display === "block" ? "none" : "block";
       if (dotEl) dotEl.style.display = "none";
 
-      // ✅ nech sa aj pri otvorení zobrazí prázdny stav
+      renderEmailToggle();
       renderNotificationList();
     });
   }
@@ -198,17 +337,27 @@ window.initializeNotifications = function initializeNotifications() {
     .then((res) => res.json())
     .then((data) => {
       if (!data.username) {
-  document.body.classList.remove("logged-in"); // ✅ doplniť
-  if (container) container.style.display = "none";
-  return;
-}
+        document.body.classList.remove("logged-in");
+        if (container) container.style.display = "none";
+        return;
+      }
 
       currentUser = data.username;
-      document.body.classList.add("logged-in");   // ✅ TU
+      document.body.classList.add("logged-in");
 
-      // ✅ až teraz zobraz zvonček
       if (container) container.style.display = "block";
       socket.emit("register-username", currentUser);
+
+      fetch(apiFetchUrl("/api/settings"), { method: "GET", credentials: "include" })
+        .then((r) => r.ok ? r.json() : Promise.reject())
+        .then((s) => {
+          emailNotifsEnabled = s?.emailNotificationsEnabled !== false;
+          renderEmailToggle();
+        })
+        .catch(() => {
+          emailNotifsEnabled = true;
+          renderEmailToggle();
+        });
 
       fetch(apiFetchUrl("/api/notifications?limit=100"), {
         method: "GET",
@@ -220,20 +369,21 @@ window.initializeNotifications = function initializeNotifications() {
             (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
           );
           currentlyVisible = BATCH_SIZE;
+
+          renderEmailToggle();
           renderNotificationList();
           checkUnreadDot();
         })
         .catch(() => {
-          // ak zlyhá načítanie notifikácií, ukáž prázdny stav
           allNotifications = [];
           currentlyVisible = BATCH_SIZE;
+          renderEmailToggle();
           renderNotificationList();
           if (dot) dot.style.display = "none";
         });
     })
     .catch(() => {
-      document.body.classList.remove("logged-in"); // ✅ TU
-      // neprihlásený -> zvonček ostáva skrytý
+      document.body.classList.remove("logged-in");
       if (container) container.style.display = "none";
     });
 };

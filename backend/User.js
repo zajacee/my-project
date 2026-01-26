@@ -45,7 +45,8 @@ const notificationSchema = new mongoose.Schema(
     contentTitle: { type: String },
     targetType: { type: String, enum: ['content', 'comment'], default: 'content' },
     timestamp: { type: Date, default: Date.now },
-    read: { type: Boolean, default: false }
+    read: { type: Boolean, default: false },
+    emailed: { type: Boolean, default: false }
   },
   { _id: true, versionKey: false }
 );
@@ -61,6 +62,8 @@ const userSchema = new mongoose.Schema(
     emailVerified: { type: Boolean, default: false },
 emailVerifiedAt: { type: Date },
 emailVerifySentAt: { type: Date },
+
+ emailNotificationsEnabled: { type: Boolean, default: true },
 
     content: { type: [contentSchema], default: [] },
 
