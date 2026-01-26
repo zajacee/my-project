@@ -51,12 +51,14 @@ function renderEmailToggle() {
     const left = document.createElement("div");
 left.style.display = "flex";
 left.style.flexDirection = "column";
+left.style.width = "100%";
 left.style.padding = "6px 0";
 left.style.borderTop = "1px solid #eee";
 left.style.marginTop = "6px";
+left.style.textAlign = "left";
 
 const hint = document.createElement("span");
-hint.textContent = "Posielať notifikácie e-mailom, keď ste offline.";
+hint.textContent = "Posielať notifikácie e-mailom v režime offline";
 hint.style.fontSize = "13px";
 hint.style.color = "#666";
 
