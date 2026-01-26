@@ -42,6 +42,7 @@ function renderEmailToggle() {
     row.style.justifyContent = "space-between";
     row.style.gap = "10px";
     row.style.padding = "10px 10px";
+    row.style.borderTop = "1px solid #eee";
     row.style.borderBottom = "1px solid #eee";
     row.style.background = "#fff";
 
@@ -53,8 +54,6 @@ left.style.display = "flex";
 left.style.flexDirection = "column";
 left.style.width = "100%";
 left.style.padding = "6px 0";
-left.style.borderTop = "1px solid #eee";
-left.style.marginTop = "6px";
 left.style.textAlign = "left";
 
 const hint = document.createElement("span");
@@ -202,6 +201,7 @@ function renderNotification(notification) {
   const br = document.createElement("br");
   const small = document.createElement("small");
   small.style.color = "#888";
+  small.style.marginTop = "2px"; 
   small.textContent = timeText;
 
   a.appendChild(line);
