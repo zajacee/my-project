@@ -49,22 +49,18 @@ function renderEmailToggle() {
     row.addEventListener("click", (e) => e.stopPropagation());
 
     const left = document.createElement("div");
-    left.style.display = "flex";
-    left.style.flexDirection = "column";
-    left.style.gap = "2px";
+left.style.display = "flex";
+left.style.flexDirection = "column";
+left.style.padding = "6px 0";
+left.style.borderTop = "1px solid #eee";
+left.style.marginTop = "6px";
 
-    const label = document.createElement("span");
-    label.textContent = "E-mail notifikácie";
-    label.style.fontSize = "14px";
-    label.style.fontWeight = "600";
+const hint = document.createElement("span");
+hint.textContent = "Posielať notifikácie e-mailom, keď ste offline.";
+hint.style.fontSize = "13px";
+hint.style.color = "#666";
 
-    const hint = document.createElement("span");
-    hint.textContent = "Posielanie notifikácií e-mailom v režime offline.";
-    hint.style.fontSize = "12px";
-    hint.style.color = "#777";
-
-    left.appendChild(label);
-    left.appendChild(hint);
+left.appendChild(hint);
 
     const right = document.createElement("div");
     right.style.display = "flex";
