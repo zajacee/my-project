@@ -59,7 +59,7 @@ function renderEmailToggle() {
     label.style.fontWeight = "600";
 
     const hint = document.createElement("span");
-    hint.textContent = "Keď ste offline, môžeme posielať súhrn e-mailom.";
+    hint.textContent = "Posielanie notifikácií e-mailom v režime offline.";
     hint.style.fontSize = "12px";
     hint.style.color = "#777";
 

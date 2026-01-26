@@ -257,13 +257,29 @@ function scheduleNotificationEmail(toUsername) {
         subject: pending.length === 1
           ? "Nová notifikácia – DajToVon"
           : `Máte ${pending.length} nových notifikácií – DajToVon`,
-        html: `
-          <p>Ahoj,</p>
-          <p>máš nové upozornenia:</p>
-          <ul>${itemsHtml}</ul>
-          <hr>
-          <p>Detail nájdeš po prihlásení na <a href="${base}">DajToVon.sk</a>.</p>
-        `
+       html: `
+  <p>
+    Na portáli <strong>DajToVon.sk</strong> máte novú aktivitu:
+  </p>
+
+  <ul>${itemsHtml}</ul>
+
+  <p>
+    Pre zobrazenie detailov sa prosím prihláste do svojho účtu:
+    <a href="${base}">${base}</a>
+  </p>
+
+ <p>
+    — Tím DajToVon.sk
+  </p>
+
+  <hr>
+
+  <p style="color:#777;font-size:13px">
+    Tento e-mail ste dostali, pretože máte zapnuté e-mailové upozornenia.
+    Nastavenie môžete kedykoľvek zmeniť vo svojom účte.
+  </p>
+`
       });
 
       // označ ako emailed=true
