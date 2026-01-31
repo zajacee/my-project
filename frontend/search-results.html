@@ -661,34 +661,41 @@ function escapeHtml(unsafe) {
         });
       }
     
-      function renderResults(allContent) {
-        if (!query) {
-          resultsContainer.innerHTML = `<p class="no-results">Nenašli sa žiadne výsledky pre hľadaný výraz.</p>`;
-          return;
-        }
-    
-        const normQuery = removeDiacritics(query).toLowerCase();
-    
-        allFilteredResults = allContent
-          .filter(entry => {
-            const topic = removeDiacritics(entry.content.topic || '').toLowerCase();
-            const content = removeDiacritics(entry.content.content || '').toLowerCase();
-            return topic.includes(normQuery) || content.includes(normQuery);
-          })
-          .sort((a, b) => new Date(b.content.date) - new Date(a.content.date));
-    
-        searchTitle.innerHTML = `Výsledky pre hľadaný výraz <strong>'${escapeHtml(query)}'</strong>, počet výsledkov <strong>${allFilteredResults.length}</strong>`;
-        resultsContainer.innerHTML = '';
-        currentIndex = 0;
-    
-        if (allFilteredResults.length === 0) {
-          resultsContainer.innerHTML = `<p class="no-results">Nenašli sa žiadne výsledky pre hľadaný výraz <strong>'${query}'</strong></p>`;
-          loadMoreButton.style.display = 'none';
-          return;
-        }
-    
-        renderNextBatch();
-      }
+     function renderResults(allContent) {
+  if (!query) {
+    resultsContainer.innerHTML = `<p class="no-results">Nenašli sa žiadne výsledky pre hľadaný výraz.</p>`;
+    return;
+  }
+
+  const normQuery = removeDiacritics(query).toLowerCase();
+
+  allFilteredResults = allContent
+    .filter(entry => {
+      const topic = removeDiacritics(entry.content.topic || '').toLowerCase();
+      const content = removeDiacritics(entry.content.content || '').toLowerCase();
+      return topic.includes(normQuery) || content.includes(normQuery);
+    })
+    .sort((a, b) => new Date(b.content.date) - new Date(a.content.date));
+
+  resultsContainer.innerHTML = '';
+  currentIndex = 0;
+
+  // ✅ keď je 0 výsledkov – NEVYPÍŠE sa veta s počtom
+  if (allFilteredResults.length === 0) {
+    resultsContainer.innerHTML = `
+      <p class="no-results">
+        Nenašli sa žiadne výsledky pre hľadaný výraz <strong>'${escapeHtml(query)}'</strong>
+      </p>`;
+    loadMoreButton.style.display = 'none';
+    return;
+  }
+
+  // ✅ keď sú výsledky – správa ostáva ako predtým
+  searchTitle.innerHTML = `Výsledky pre hľadaný výraz <strong>'${escapeHtml(query)}'</strong>, počet nájdených príspevkov <strong>${allFilteredResults.length}</strong>`;
+
+  renderNextBatch();
+}
+
     
       // --- Load and cache content ---
       const cacheTime = 5 * 60 * 1000;
