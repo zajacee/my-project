@@ -682,6 +682,7 @@ function escapeHtml(unsafe) {
 
   // ✅ keď je 0 výsledkov – NEVYPÍŠE sa veta s počtom
   if (allFilteredResults.length === 0) {
+  searchTitle.textContent = ""; // 👈 skryje "Výsledky vyhľadávania"
     resultsContainer.innerHTML = `
       <p class="no-results">
         Nenašli sa žiadne výsledky pre hľadaný výraz <strong>'${escapeHtml(query)}'</strong>
